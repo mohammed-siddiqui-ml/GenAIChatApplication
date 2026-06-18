@@ -14,6 +14,7 @@ from fastapi.responses import JSONResponse
 from core.config import settings
 from core.logging import setup_logging
 from core.database import init_db, close_db, check_db_health
+from core.redis import init_redis, close_redis, check_redis_health
 
 # Initialize logging
 logger = setup_logging()
@@ -41,10 +42,25 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
         logger.error(f"Failed to initialize database: {e}")
         raise
 
+    # Initialize Redis
+    try:
+        await init_redis()
+        logger.info("Redis initialization complete")
+    except Exception as e:
+        logger.error(f"Failed to initialize Redis: {e}")
+        raise
+
     yield
 
     # Shutdown logic
     logger.info("Shutting down application...")
+
+    # Close Redis connections
+    try:
+        await close_redis()
+        logger.info("Redis connections closed")
+    except Exception as e:
+        logger.error(f"Error closing Redis connections: {e}")
 
     # Close database connections
     try:
@@ -105,15 +121,18 @@ async def readiness_check() -> JSONResponse:
 
     Verifies that the application is ready to serve traffic by checking:
     - Database connectivity
+    - Redis connectivity
     - Connection pool availability
     """
     db_healthy = await check_db_health()
+    redis_healthy = await check_redis_health()
 
-    if db_healthy:
+    if db_healthy and redis_healthy:
         return JSONResponse(
             content={
                 "status": "ready",
                 "database": "connected",
+                "redis": "connected",
             }
         )
     else:
@@ -121,7 +140,8 @@ async def readiness_check() -> JSONResponse:
             status_code=503,
             content={
                 "status": "not ready",
-                "database": "disconnected",
+                "database": "connected" if db_healthy else "disconnected",
+                "redis": "connected" if redis_healthy else "disconnected",
             }
         )
 

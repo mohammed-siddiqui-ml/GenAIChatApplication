@@ -19,6 +19,7 @@ src_dir = backend_dir / "src"
 sys.path.insert(0, str(src_dir))
 
 import pytest
+import pytest_asyncio
 from fastapi.testclient import TestClient
 
 
@@ -60,3 +61,65 @@ def app(test_env_vars):
 def client(app):
     """Create TestClient for making requests to the app."""
     return TestClient(app)
+
+
+@pytest.fixture(scope="module")
+def test_client(app):
+    """Alias for client fixture - used in some tests."""
+    return TestClient(app)
+
+
+# ==================== Redis Test Fixtures ====================
+
+@pytest_asyncio.fixture(scope="function")
+async def redis_client():
+    """
+    Provide fake Redis client for testing.
+
+    Uses fakeredis to provide an in-memory Redis instance for fast,
+    isolated tests without requiring a real Redis server.
+    """
+    import fakeredis.aioredis as fakeredis_async
+
+    # Create FakeRedis client
+    client = fakeredis_async.FakeRedis(
+        decode_responses=True
+    )
+
+    yield client
+
+    # Cleanup
+    try:
+        await client.flushall()
+    except:
+        pass
+    await client.aclose()
+
+
+@pytest_asyncio.fixture(scope="function")
+async def clean_redis(redis_client, monkeypatch):
+    """
+    Provide clean Redis instance for each test.
+
+    This fixture:
+    1. Flushes all data before the test
+    2. Patches get_redis_client to use the fake Redis client
+    3. Ensures test isolation
+    """
+    # Clear all data
+    await redis_client.flushall()
+
+    # Patch get_redis_client to return our fake client
+    import core.redis
+    monkeypatch.setattr(core.redis, '_redis_client', redis_client)
+
+    # Also patch get_redis_client function directly
+    def mock_get_redis_client():
+        return redis_client
+
+    monkeypatch.setattr(core.redis, 'get_redis_client', mock_get_redis_client)
+
+    yield redis_client
+
+    # Cleanup after test
+    await redis_client.flushall()
