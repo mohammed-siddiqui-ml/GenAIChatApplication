@@ -65,12 +65,12 @@ class Settings(BaseSettings):
     
     # GenAI Settings
     OPENAI_API_KEY: str = Field(default="")
-    OPENAI_MODEL: str = Field(default="gpt-4")
+    OPENAI_MODEL: str = Field(default="gpt-4-turbo-preview")  # GPT-4 Turbo for chat completions
     OPENAI_TEMPERATURE: float = Field(default=0.7, ge=0.0, le=2.0)
     OPENAI_MAX_TOKENS: int = Field(default=500, ge=1)
-    
+
     # Embedding Settings
-    EMBEDDING_MODEL: str = Field(default="text-embedding-ada-002")
+    EMBEDDING_MODEL: str = Field(default="text-embedding-3-small")  # text-embedding-3-small (1536 dimensions)
     EMBEDDING_DIMENSION: int = Field(default=1536, ge=1)
     
     # Vector Database Settings (for semantic search)
