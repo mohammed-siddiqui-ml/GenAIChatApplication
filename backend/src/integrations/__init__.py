@@ -21,6 +21,14 @@ from integrations.confluence_client import (
     ConfluenceRateLimitError,
 )
 
+from integrations.jira_client import (
+    JiraClient,
+    JiraError,
+    JiraAuthError,
+    JiraAPIError,
+    JiraRateLimitError,
+)
+
 __all__ = [
     "OpenAIClient",
     "OpenAIError",
@@ -32,4 +40,9 @@ __all__ = [
     "ConfluenceAuthError",
     "ConfluenceAPIError",
     "ConfluenceRateLimitError",
+    "JiraClient",
+    "JiraError",
+    "JiraAuthError",
+    "JiraAPIError",
+    "JiraRateLimitError",
 ]
