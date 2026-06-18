@@ -13,6 +13,7 @@ from fastapi.responses import JSONResponse
 
 from core.config import settings
 from core.logging import setup_logging
+from core.database import init_db, close_db, check_db_health
 
 # Initialize logging
 logger = setup_logging()
@@ -22,20 +23,35 @@ logger = setup_logging()
 async def lifespan(app: FastAPI) -> AsyncGenerator:
     """
     Application lifespan manager for startup and shutdown events.
-    
+
     This handles initialization and cleanup of resources like database
     connections, background tasks, and external service clients.
     """
     logger.info("Starting up GenAI Knowledge Retrieval System...")
-    
+
     # Startup logic
     logger.info(f"Environment: {settings.ENVIRONMENT}")
     logger.info(f"API Version: {settings.API_VERSION}")
-    
+
+    # Initialize database
+    try:
+        await init_db()
+        logger.info("Database initialization complete")
+    except Exception as e:
+        logger.error(f"Failed to initialize database: {e}")
+        raise
+
     yield
-    
+
     # Shutdown logic
     logger.info("Shutting down application...")
+
+    # Close database connections
+    try:
+        await close_db()
+        logger.info("Database connections closed")
+    except Exception as e:
+        logger.error(f"Error closing database connections: {e}")
 
 
 # Initialize FastAPI application
@@ -80,6 +96,34 @@ async def health_check() -> JSONResponse:
             "environment": settings.ENVIRONMENT,
         }
     )
+
+
+@app.get("/ready")
+async def readiness_check() -> JSONResponse:
+    """
+    Readiness check endpoint for Kubernetes/Docker health probes.
+
+    Verifies that the application is ready to serve traffic by checking:
+    - Database connectivity
+    - Connection pool availability
+    """
+    db_healthy = await check_db_health()
+
+    if db_healthy:
+        return JSONResponse(
+            content={
+                "status": "ready",
+                "database": "connected",
+            }
+        )
+    else:
+        return JSONResponse(
+            status_code=503,
+            content={
+                "status": "not ready",
+                "database": "disconnected",
+            }
+        )
 
 
 # API Router registration will be added here as routes are developed
