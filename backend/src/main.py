@@ -150,12 +150,20 @@ async def readiness_check() -> JSONResponse:
 from api.v1.router import api_router
 app.include_router(api_router, prefix=settings.API_V1_PREFIX)
 
+# Socket.IO integration
+from websockets.chat_socket import setup_socketio
+
+# Create combined ASGI app with Socket.IO support
+# This wraps the FastAPI app to handle both HTTP and WebSocket traffic
+app_with_socketio = setup_socketio(app)
+
 
 if __name__ == "__main__":
     import uvicorn
-    
+
+    # Run the combined app with Socket.IO support
     uvicorn.run(
-        "main:app",
+        "main:app_with_socketio",
         host="0.0.0.0",
         port=8000,
         reload=settings.ENVIRONMENT == "development",
