@@ -1,0 +1,46 @@
+[flake8]
+# Maximum line length
+max-line-length = 100
+
+# Exclude patterns
+exclude =
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    .eggs,
+    *.egg,
+    .mypy_cache,
+    .tox,
+    build,
+    dist,
+    migrations,
+    .pytest_cache
+
+# Error codes to ignore
+ignore =
+    # E203: whitespace before ':' (conflicts with Black)
+    E203,
+    # E501: line too long (handled by Black)
+    E501,
+    # W503: line break before binary operator (conflicts with Black)
+    W503,
+    # D100: Missing docstring in public module
+    D100,
+    # D104: Missing docstring in public package
+    D104
+
+# Maximum complexity
+max-complexity = 10
+
+# Docstring conventions
+docstring-convention = google
+
+# Count errors
+count = True
+
+# Show source code
+show-source = True
+
+# Statistics
+statistics = True

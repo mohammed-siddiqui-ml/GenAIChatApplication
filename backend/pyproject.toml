@@ -1,0 +1,142 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "genai-knowledge-retrieval"
+version = "1.0.0"
+description = "GenAI Intelligent Chat-Based Knowledge Retrieval System"
+requires-python = ">=3.11"
+authors = [
+    {name = "Development Team"}
+]
+readme = "README.md"
+license = {text = "MIT"}
+
+[project.urls]
+Homepage = "https://github.com/your-org/genai-knowledge-retrieval"
+
+# Black configuration
+[tool.black]
+line-length = 100
+target-version = ['py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+    \.git
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | migrations
+)/
+'''
+
+# isort configuration
+[tool.isort]
+profile = "black"
+line_length = 100
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+skip_gitignore = true
+skip = [
+    ".git",
+    ".mypy_cache",
+    ".tox",
+    ".venv",
+    "venv",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "migrations",
+]
+known_first_party = ["api", "core", "models", "schemas", "services", "middleware", "tasks", "utils"]
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+
+# mypy configuration
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = false
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+strict_equality = true
+strict_concatenate = true
+
+# Ignore missing imports for third-party libraries
+[[tool.mypy.overrides]]
+module = [
+    "atlassian.*",
+    "celery.*",
+    "chromadb.*",
+    "langchain.*",
+    "qdrant_client.*",
+    "sentence_transformers.*",
+    "tiktoken.*",
+    "pythonjsonlogger.*",
+]
+ignore_missing_imports = true
+
+# pytest configuration
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+pythonpath = ["src"]
+asyncio_mode = "auto"
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--cov=src",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+    "--cov-fail-under=80",
+]
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "slow: Slow running tests",
+    "asyncio: Async tests",
+]
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/migrations/*",
+    "*/__pycache__/*",
+    "*/venv/*",
+    "*/.venv/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]
+
+# Bandit security configuration
+[tool.bandit]
+exclude_dirs = ["/tests", "/migrations", "/.venv", "/venv"]
+skips = ["B101"]  # Skip assert warnings in tests
