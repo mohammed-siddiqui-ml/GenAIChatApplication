@@ -119,6 +119,12 @@ class Settings(BaseSettings):
     MINIO_BUCKET_EMBEDDINGS_BACKUP: str = Field(default="embeddings-backup")
     MINIO_BUCKET_AUDIT_LOGS: str = Field(default="audit-logs")
 
+    # Celery Settings (Background Task Queue)
+    CELERY_BROKER_URL: str = Field(default="redis://:redispassword@redis:6379/1")
+    CELERY_RESULT_BACKEND: str = Field(default="redis://:redispassword@redis:6379/2")
+    CELERY_TASK_ALWAYS_EAGER: bool = Field(default=False)  # Execute tasks synchronously in testing
+    CELERY_TASK_EAGER_PROPAGATES: bool = Field(default=True)  # Propagate exceptions in eager mode
+
 
 # Global settings instance
 settings = Settings()
