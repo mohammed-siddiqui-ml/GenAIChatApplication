@@ -59,7 +59,8 @@ class Settings(BaseSettings):
         min_length=32,
     )
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=30, ge=1)
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=1440, ge=1)  # 24 hours = 1440 minutes
+    ACCESS_TOKEN_EXPIRE_HOURS: int = Field(default=24, ge=1)  # 24-hour expiry as per requirements
     REFRESH_TOKEN_EXPIRE_DAYS: int = Field(default=7, ge=1)
     
     # GenAI Settings

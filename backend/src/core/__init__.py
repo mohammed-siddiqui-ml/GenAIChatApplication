@@ -25,6 +25,15 @@ from core.minio_client import (
     BUCKET_EMBEDDINGS_BACKUP,
     BUCKET_AUDIT_LOGS,
 )
+from core.security import (
+    hash_password,
+    verify_password,
+    create_access_token,
+    create_refresh_token,
+    decode_token,
+    verify_token,
+    get_token_expiration,
+)
 
 __all__ = [
     "settings",
@@ -46,4 +55,11 @@ __all__ = [
     "BUCKET_KNOWLEDGE_FILES",
     "BUCKET_EMBEDDINGS_BACKUP",
     "BUCKET_AUDIT_LOGS",
+    "hash_password",
+    "verify_password",
+    "create_access_token",
+    "create_refresh_token",
+    "decode_token",
+    "verify_token",
+    "get_token_expiration",
 ]

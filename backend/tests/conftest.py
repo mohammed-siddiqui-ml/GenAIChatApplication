@@ -123,3 +123,46 @@ async def clean_redis(redis_client, monkeypatch):
 
     # Cleanup after test
     await redis_client.flushall()
+
+
+# ==================== Database Test Fixtures ====================
+
+@pytest_asyncio.fixture(scope='function')
+async def engine():
+    """Create test database engine - fresh for each test."""
+    from sqlalchemy.ext.asyncio import create_async_engine
+    from sqlalchemy.pool import StaticPool
+
+    test_engine = create_async_engine(
+        "sqlite+aiosqlite:///:memory:",
+        poolclass=StaticPool,
+        connect_args={"check_same_thread": False}
+    )
+
+    yield test_engine
+
+    await test_engine.dispose()
+
+
+@pytest_asyncio.fixture(scope='function')
+async def db_session(engine):
+    """Create test database session - fresh for each test."""
+    from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+    from models.base import Base
+
+    # Create tables
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all, checkfirst=True)
+
+    # Create session factory
+    async_session = async_sessionmaker(
+        engine, class_=AsyncSession, expire_on_commit=False
+    )
+
+    # Provide session
+    async with async_session() as session:
+        yield session
+
+    # Cleanup: Drop tables
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
