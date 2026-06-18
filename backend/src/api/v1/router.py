@@ -5,9 +5,17 @@ Central router for all v1 API endpoints.
 """
 
 from fastapi import APIRouter
+from api.v1 import auth
 
 # Create main API router
 api_router = APIRouter()
+
+# Include authentication endpoints
+api_router.include_router(
+    auth.router,
+    prefix="/auth",
+    tags=["Authentication"]
+)
 
 # Import and include routers from different modules
 # Example:

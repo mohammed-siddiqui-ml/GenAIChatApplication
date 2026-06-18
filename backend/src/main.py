@@ -146,10 +146,9 @@ async def readiness_check() -> JSONResponse:
         )
 
 
-# API Router registration will be added here as routes are developed
-# Example:
-# from api.v1.router import api_router
-# app.include_router(api_router, prefix=settings.API_V1_PREFIX)
+# API Router registration
+from api.v1.router import api_router
+app.include_router(api_router, prefix=settings.API_V1_PREFIX)
 
 
 if __name__ == "__main__":
