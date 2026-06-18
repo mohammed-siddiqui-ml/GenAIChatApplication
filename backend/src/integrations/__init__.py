@@ -13,10 +13,23 @@ from integrations.openai_client import (
     CircuitBreakerOpen,
 )
 
+from integrations.confluence_client import (
+    ConfluenceClient,
+    ConfluenceError,
+    ConfluenceAuthError,
+    ConfluenceAPIError,
+    ConfluenceRateLimitError,
+)
+
 __all__ = [
     "OpenAIClient",
     "OpenAIError",
     "OpenAIRateLimitError",
     "OpenAIAPIError",
     "CircuitBreakerOpen",
+    "ConfluenceClient",
+    "ConfluenceError",
+    "ConfluenceAuthError",
+    "ConfluenceAPIError",
+    "ConfluenceRateLimitError",
 ]
