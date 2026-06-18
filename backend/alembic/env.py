@@ -32,12 +32,14 @@ if config.config_file_name is not None:
 
 # Add your model's MetaData object here for 'autogenerate' support
 # Import all models here so that Alembic can detect them
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
+from src.models import Base
+# Import all models to ensure they're registered with Base.metadata
+from src.models import (
+    User, ChatSession, ChatMessage, DataSource, IngestionJob,
+    KnowledgeDocument, DocumentEmbedding, AuditLog
+)
 
-# For now, we'll set metadata to None and create migrations manually
-# Once SQLAlchemy models are created in task-007, this will be updated
-target_metadata = None
+target_metadata = Base.metadata
 
 # Override sqlalchemy.url with environment variable if present
 database_url = os.getenv('DATABASE_URL')
