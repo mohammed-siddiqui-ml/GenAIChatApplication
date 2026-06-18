@@ -150,7 +150,7 @@ class ChatMessage(Base):
 
     # Primary key
     id: Mapped[int] = mapped_column(
-        BigInteger,
+        Integer,
         primary_key=True,
         autoincrement=True,
         comment="Unique message identifier"
