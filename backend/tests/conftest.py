@@ -129,9 +129,15 @@ async def clean_redis(redis_client, monkeypatch):
 
 @pytest_asyncio.fixture(scope='function')
 async def engine():
-    """Create test database engine - fresh for each test."""
+    """
+    Create test database engine - fresh for each test.
+
+    CRITICAL: Uses function scope with checkfirst=True and proper cleanup
+    to prevent "index/table already exists" errors in SQLAlchemy async tests.
+    """
     from sqlalchemy.ext.asyncio import create_async_engine
     from sqlalchemy.pool import StaticPool
+    from models.base import Base
 
     test_engine = create_async_engine(
         "sqlite+aiosqlite:///:memory:",
@@ -139,20 +145,28 @@ async def engine():
         connect_args={"check_same_thread": False}
     )
 
+    # CRITICAL: Create tables with checkfirst=True to prevent "already exists" errors
+    async with test_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all, checkfirst=True)
+
     yield test_engine
+
+    # CRITICAL: Cleanup to prevent schema persistence across tests
+    async with test_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
 
     await test_engine.dispose()
 
 
 @pytest_asyncio.fixture(scope='function')
 async def db_session(engine):
-    """Create test database session - fresh for each test."""
-    from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
-    from models.base import Base
+    """
+    Create test database session - fresh for each test.
 
-    # Create tables
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all, checkfirst=True)
+    Tables are already created by the engine fixture, so this just
+    provides a session for interacting with the database.
+    """
+    from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
     # Create session factory
     async_session = async_sessionmaker(
@@ -162,10 +176,7 @@ async def db_session(engine):
     # Provide session
     async with async_session() as session:
         yield session
-
-    # Cleanup: Drop tables
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
+        # Session cleanup handled by context manager
 
 
 @pytest_asyncio.fixture(scope='function')
