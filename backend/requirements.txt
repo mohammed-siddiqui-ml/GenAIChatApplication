@@ -51,6 +51,9 @@ pytest-cov==4.1.0
 httpx==0.26.0
 fakeredis[aioredis]==2.21.1
 
+# Object Storage
+minio==7.2.5
+
 # Utilities
 aiohttp==3.9.1
 python-dateutil==2.8.2

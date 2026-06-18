@@ -106,6 +106,18 @@ class Settings(BaseSettings):
         default=["pdf", "txt", "md", "docx", "csv"]
     )
 
+    # MinIO Object Storage Settings
+    MINIO_ENDPOINT: str = Field(default="minio:9000")
+    MINIO_ACCESS_KEY: str = Field(default="minioadmin")
+    MINIO_SECRET_KEY: str = Field(default="minioadmin123")
+    MINIO_USE_SSL: bool = Field(default=False)
+    MINIO_BUCKET_NAME: str = Field(default="knowledge-assets")  # Legacy bucket
+
+    # MinIO Bucket Names
+    MINIO_BUCKET_KNOWLEDGE_FILES: str = Field(default="knowledge-files")
+    MINIO_BUCKET_EMBEDDINGS_BACKUP: str = Field(default="embeddings-backup")
+    MINIO_BUCKET_AUDIT_LOGS: str = Field(default="audit-logs")
+
 
 # Global settings instance
 settings = Settings()
