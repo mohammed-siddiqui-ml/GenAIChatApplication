@@ -166,3 +166,74 @@ async def db_session(engine):
     # Cleanup: Drop tables
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
+
+
+@pytest_asyncio.fixture(scope='function')
+async def session(db_session):
+    """Alias for db_session fixture - used in auth tests."""
+    return db_session
+
+
+# ==================== User Test Fixtures ====================
+
+@pytest_asyncio.fixture(scope='function')
+async def admin_user(session):
+    """Create admin user for testing."""
+    from models.user import User, UserRole
+    from core.security import hash_password
+
+    # Create admin user
+    user = User(
+        email="admin@test.com",
+        password_hash=hash_password("Admin123!@#"),
+        role=UserRole.ADMIN,
+        is_active=True
+    )
+
+    session.add(user)
+    await session.commit()
+    await session.refresh(user)
+
+    return user
+
+
+@pytest_asyncio.fixture(scope='function')
+async def regular_user(session):
+    """Create regular user for testing."""
+    from models.user import User, UserRole
+    from core.security import hash_password
+
+    # Create regular user
+    user = User(
+        email="user@test.com",
+        password_hash=hash_password("User123!@#"),
+        role=UserRole.USER,
+        is_active=True
+    )
+
+    session.add(user)
+    await session.commit()
+    await session.refresh(user)
+
+    return user
+
+
+@pytest_asyncio.fixture(scope='function')
+async def inactive_user(session):
+    """Create inactive user for testing."""
+    from models.user import User, UserRole
+    from core.security import hash_password
+
+    # Create inactive user
+    user = User(
+        email="inactive@test.com",
+        password_hash=hash_password("Test123!@#"),
+        role=UserRole.USER,
+        is_active=False
+    )
+
+    session.add(user)
+    await session.commit()
+    await session.refresh(user)
+
+    return user
