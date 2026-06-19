@@ -107,8 +107,8 @@ def clean_html(html_content: str) -> str:
         TextProcessingError: If HTML cleaning fails
     """
     try:
-        # Parse HTML with BeautifulSoup
-        soup = BeautifulSoup(html_content, 'lxml')
+        # Parse HTML with BeautifulSoup (using built-in html.parser for better test compatibility)
+        soup = BeautifulSoup(html_content, 'html.parser')
 
         # Remove script and style elements
         for script in soup(['script', 'style', 'noscript']):

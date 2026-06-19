@@ -137,6 +137,7 @@ async def engine():
     """
     from sqlalchemy.ext.asyncio import create_async_engine
     from sqlalchemy.pool import StaticPool
+    from sqlalchemy import Integer, BigInteger
     from models.base import Base
 
     test_engine = create_async_engine(
@@ -145,9 +146,19 @@ async def engine():
         connect_args={"check_same_thread": False}
     )
 
-    # CRITICAL: Create tables with checkfirst=True to prevent "already exists" errors
+    # CRITICAL: Replace BigInteger with Integer for SQLite compatibility
+    # SQLite doesn't auto-increment BIGINT columns, only INTEGER PRIMARY KEY
     async with test_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all, checkfirst=True)
+        def create_tables_sqlite_compat(connection):
+            """Create tables with BigInteger->Integer replacement for SQLite."""
+            for table in Base.metadata.sorted_tables:
+                for column in table.columns:
+                    # Replace BigInteger with Integer for primary key autoincrement support
+                    if isinstance(column.type, BigInteger) and column.primary_key:
+                        column.type = Integer()
+            Base.metadata.create_all(connection, checkfirst=True)
+
+        await conn.run_sync(create_tables_sqlite_compat)
 
     yield test_engine
 
