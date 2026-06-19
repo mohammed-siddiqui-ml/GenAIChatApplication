@@ -12,11 +12,12 @@ Tasks in this module are typically long-running and process data in batches.
 # Import tasks here as they are implemented
 from tasks.ingestion.confluence import ingest_confluence_docs, refresh_confluence_data
 from tasks.ingestion.jira import ingest_jira_issues, refresh_jira_data
-# from tasks.ingestion.onboarding import process_onboarding_material
+from tasks.ingestion.onboarding import ingest_onboarding_materials
 
 __all__ = [
     'ingest_confluence_docs',
     'refresh_confluence_data',
     'ingest_jira_issues',
     'refresh_jira_data',
+    'ingest_onboarding_materials',
 ]

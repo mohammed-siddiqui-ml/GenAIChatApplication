@@ -129,6 +129,7 @@ class KnowledgeDocument(Base, TimestampMixin):
         Boolean,
         nullable=False,
         server_default="false",
+        default=False,
         comment="Soft delete flag"
     )
 
