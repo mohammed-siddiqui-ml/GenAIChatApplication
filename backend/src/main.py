@@ -10,6 +10,7 @@ from typing import AsyncGenerator
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from core.config import settings
 from core.logging import setup_logging
@@ -89,6 +90,28 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Configure Prometheus metrics instrumentation
+# This automatically collects HTTP request metrics (count, duration, error rate)
+instrumentator = Instrumentator(
+    should_group_status_codes=True,
+    should_ignore_untemplated=False,
+    should_respect_env_var=True,
+    should_instrument_requests_inprogress=True,
+    excluded_handlers=["/health", "/ready"],  # Exclude health checks from metrics
+    env_var_name="ENABLE_METRICS",
+    inprogress_name="http_requests_inprogress",
+    inprogress_labels=True,
+)
+
+# Add default metrics (request count, duration with percentiles)
+instrumentator.instrument(app)
+
+# Expose metrics endpoint at /api/v1/metrics
+# This will be scraped by Prometheus
+instrumentator.expose(app, endpoint=f"{settings.API_V1_PREFIX}/metrics", include_in_schema=True)
+
+logger.info(f"Prometheus metrics enabled at {settings.API_V1_PREFIX}/metrics")
 
 
 @app.get("/")

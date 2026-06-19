@@ -1,0 +1,122 @@
+# Prometheus Configuration for GenAI Knowledge Retrieval System
+#
+# This configuration defines:
+# - Global scrape and evaluation intervals
+# - Data retention policy (15 days)
+# - Scrape targets for backend API and other services
+
+global:
+  scrape_interval: 15s      # Default scrape interval
+  evaluation_interval: 15s  # Evaluate rules every 15 seconds
+  external_labels:
+    cluster: 'genai-knowledge-retrieval'
+    environment: 'production'
+
+# Storage retention configuration
+# Retention time: 15 days (as per requirements)
+# Retention size: 10GB (to prevent disk overflow)
+# Note: CLI flags --storage.tsdb.retention.time and --storage.tsdb.retention.size
+# will override these if provided
+storage:
+  tsdb:
+    retention_time: 15d
+    retention_size: 10GB
+
+# Alerting configuration (optional - can be configured later)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets:
+#           - alertmanager:9093
+
+# Rule files for alerts and recording rules (optional)
+# rule_files:
+#   - "alerts/*.yml"
+#   - "rules/*.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+
+  # GenAI Backend API - FastAPI with prometheus-fastapi-instrumentator
+  # Exposes metrics at /api/v1/metrics
+  - job_name: 'genai-backend'
+    metrics_path: '/api/v1/metrics'
+    scrape_interval: 10s  # More frequent scraping for API metrics
+    scrape_timeout: 5s
+    static_configs:
+      - targets: ['backend:8000']
+        labels:
+          service: 'backend-api'
+          component: 'fastapi'
+          environment: 'production'
+
+  # Metrics collected from backend:
+  # - http_requests_total: Total HTTP requests by method, endpoint, and status
+  # - http_request_duration_seconds: Request latency (with p50, p95, p99 percentiles)
+  # - http_requests_inprogress: Current number of requests being processed
+  # - query_processing_duration_seconds: RAG query processing time
+  # - embedding_generation_duration_seconds: Embedding generation time
+  # - vector_search_duration_seconds: Vector search execution time
+  # - database_query_duration_seconds: Database query time
+  # - active_chat_sessions: Currently active chat sessions
+  # - knowledge_documents_total: Total documents in knowledge base
+  # - llm_api_requests_total: LLM API request count
+  # - llm_tokens_used_total: Total tokens consumed
+
+  # Celery worker metrics (if exposed via prometheus-client)
+  # Uncomment when Celery worker metrics endpoint is configured
+  # - job_name: 'celery-worker'
+  #   metrics_path: '/metrics'
+  #   static_configs:
+  #     - targets: ['celery_worker:8000']
+  #       labels:
+  #         service: 'celery-worker'
+  #         component: 'background-tasks'
+  #         environment: 'production'
+
+  # PostgreSQL Exporter (optional - requires postgres_exporter)
+  # Uncomment when PostgreSQL exporter is deployed
+  # - job_name: 'postgres'
+  #   static_configs:
+  #     - targets: ['postgres-exporter:9187']
+  #       labels:
+  #         service: 'postgres'
+  #         component: 'database'
+  #         environment: 'production'
+
+  # Redis Exporter (optional - requires redis_exporter)
+  # Uncomment when Redis exporter is deployed
+  # - job_name: 'redis'
+  #   static_configs:
+  #     - targets: ['redis-exporter:9121']
+  #       labels:
+  #         service: 'redis'
+  #         component: 'cache'
+  #         environment: 'production'
+
+  # Node Exporter (optional - for system metrics)
+  # Uncomment when node_exporter is deployed
+  # - job_name: 'node'
+  #   static_configs:
+  #     - targets: ['node-exporter:9100']
+  #       labels:
+  #         service: 'node-exporter'
+  #         component: 'infrastructure'
+  #         environment: 'production'
+
+# Remote write configuration (optional - for long-term storage)
+# Uncomment to send metrics to remote storage like Thanos, Cortex, or cloud providers
+# remote_write:
+#   - url: "http://remote-storage:9009/api/v1/push"
+#     queue_config:
+#       capacity: 10000
+#       max_shards: 10
+#       min_shards: 1
+#       max_samples_per_send: 5000
+#       batch_send_deadline: 5s

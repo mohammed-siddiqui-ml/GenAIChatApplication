@@ -6,6 +6,7 @@ Combines vector search with LLM prompting for accurate, source-cited answers.
 """
 
 import logging
+import time
 from typing import List, Dict, Any, Optional, AsyncIterator
 from datetime import datetime
 
@@ -17,6 +18,12 @@ from models.knowledge import DocumentEmbedding, KnowledgeDocument
 from models.chat import ChatMessage, MessageRole
 from integrations.openai_client import OpenAIClient, OpenAIError
 from core.config import settings
+from core.metrics import (
+    query_processing_duration,
+    embedding_generation_duration,
+    vector_search_duration,
+    vector_search_results,
+)
 
 # Logger
 logger = logging.getLogger(__name__)
@@ -110,6 +117,9 @@ class RAGEngine:
             RAGError: If RAG pipeline fails
         """
         try:
+            # Start timing the overall query processing
+            query_start_time = time.time()
+
             logger.info(f"RAG query: '{query_text[:100]}...'")
 
             # Step 1: Generate query embedding
@@ -144,6 +154,10 @@ class RAGEngine:
                     max_tokens=max_tokens
                 )
 
+                # Record query processing time
+                query_duration = time.time() - query_start_time
+                query_processing_duration.observe(query_duration)
+
                 return {
                     "streaming_iterator": streaming_iterator,
                     "sources": sources,
@@ -162,6 +176,10 @@ class RAGEngine:
                     max_tokens=max_tokens
                 )
 
+                # Record query processing time
+                query_duration = time.time() - query_start_time
+                query_processing_duration.observe(query_duration)
+
                 return {
                     "content": response["content"],
                     "sources": sources,
@@ -171,6 +189,7 @@ class RAGEngine:
                         "context_length": len(context),
                         "usage": response.get("usage", {}),
                         "finish_reason": response.get("finish_reason"),
+                        "processing_time_seconds": query_duration,
                         "timestamp": datetime.utcnow().isoformat()
                     }
                 }
@@ -197,8 +216,16 @@ class RAGEngine:
         """
         try:
             logger.debug(f"Generating query embedding ({len(query_text)} chars)")
+
+            # Time embedding generation
+            embed_start = time.time()
             embedding = await self.openai_client.generate_embedding(query_text)
-            logger.debug(f"Query embedding generated: {len(embedding)} dimensions")
+            embed_duration = time.time() - embed_start
+
+            # Record embedding generation time
+            embedding_generation_duration.observe(embed_duration)
+
+            logger.debug(f"Query embedding generated: {len(embedding)} dimensions in {embed_duration:.3f}s")
             return embedding
         except Exception as e:
             logger.error(f"Query embedding failed: {e}")
@@ -236,6 +263,9 @@ class RAGEngine:
         """
         try:
             logger.debug(f"Vector search: top_k={top_k}, threshold={similarity_threshold}")
+
+            # Time vector search
+            search_start = time.time()
 
             # Convert embedding to pgvector format
             embedding_str = '[' + ','.join(map(str, query_embedding)) + ']'
@@ -275,6 +305,10 @@ class RAGEngine:
 
             rows = result.fetchall()
 
+            # Record vector search time
+            search_duration = time.time() - search_start
+            vector_search_duration.observe(search_duration)
+
             # Use subscript notation for compatibility with both Row objects and dicts
             search_results = [
                 {
@@ -290,7 +324,10 @@ class RAGEngine:
                 for row in rows
             ]
 
-            logger.info(f"Vector search found {len(search_results)} results")
+            # Record number of results
+            vector_search_results.observe(len(search_results))
+
+            logger.info(f"Vector search found {len(search_results)} results in {search_duration:.3f}s")
 
             return search_results
 

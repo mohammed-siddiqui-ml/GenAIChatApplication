@@ -25,6 +25,12 @@ from openai.types.chat import ChatCompletion, ChatCompletionChunk
 from openai.types import CreateEmbeddingResponse
 
 from core.config import settings
+from core.metrics import (
+    llm_api_requests_total,
+    llm_api_duration,
+    llm_tokens_used,
+    embedding_generation_total,
+)
 
 
 # Logger
@@ -371,26 +377,36 @@ class OpenAIClient:
         try:
             logger.debug(f"Generating embedding for text ({len(text)} chars)")
 
+            # Time the API call
+            start_time = time.time()
+
             response: CreateEmbeddingResponse = await self._retry_with_backoff(
                 self.client.embeddings.create,
                 model=self.embedding_model,
                 input=text
             )
 
+            # Record metrics
+            duration = time.time() - start_time
+            embedding_generation_total.labels(model=self.embedding_model, status="success").inc()
+
             # Extract embedding
             embedding = response.data[0].embedding
 
-            # Update usage stats
+            # Update usage stats and record token metrics
             if hasattr(response, 'usage') and response.usage:
                 self.usage_stats.update(response.usage.prompt_tokens, 0)
+                llm_tokens_used.labels(model=self.embedding_model, type="prompt").inc(response.usage.prompt_tokens)
 
-            logger.debug(f"Embedding generated: {len(embedding)} dimensions")
+            logger.debug(f"Embedding generated: {len(embedding)} dimensions in {duration:.3f}s")
 
             return embedding
 
-        except (OpenAIRateLimitError, OpenAIAPIError, CircuitBreakerOpen):
+        except (OpenAIRateLimitError, OpenAIAPIError, CircuitBreakerOpen) as e:
+            embedding_generation_total.labels(model=self.embedding_model, status="error").inc()
             raise
         except Exception as e:
+            embedding_generation_total.labels(model=self.embedding_model, status="error").inc()
             logger.error(f"Failed to generate embedding: {e}")
             raise OpenAIError(f"Embedding generation failed: {e}")
 
@@ -488,6 +504,9 @@ class OpenAIClient:
         try:
             logger.debug(f"Generating completion with {len(messages)} messages")
 
+            # Time the API call
+            start_time = time.time()
+
             response: ChatCompletion = await self._retry_with_backoff(
                 self.client.chat.completions.create,
                 model=self.chat_model,
@@ -497,16 +516,23 @@ class OpenAIClient:
                 **kwargs
             )
 
+            # Record LLM API metrics
+            duration = time.time() - start_time
+            llm_api_duration.labels(model=self.chat_model).observe(duration)
+            llm_api_requests_total.labels(model=self.chat_model, status="success").inc()
+
             # Extract completion
             choice = response.choices[0]
             content = choice.message.content or ""
 
-            # Update usage stats
+            # Update usage stats and record token metrics
             if response.usage:
                 self.usage_stats.update(
                     response.usage.prompt_tokens,
                     response.usage.completion_tokens
                 )
+                llm_tokens_used.labels(model=self.chat_model, type="prompt").inc(response.usage.prompt_tokens)
+                llm_tokens_used.labels(model=self.chat_model, type="completion").inc(response.usage.completion_tokens)
 
             result = {
                 "content": content,
@@ -521,14 +547,16 @@ class OpenAIClient:
 
             logger.debug(
                 f"Completion generated: {len(content)} chars, "
-                f"{result['usage']['total_tokens']} tokens"
+                f"{result['usage']['total_tokens']} tokens in {duration:.3f}s"
             )
 
             return result
 
-        except (OpenAIRateLimitError, OpenAIAPIError, CircuitBreakerOpen):
+        except (OpenAIRateLimitError, OpenAIAPIError, CircuitBreakerOpen) as e:
+            llm_api_requests_total.labels(model=self.chat_model, status="error").inc()
             raise
         except Exception as e:
+            llm_api_requests_total.labels(model=self.chat_model, status="error").inc()
             logger.error(f"Failed to generate completion: {e}")
             raise OpenAIError(f"Completion generation failed: {e}")
 
