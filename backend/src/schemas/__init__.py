@@ -8,6 +8,14 @@ from .auth import RegisterRequest, LoginRequest, TokenResponse, UserResponse
 # Chat schemas
 from .chat import QueryRequest, QueryResponse, SourceCitation, SessionResponse
 
+# Admin schemas
+from .admin import (
+    DataSourceCreate,
+    DataSourceUpdate,
+    DataSourceResponse,
+    DataSourceListResponse
+)
+
 __all__ = [
     # Authentication
     "RegisterRequest",
@@ -19,4 +27,9 @@ __all__ = [
     "QueryResponse",
     "SourceCitation",
     "SessionResponse",
+    # Admin
+    "DataSourceCreate",
+    "DataSourceUpdate",
+    "DataSourceResponse",
+    "DataSourceListResponse",
 ]
