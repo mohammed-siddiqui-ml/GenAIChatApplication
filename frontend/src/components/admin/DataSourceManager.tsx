@@ -306,6 +306,7 @@ export function DataSourceManager() {
                     color="primary"
                     onClick={() => setEditingDataSource(dataSource)}
                     title="Edit"
+                    aria-label="Edit"
                   >
                     <EditIcon />
                   </IconButton>
@@ -314,6 +315,7 @@ export function DataSourceManager() {
                     color="error"
                     onClick={() => setDeletingDataSource(dataSource)}
                     title="Delete"
+                    aria-label="Delete"
                   >
                     <DeleteIcon />
                   </IconButton>

@@ -158,13 +158,15 @@ export function MetricsDashboard() {
     return <Alert severity="info">No metrics data available</Alert>;
   }
 
-  // Prepare chart data for query trends
-  const queryTrendData = [
-    { period: 'Today', queries: metrics.queries.total_today },
-    { period: 'This Week', queries: metrics.queries.total_this_week },
-    { period: 'This Month', queries: metrics.queries.total_this_month },
-    { period: 'All Time', queries: metrics.queries.total_all_time },
-  ];
+  // Prepare chart data for query trends (with null safety checks)
+  const queryTrendData = metrics.queries
+    ? [
+        { period: 'Today', queries: metrics.queries.total_today },
+        { period: 'This Week', queries: metrics.queries.total_this_week },
+        { period: 'This Month', queries: metrics.queries.total_this_month },
+        { period: 'All Time', queries: metrics.queries.total_all_time },
+      ]
+    : [];
 
   // Format response time
   const formatResponseTime = (ms: number | null) => {

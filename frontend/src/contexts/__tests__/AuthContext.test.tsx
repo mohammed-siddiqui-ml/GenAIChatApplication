@@ -31,9 +31,14 @@ describe('AuthContext', () => {
 
   describe('useAuth hook', () => {
     it('should throw error when used outside AuthProvider', () => {
+      // Suppress console.error for this test since we expect an error
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+
       expect(() => {
         renderHook(() => useAuth());
       }).toThrow('useAuth must be used within AuthProvider');
+
+      consoleError.mockRestore();
     });
   });
 

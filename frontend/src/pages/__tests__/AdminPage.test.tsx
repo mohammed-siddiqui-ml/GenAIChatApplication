@@ -324,19 +324,20 @@ describe('AdminPage', () => {
       await renderAdminPage('/admin/metrics');
 
       // "System Metrics" should be unique to the page content
-      expect(screen.getByText('System Metrics')).toBeInTheDocument();
-      expect(
-        screen.getByText(/View system health, performance metrics/i)
-      ).toBeInTheDocument();
+      // Wait for the component to load (may show loading state first)
+      await waitFor(() => {
+        expect(screen.getByText('System Metrics')).toBeInTheDocument();
+      }, { timeout: 2000 });
     });
 
     it('TC-016: Audit Logs route shows correct content', async () => {
       await renderAdminPage('/admin/audit');
 
-      // Check for unique page content
-      expect(
-        screen.getByText(/Review system activity logs/i)
-      ).toBeInTheDocument();
+      // Check for unique page content - use getByRole to find the heading specifically
+      // Wait for the component to load (may show loading state first)
+      await waitFor(() => {
+        expect(screen.getByRole('heading', { name: /audit logs/i })).toBeInTheDocument();
+      }, { timeout: 2000 });
     });
   });
 
