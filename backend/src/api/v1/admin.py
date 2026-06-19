@@ -7,8 +7,9 @@ including data source management (CRUD operations).
 
 import logging
 from typing import Optional, Dict, Any
+from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
@@ -24,17 +25,51 @@ from schemas.admin import (
     IngestionTriggerResponse,
     IngestionJobResponse,
     IngestionJobListResponse,
-    SystemMetricsResponse
+    SystemMetricsResponse,
+    AuditLogResponse,
+    AuditLogListResponse
 )
 from services.admin_service import DataSourceService, DataSourceError
 from services.ingestion_service import IngestionJobService, IngestionJobError
 from services.metrics_service import MetricsService, MetricsServiceError
+from services.audit_service import AuditService, AuditServiceError
 
 # Logger
 logger = logging.getLogger(__name__)
 
 # Create router
 router = APIRouter()
+
+
+def get_client_ip(request: Request) -> Optional[str]:
+    """
+    Extract client IP address from request.
+
+    Checks X-Forwarded-For header first (for proxied requests),
+    then falls back to direct client IP.
+
+    Args:
+        request: FastAPI request object
+
+    Returns:
+        Client IP address as string, or None if unavailable
+    """
+    # Check X-Forwarded-For header (for proxied requests)
+    forwarded_for = request.headers.get("X-Forwarded-For")
+    if forwarded_for:
+        # Take the first IP in the chain
+        return forwarded_for.split(",")[0].strip()
+
+    # Check X-Real-IP header (alternative proxy header)
+    real_ip = request.headers.get("X-Real-IP")
+    if real_ip:
+        return real_ip.strip()
+
+    # Fall back to direct client IP
+    if request.client:
+        return request.client.host
+
+    return None
 
 
 @router.get(
@@ -212,6 +247,7 @@ async def list_data_sources(
     }
 )
 async def create_data_source(
+    fastapi_request: Request,
     request: DataSourceCreate,
     admin: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db)
@@ -220,6 +256,7 @@ async def create_data_source(
     Create a new data source.
 
     Args:
+        fastapi_request: FastAPI request object (for IP extraction)
         request: Data source creation request with name, type, config, etc.
         admin: Authenticated admin user (from dependency)
         db: Database session
@@ -236,6 +273,8 @@ async def create_data_source(
     logger.info(f"Admin {admin.email} creating data source: {request.name} (type: {request.type})")
 
     try:
+        # Get client IP
+        client_ip = get_client_ip(fastapi_request)
         service = DataSourceService(db)
 
         # Create data source with admin as creator
@@ -249,6 +288,21 @@ async def create_data_source(
         )
 
         logger.info(f"Created data source: {data_source.name} (ID: {data_source.id})")
+
+        # Create audit log
+        audit_service = AuditService(db)
+        await audit_service.create_audit_log(
+            user_id=admin.id,
+            action="create",
+            resource_type="data_source",
+            resource_id=data_source.id,
+            changes={
+                "name": data_source.name,
+                "type": data_source.type.value,
+                "is_active": data_source.is_active
+            },
+            ip_address=client_ip
+        )
 
         return data_source
 
@@ -409,6 +463,7 @@ async def get_data_source(
 )
 async def update_data_source(
     data_source_id: int,
+    fastapi_request: Request,
     request: DataSourceUpdate,
     admin: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db)
@@ -418,6 +473,7 @@ async def update_data_source(
 
     Args:
         data_source_id: ID of the data source to update
+        fastapi_request: FastAPI request object (for IP extraction)
         request: Data source update request (all fields optional)
         admin: Authenticated admin user (from dependency)
         db: Database session
@@ -435,7 +491,19 @@ async def update_data_source(
     logger.info(f"Admin {admin.email} updating data source ID: {data_source_id}")
 
     try:
+        # Get client IP
+        client_ip = get_client_ip(fastapi_request)
+
         service = DataSourceService(db)
+
+        # Get original data source for before state
+        original_ds = await service.get_data_source(data_source_id, decrypt_config=False)
+        if not original_ds:
+            logger.warning(f"Data source not found: {data_source_id}")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Data source not found: {data_source_id}"
+            )
 
         # Update data source
         data_source = await service.update_data_source(
@@ -447,6 +515,29 @@ async def update_data_source(
         )
 
         logger.info(f"Updated data source: {data_source.name} (ID: {data_source_id})")
+
+        # Track changes for audit log
+        changes = {"before": {}, "after": {}}
+        if request.name is not None:
+            changes["before"]["name"] = original_ds.name
+            changes["after"]["name"] = data_source.name
+        if request.is_active is not None:
+            changes["before"]["is_active"] = original_ds.is_active
+            changes["after"]["is_active"] = data_source.is_active
+        if request.sync_schedule is not None:
+            changes["before"]["sync_schedule"] = original_ds.sync_schedule
+            changes["after"]["sync_schedule"] = data_source.sync_schedule
+
+        # Create audit log
+        audit_service = AuditService(db)
+        await audit_service.create_audit_log(
+            user_id=admin.id,
+            action="update",
+            resource_type="data_source",
+            resource_id=data_source_id,
+            changes=changes,
+            ip_address=client_ip
+        )
 
         return data_source
 
@@ -509,6 +600,7 @@ async def update_data_source(
 )
 async def delete_data_source(
     data_source_id: int,
+    fastapi_request: Request,
     admin: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db)
 ) -> Dict[str, Any]:
@@ -517,6 +609,7 @@ async def delete_data_source(
 
     Args:
         data_source_id: ID of the data source to delete
+        fastapi_request: FastAPI request object (for IP extraction)
         admin: Authenticated admin user (from dependency)
         db: Database session
 
@@ -531,13 +624,40 @@ async def delete_data_source(
     logger.info(f"Admin {admin.email} deleting data source ID: {data_source_id}")
 
     try:
+        # Get client IP
+        client_ip = get_client_ip(fastapi_request)
+
         service = DataSourceService(db)
+
+        # Get data source info before deletion for audit log
+        data_source = await service.get_data_source(data_source_id, decrypt_config=False)
+        if not data_source:
+            logger.warning(f"Data source not found: {data_source_id}")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Data source not found: {data_source_id}"
+            )
 
         # Delete data source
         success = await service.delete_data_source(data_source_id)
 
         if success:
             logger.info(f"Successfully deleted data source ID: {data_source_id}")
+
+            # Create audit log
+            audit_service = AuditService(db)
+            await audit_service.create_audit_log(
+                user_id=admin.id,
+                action="delete",
+                resource_type="data_source",
+                resource_id=data_source_id,
+                changes={
+                    "name": data_source.name,
+                    "type": data_source.type.value
+                },
+                ip_address=client_ip
+            )
+
             return {
                 "message": "Data source deleted successfully",
                 "data_source_id": data_source_id
@@ -1047,6 +1167,170 @@ async def get_system_metrics(
         )
     except Exception as e:
         logger.error(f"Unexpected error getting system metrics: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred"
+        )
+
+
+@router.get(
+    "/audit-logs",
+    response_model=AuditLogListResponse,
+    summary="Get audit logs",
+    description="""
+    Retrieve audit logs with filtering and pagination.
+
+    Supports filtering by:
+    - User ID (who performed the action)
+    - Action type (create, update, delete)
+    - Resource type (data_source, user, config)
+    - Date range (start_date and end_date)
+
+    Returns paginated results with total count.
+    Audit logs are immutable and cannot be modified or deleted.
+
+    **Requires**: Admin role
+    """,
+    responses={
+        200: {
+            "description": "Audit logs retrieved successfully",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "items": [
+                            {
+                                "id": 42,
+                                "user_id": 1,
+                                "user_email": "admin@example.com",
+                                "action": "create",
+                                "resource_type": "data_source",
+                                "resource_id": 5,
+                                "changes": {"name": "New Wiki", "type": "confluence"},
+                                "ip_address": "192.168.1.100",
+                                "created_at": "2024-01-15T14:30:00Z"
+                            }
+                        ],
+                        "total": 150,
+                        "limit": 50,
+                        "offset": 0
+                    }
+                }
+            }
+        },
+        403: {"description": "Admin access required"},
+        422: {"description": "Invalid query parameters"},
+        500: {"description": "Internal server error"}
+    }
+)
+async def get_audit_logs(
+    user_id: Optional[int] = Query(
+        None,
+        description="Filter by user ID who performed the action"
+    ),
+    action: Optional[str] = Query(
+        None,
+        description="Filter by action type (create, update, delete)"
+    ),
+    resource_type: Optional[str] = Query(
+        None,
+        description="Filter by resource type (data_source, user, config)"
+    ),
+    start_date: Optional[datetime] = Query(
+        None,
+        description="Filter logs created on or after this date (ISO 8601 format)"
+    ),
+    end_date: Optional[datetime] = Query(
+        None,
+        description="Filter logs created on or before this date (ISO 8601 format)"
+    ),
+    limit: int = Query(
+        50,
+        ge=1,
+        le=100,
+        description="Number of items per page (max 100)"
+    ),
+    offset: int = Query(
+        0,
+        ge=0,
+        description="Number of items to skip"
+    ),
+    admin: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+) -> AuditLogListResponse:
+    """
+    Get audit logs with filtering and pagination.
+
+    Args:
+        user_id: Filter by user ID
+        action: Filter by action type
+        resource_type: Filter by resource type
+        start_date: Filter by start date
+        end_date: Filter by end date
+        limit: Page size
+        offset: Pagination offset
+        admin: Authenticated admin user (from dependency)
+        db: Database session
+
+    Returns:
+        AuditLogListResponse: Paginated list of audit logs
+
+    Raises:
+        HTTPException 403: If user is not admin
+        HTTPException 422: If query parameters are invalid
+        HTTPException 500: If query fails
+    """
+    logger.info(
+        f"Admin {admin.email} retrieving audit logs: "
+        f"user_id={user_id}, action={action}, resource_type={resource_type}, "
+        f"limit={limit}, offset={offset}"
+    )
+
+    try:
+        service = AuditService(db)
+        audit_logs, total = await service.get_audit_logs(
+            user_id=user_id,
+            action=action,
+            resource_type=resource_type,
+            start_date=start_date,
+            end_date=end_date,
+            limit=limit,
+            offset=offset
+        )
+
+        # Convert to response format with user email
+        items = []
+        for log in audit_logs:
+            items.append(
+                AuditLogResponse(
+                    id=log.id,
+                    user_id=log.user_id,
+                    user_email=log.get_user_email(),
+                    action=log.action,
+                    resource_type=log.resource_type,
+                    resource_id=log.resource_id,
+                    changes=log.audit_changes,
+                    ip_address=log.ip_address,
+                    created_at=log.created_at
+                )
+            )
+
+        logger.info(f"Retrieved {len(items)} audit logs (total: {total})")
+
+        return AuditLogListResponse(
+            items=items,
+            total=total,
+            limit=limit,
+            offset=offset
+        )
+
+    except AuditServiceError as e:
+        logger.error(f"Failed to get audit logs: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get audit logs: {str(e)}"
+        )
+    except Exception as e:
+        logger.error(f"Unexpected error getting audit logs: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred"

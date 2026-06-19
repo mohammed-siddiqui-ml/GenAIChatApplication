@@ -13,7 +13,9 @@ from .admin import (
     DataSourceCreate,
     DataSourceUpdate,
     DataSourceResponse,
-    DataSourceListResponse
+    DataSourceListResponse,
+    AuditLogResponse,
+    AuditLogListResponse
 )
 
 __all__ = [
@@ -32,4 +34,6 @@ __all__ = [
     "DataSourceUpdate",
     "DataSourceResponse",
     "DataSourceListResponse",
+    "AuditLogResponse",
+    "AuditLogListResponse",
 ]

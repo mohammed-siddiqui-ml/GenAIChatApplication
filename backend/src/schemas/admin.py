@@ -5,7 +5,7 @@ This module defines Pydantic schemas for admin API endpoints
 including data source CRUD operations and configuration management.
 """
 
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from datetime import datetime
 from pydantic import BaseModel, Field, field_validator
 
@@ -701,6 +701,83 @@ class SystemMetricsResponse(BaseModel):
                         "last_failed_run": "2024-01-14T08:15:00Z"
                     },
                     "timestamp": "2024-01-15T14:30:00Z"
+                }
+            ]
+        }
+    }
+
+
+class AuditLogResponse(BaseModel):
+    """
+    Response schema for a single audit log entry.
+
+    Contains complete audit trail information for an administrative action.
+    """
+    id: int = Field(..., description="Unique audit log identifier")
+    user_id: Optional[int] = Field(None, description="ID of user who performed the action (None for system actions)")
+    user_email: Optional[str] = Field(None, description="Email of user who performed the action")
+    action: str = Field(..., description="Action performed (create, update, delete)")
+    resource_type: Optional[str] = Field(None, description="Type of resource affected (data_source, user, config)")
+    resource_id: Optional[int] = Field(None, description="ID of the affected resource")
+    changes: Optional[Dict[str, Any]] = Field(None, description="Before/after state or change details")
+    ip_address: Optional[str] = Field(None, description="IP address of the user")
+    created_at: datetime = Field(..., description="Timestamp when the action occurred")
+
+    model_config = {
+        "from_attributes": True,
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "id": 42,
+                    "user_id": 1,
+                    "user_email": "admin@example.com",
+                    "action": "create",
+                    "resource_type": "data_source",
+                    "resource_id": 5,
+                    "changes": {
+                        "name": "New Wiki",
+                        "type": "confluence",
+                        "is_active": True
+                    },
+                    "ip_address": "192.168.1.100",
+                    "created_at": "2024-01-15T14:30:00Z"
+                }
+            ]
+        }
+    }
+
+
+class AuditLogListResponse(BaseModel):
+    """
+    Response schema for paginated audit log list.
+
+    Contains list of audit logs with pagination metadata.
+    """
+    items: List[AuditLogResponse] = Field(..., description="List of audit log entries")
+    total: int = Field(..., description="Total number of audit logs matching the filters")
+    limit: int = Field(..., description="Maximum number of items per page")
+    offset: int = Field(..., description="Number of items skipped")
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "items": [
+                        {
+                            "id": 42,
+                            "user_id": 1,
+                            "user_email": "admin@example.com",
+                            "action": "create",
+                            "resource_type": "data_source",
+                            "resource_id": 5,
+                            "changes": {"name": "New Wiki"},
+                            "ip_address": "192.168.1.100",
+                            "created_at": "2024-01-15T14:30:00Z"
+                        }
+                    ],
+                    "total": 150,
+                    "limit": 50,
+                    "offset": 0
                 }
             ]
         }
