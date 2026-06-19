@@ -17,7 +17,7 @@ function App() {
                 <Route path="/chat" element={<ChatPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route
-                  path="/admin"
+                  path="/admin/*"
                   element={
                     <ProtectedRoute requireAdmin>
                       <AdminPage />
