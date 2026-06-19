@@ -17,7 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from core.redis import session_set, session_get, session_extend
-from models.chat import ChatSession, ChatMessage
+from models.chat import ChatSession, ChatMessage, MessageRole
 
 # Logger
 logger = logging.getLogger(__name__)
@@ -75,25 +75,25 @@ class ChatService:
     ) -> ChatSession:
         """
         Create a new chat session for anonymous or authenticated users.
-        
+
         Creates a session record in the database and caches the session token
         in Redis with a 24-hour TTL.
-        
+
         Args:
             ip_address: Client IP address (optional)
             user_agent: Browser user agent string (optional)
             user_id: User ID for authenticated users (optional, None for anonymous)
-            
+
         Returns:
-            ChatSession: Created session object with generated token
-            
+            ChatSession: The created session object
+
         Raises:
             ChatSessionError: If session creation fails
         """
         try:
             # Generate secure session token
             session_token = self.generate_session_token()
-            
+
             # Create session object
             session = ChatSession(
                 session_token=session_token,
@@ -101,12 +101,12 @@ class ChatService:
                 user_agent=user_agent,
                 user_id=user_id
             )
-            
+
             # Add to database
             self.db.add(session)
             await self.db.flush()  # Flush to get the session ID
             await self.db.refresh(session)  # Refresh to get server defaults
-            
+
             # Cache session in Redis with 24-hour TTL
             session_data = json.dumps({
                 "session_id": str(session.id),
@@ -115,27 +115,126 @@ class ChatService:
                 "user_agent": user_agent,
                 "created_at": session.started_at.isoformat()
             })
-            
+
             await session_set(
                 session_token=session_token,
                 session_data=session_data,
                 expire_seconds=SESSION_TTL_SECONDS
             )
-            
+
             logger.info(
                 f"Chat session created: session_id={session.id}, "
                 f"user_id={user_id or 'anonymous'}, ip={ip_address}"
             )
-            
+
             return session
-            
+
         except Exception as e:
             logger.error(f"Failed to create chat session: {str(e)}")
             raise ChatSessionError(f"Session creation failed: {str(e)}")
 
+    async def get_session(self, session_token: str) -> ChatSession:
+        """
+        Retrieve a session by token.
+
+        First checks Redis cache for performance, then falls back to database.
+        Updates the last_activity_at timestamp.
+
+        Args:
+            session_token: Session token to retrieve
+
+        Returns:
+            ChatSession object if found
+
+        Raises:
+            ChatSessionError: If session not found or expired
+        """
+        try:
+            # Try to get session from Redis cache first
+            cached_data = await session_get(session_token)
+
+            if cached_data:
+                # Parse cached data to get session_id
+                session_info = json.loads(cached_data)
+                session_id = UUID(session_info["session_id"])
+
+                # Need to check if session has ended (cache doesn't store ended_at)
+                # Query database to verify session is still active
+                result = await self.db.execute(
+                    select(ChatSession)
+                    .where(ChatSession.id == session_id)
+                    .where(ChatSession.ended_at.is_(None))  # Only active sessions
+                )
+                session = result.scalar_one_or_none()
+
+                if not session:
+                    # Session has ended
+                    logger.warning(f"Session has ended: {session_token[:10]}...")
+                    raise ChatSessionError("Session not found or expired")
+
+                # Session found in cache and still active - extend TTL
+                await session_extend(session_token, expire_seconds=SESSION_TTL_SECONDS)
+                logger.debug(f"Session retrieved from cache: {session_token[:10]}...")
+            else:
+                # Session not in cache - query database
+                logger.debug(f"Session not in cache, querying database: {session_token[:10]}...")
+
+                result = await self.db.execute(
+                    select(ChatSession)
+                    .where(ChatSession.session_token == session_token)
+                    .where(ChatSession.ended_at.is_(None))  # Only active sessions
+                )
+                session = result.scalar_one_or_none()
+
+                if not session:
+                    logger.warning(f"Invalid or expired session token: {session_token[:10]}...")
+                    raise ChatSessionError("Session not found or expired")
+
+                session_id = session.id
+
+                # Re-cache the session
+                session_data = json.dumps({
+                    "session_id": str(session.id),
+                    "user_id": session.user_id,
+                    "ip_address": session.ip_address,
+                    "user_agent": session.user_agent,
+                    "created_at": session.started_at.isoformat()
+                })
+
+                await session_set(
+                    session_token=session_token,
+                    session_data=session_data,
+                    expire_seconds=SESSION_TTL_SECONDS
+                )
+
+            # Update last_activity_at timestamp
+            await self.db.execute(
+                update(ChatSession)
+                .where(ChatSession.id == session_id)
+                .values(last_activity_at=datetime.utcnow())
+            )
+            await self.db.flush()
+
+            # Retrieve the updated session
+            result = await self.db.execute(
+                select(ChatSession)
+                .where(ChatSession.id == session_id)
+                .options(selectinload(ChatSession.messages))
+            )
+            session = result.scalar_one()
+
+            logger.info(f"Session retrieved and activity updated: session_id={session_id}")
+            return session
+
+        except ChatSessionError:
+            raise
+        except Exception as e:
+            logger.error(f"Session retrieval error: {str(e)}")
+            raise ChatSessionError(f"Session retrieval failed: {str(e)}")
+
     async def validate_session(self, session_token: str) -> Optional[ChatSession]:
         """
-        Validate a session token and retrieve the associated session.
+        Validate a session token and return the session object.
 
         First checks Redis cache for performance, then falls back to database.
         Updates the last_activity_at timestamp on successful validation.
@@ -190,8 +289,6 @@ class ChatService:
                     logger.warning(f"Invalid or expired session token: {session_token[:10]}...")
                     return None
 
-                session_id = session.id
-
                 # Re-cache the session
                 session_data = json.dumps({
                     "session_id": str(session.id),
@@ -210,25 +307,18 @@ class ChatService:
             # Update last_activity_at timestamp
             await self.db.execute(
                 update(ChatSession)
-                .where(ChatSession.id == session_id)
+                .where(ChatSession.id == session.id)
                 .values(last_activity_at=datetime.utcnow())
             )
             await self.db.flush()
 
-            # Retrieve the updated session
-            result = await self.db.execute(
-                select(ChatSession)
-                .where(ChatSession.id == session_id)
-                .options(selectinload(ChatSession.messages))
-            )
-            session = result.scalar_one()
-
-            logger.info(f"Session validated and activity updated: session_id={session_id}")
+            logger.info(f"Session validated and activity updated: session_id={session.id}")
             return session
 
         except Exception as e:
             logger.error(f"Session validation error: {str(e)}")
-            raise ChatSessionError(f"Session validation failed: {str(e)}")
+            # Return None instead of raising exception for validation
+            return None
 
     async def get_session_history(
         self,
@@ -249,11 +339,8 @@ class ChatService:
             ChatSessionError: If session is invalid or retrieval fails
         """
         try:
-            # Validate session first
-            session = await self.validate_session(session_token)
-
-            if not session:
-                raise ChatSessionError("Invalid or expired session token")
+            # Get session first
+            session = await self.get_session(session_token)
 
             # Query messages for this session
             query = (
@@ -279,6 +366,58 @@ class ChatService:
         except Exception as e:
             logger.error(f"Failed to retrieve session history: {str(e)}")
             raise ChatSessionError(f"History retrieval failed: {str(e)}")
+
+    async def add_message(
+        self,
+        session_token: str,
+        role: MessageRole,
+        content: str,
+        metadata: Optional[dict] = None
+    ) -> ChatMessage:
+        """
+        Add a message to a chat session.
+
+        Args:
+            session_token: Session token
+            role: Message role (user, assistant, or system)
+            content: Message content
+            metadata: Optional metadata (sources, tokens, etc.)
+
+        Returns:
+            ChatMessage: Created message object
+
+        Raises:
+            ChatSessionError: If session is invalid or message creation fails
+        """
+        try:
+            # Get session first
+            session = await self.get_session(session_token)
+
+            # Create message
+            message = ChatMessage(
+                session_id=session.id,
+                role=role,
+                content=content,
+                message_metadata=metadata
+            )
+
+            # Add to database
+            self.db.add(message)
+            await self.db.flush()
+            await self.db.refresh(message)
+
+            logger.info(
+                f"Message added to session {session.id}: role={role.value}, "
+                f"content_length={len(content)}"
+            )
+
+            return message
+
+        except ChatSessionError:
+            raise
+        except Exception as e:
+            logger.error(f"Failed to add message: {str(e)}")
+            raise ChatSessionError(f"Message creation failed: {str(e)}")
 
     async def end_session(self, session_token: str) -> bool:
         """

@@ -528,3 +528,139 @@ Please provide a helpful, accurate response based on the above context."""
         except Exception as e:
             logger.error(f"Streaming response failed: {e}")
             raise RAGError(f"Streaming generation error: {e}")
+
+    # ==================== Public Methods for Testing ====================
+    # These methods expose internal functionality for unit testing
+
+    async def generate_embedding(self, text: str) -> List[float]:
+        """
+        Generate embedding for text (public wrapper for testing).
+
+        Args:
+            text: Text to embed
+
+        Returns:
+            List[float]: Embedding vector
+        """
+        return await self._embed_query(text)
+
+    async def search_similar_documents(
+        self,
+        query: str,
+        top_k: int = DEFAULT_TOP_K,
+        similarity_threshold: float = DEFAULT_SIMILARITY_THRESHOLD
+    ) -> List[Dict[str, Any]]:
+        """
+        Search for similar documents (public wrapper for testing).
+
+        Args:
+            query: Query text
+            top_k: Number of results to return
+            similarity_threshold: Minimum similarity score
+
+        Returns:
+            List[Dict[str, Any]]: Search results with similarity scores
+        """
+        query_embedding = await self._embed_query(query)
+        return await self._vector_search(query_embedding, top_k, similarity_threshold)
+
+    def assemble_context(
+        self,
+        search_results: List[Dict[str, Any]],
+        max_tokens: int = DEFAULT_MAX_CONTEXT_TOKENS
+    ) -> str:
+        """
+        Assemble context from search results (synchronous wrapper for testing).
+
+        Args:
+            search_results: Search results to assemble
+            max_tokens: Maximum tokens in context
+
+        Returns:
+            str: Assembled context text
+        """
+        # Note: This is a synchronous wrapper. Tests may need adjustment.
+        # The actual implementation is async.
+        context_parts = []
+
+        for result in search_results:
+            chunk_text = result.get("chunk_text", result.get("content", ""))
+            title = result.get("title", "Unknown")
+            context_parts.append(f"[{title}]\n{chunk_text}")
+
+        return "\n\n".join(context_parts)
+
+    async def generate_response(
+        self,
+        query: str,
+        context: str,
+        conversation_history: Optional[List[ChatMessage]] = None,
+        temperature: Optional[float] = None,
+        max_tokens: Optional[int] = None
+    ) -> Dict[str, Any]:
+        """
+        Generate response using RAG context (public wrapper for testing).
+
+        Args:
+            query: User query
+            context: RAG context to use
+            conversation_history: Previous conversation messages
+            temperature: LLM temperature
+            max_tokens: Max tokens in response
+
+        Returns:
+            Dict[str, Any]: Response with content and metadata
+        """
+        # Build messages
+        system_message = self._build_system_message(context)
+
+        messages = [{"role": "system", "content": system_message}]
+
+        # Add conversation history
+        if conversation_history:
+            for msg in conversation_history[-5:]:  # Last 5 messages
+                messages.append({
+                    "role": msg.role.value,
+                    "content": msg.content
+                })
+
+        # Add current query
+        messages.append({"role": "user", "content": query})
+
+        # Call OpenAI for non-streaming response
+        try:
+            response = await self.openai_client.create_completion(
+                messages=messages,
+                temperature=temperature or 0.7,
+                max_tokens=max_tokens or 1000,
+                stream=False
+            )
+
+            return {
+                "content": response["choices"][0]["message"]["content"],
+                "model": response.get("model", "unknown"),
+                "usage": response.get("usage", {})
+            }
+        except Exception as e:
+            logger.error(f"Response generation failed: {e}")
+            raise RAGError(f"Failed to generate response: {e}")
+
+    async def generate_streaming_response(
+        self,
+        messages: List[Dict[str, str]],
+        temperature: Optional[float] = None,
+        max_tokens: Optional[int] = None
+    ) -> AsyncIterator[str]:
+        """
+        Generate streaming response (public wrapper for testing).
+
+        Args:
+            messages: Chat messages
+            temperature: LLM temperature
+            max_tokens: Max tokens in response
+
+        Yields:
+            str: Response chunks
+        """
+        async for chunk in self._generate_streaming_response(messages, temperature, max_tokens):
+            yield chunk

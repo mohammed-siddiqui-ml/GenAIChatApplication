@@ -521,3 +521,70 @@ async def _refresh_jira_data_async() -> Dict[str, Any]:
             logger.error(f"JIRA refresh failed: {e}", exc_info=True)
             raise
 
+
+# ============================================================================
+# Utility Functions
+# ============================================================================
+
+def format_issue_content(issue: dict, include_comments: bool = True) -> str:
+    """
+    Format JIRA issue into readable text content.
+
+    Extracts and formats key fields from a JIRA issue including summary,
+    description, status, and optionally comments.
+
+    Args:
+        issue: JIRA issue dictionary from API
+        include_comments: Whether to include comments in content
+
+    Returns:
+        str: Formatted issue content as plain text
+    """
+    fields = issue.get("fields", {})
+
+    # Build content parts
+    content_parts = []
+
+    # Add summary
+    summary = fields.get("summary", "No summary")
+    content_parts.append(f"Summary: {summary}")
+
+    # Add description
+    description = fields.get("description", "No description")
+    content_parts.append(f"\nDescription:\n{description}")
+
+    # Add status
+    status = fields.get("status", {})
+    status_name = status.get("name", "Unknown") if isinstance(status, dict) else "Unknown"
+    content_parts.append(f"\nStatus: {status_name}")
+
+    # Add priority
+    priority = fields.get("priority", {})
+    priority_name = priority.get("name", "Unknown") if isinstance(priority, dict) else "Unknown"
+    content_parts.append(f"Priority: {priority_name}")
+
+    # Add assignee
+    assignee = fields.get("assignee", {})
+    assignee_name = assignee.get("displayName", "Unassigned") if isinstance(assignee, dict) else "Unassigned"
+    content_parts.append(f"Assignee: {assignee_name}")
+
+    # Add labels
+    labels = fields.get("labels", [])
+    if labels:
+        content_parts.append(f"Labels: {', '.join(labels)}")
+
+    # Add comments if requested
+    if include_comments:
+        comment_data = fields.get("comment", {})
+        if isinstance(comment_data, dict):
+            comments = comment_data.get("comments", [])
+            if comments:
+                content_parts.append("\nComments:")
+                for idx, comment in enumerate(comments, 1):
+                    author = comment.get("author", {})
+                    author_name = author.get("displayName", "Unknown") if isinstance(author, dict) else "Unknown"
+                    body = comment.get("body", "")
+                    content_parts.append(f"\nComment {idx} by {author_name}:")
+                    content_parts.append(body)
+
+    return "\n".join(content_parts)

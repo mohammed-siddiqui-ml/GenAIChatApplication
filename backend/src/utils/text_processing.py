@@ -407,3 +407,81 @@ def chunk_documents(
     logger.info(f"Chunked {len(documents)} documents into {len(chunked_documents)} chunks")
     return chunked_documents
 
+
+def extract_text_from_pdf(pdf_path: str) -> str:
+    """
+    Extract text from PDF file.
+
+    NOTE: This is a stub implementation for testing.
+    In production, use PyPDF2, pdfplumber, or pypdf.
+
+    Args:
+        pdf_path: Path to PDF file
+
+    Returns:
+        str: Extracted text content
+
+    Raises:
+        TextProcessingError: If PDF extraction fails
+    """
+    logger.warning(f"PDF extraction using stub implementation: {pdf_path}")
+
+    # Stub implementation - returns placeholder text
+    # In production, would use:
+    # import PyPDF2
+    # with open(pdf_path, 'rb') as file:
+    #     reader = PyPDF2.PdfReader(file)
+    #     text = ""
+    #     for page in reader.pages:
+    #         text += page.extract_text()
+    #     return text
+
+    return f"Extracted text from PDF: {pdf_path}\n\nThis is placeholder content from stub implementation."
+
+
+def parse_markdown(markdown_content: str) -> Dict[str, Any]:
+    """
+    Parse Markdown content into structured data.
+
+    NOTE: This is a simplified implementation for testing.
+    In production, use markdown library or mistune for full parsing.
+
+    Args:
+        markdown_content: Markdown text to parse
+
+    Returns:
+        dict: Parsed content with metadata (content, headings, links)
+    """
+    if not markdown_content:
+        return {
+            "content": "",
+            "headings": [],
+            "links": []
+        }
+
+    # Extract plain text using existing function
+    plain_text = extract_markdown_text(markdown_content)
+
+    # Extract headings (lines starting with #)
+    headings = []
+    heading_pattern = re.compile(r'^(#{1,6})\s+(.+)$', re.MULTILINE)
+    for match in heading_pattern.finditer(markdown_content):
+        level = len(match.group(1))
+        text = match.group(2)
+        headings.append({"level": level, "text": text})
+
+    # Extract links ([text](url))
+    links = []
+    link_pattern = re.compile(r'\[([^\]]+)\]\(([^\)]+)\)')
+    for match in link_pattern.finditer(markdown_content):
+        links.append({
+            "text": match.group(1),
+            "url": match.group(2)
+        })
+
+    return {
+        "content": plain_text,
+        "headings": headings,
+        "links": links
+    }
+

@@ -89,17 +89,20 @@ class TestDirectoryStructure:
         """TC-006: Verify frontend subdirectory structure"""
         frontend_dir = PROJECT_ROOT / "frontend"
         required_subdirs = ["src", "public"]
-        
+
         for subdir in required_subdirs:
             subdir_path = frontend_dir / subdir
             assert subdir_path.exists(), f"Frontend subdirectory '{subdir}' does not exist"
             assert subdir_path.is_dir(), f"Frontend '{subdir}' is not a directory"
-        
-        # Check for essential React files
+
+        # Check for essential React files (support both TypeScript and JavaScript)
+        app_tsx = frontend_dir / "src" / "App.tsx"
         app_jsx = frontend_dir / "src" / "App.jsx"
+        main_tsx = frontend_dir / "src" / "main.tsx"
         main_jsx = frontend_dir / "src" / "main.jsx"
-        assert app_jsx.exists(), "Frontend src/App.jsx does not exist"
-        assert main_jsx.exists(), "Frontend src/main.jsx does not exist"
+
+        assert app_tsx.exists() or app_jsx.exists(), "Frontend src/App.tsx or App.jsx does not exist"
+        assert main_tsx.exists() or main_jsx.exists(), "Frontend src/main.tsx or main.jsx does not exist"
 
 
 class TestGitignore:
@@ -176,8 +179,7 @@ class TestConfigFiles:
             "backend/requirements.txt",
             "backend/pytest.ini",
             "backend/alembic.ini",
-            "frontend/package.json",
-            "frontend/vite.config.js"
+            "frontend/package.json"
         ]
 
         for file_path in required_files:
@@ -186,6 +188,11 @@ class TestConfigFiles:
             assert full_path.is_file(), f"'{file_path}' is not a file"
             # Verify non-empty
             assert full_path.stat().st_size > 0, f"Configuration file '{file_path}' is empty"
+
+        # Check for Vite config (support both TypeScript and JavaScript)
+        vite_ts = PROJECT_ROOT / "frontend" / "vite.config.ts"
+        vite_js = PROJECT_ROOT / "frontend" / "vite.config.js"
+        assert vite_ts.exists() or vite_js.exists(), "Frontend vite.config.ts or vite.config.js does not exist"
 
     def test_dockerfiles(self):
         """TC-013: Verify Dockerfile exists for backend and frontend"""

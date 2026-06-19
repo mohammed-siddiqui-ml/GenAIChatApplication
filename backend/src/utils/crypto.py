@@ -148,25 +148,36 @@ def encrypt_config_dict(config: dict, sensitive_fields: list[str]) -> dict:
     return encrypted_config
 
 
-def decrypt_config_dict(config: dict, sensitive_fields: list[str]) -> dict:
+def decrypt_config_dict(config: dict, sensitive_fields: list[str] = None) -> dict:
     """
     Decrypt sensitive fields in a configuration dictionary.
-    
+
     Creates a copy of the config dict and decrypts specified sensitive fields.
-    
+
     Args:
         config: Configuration dictionary with encrypted fields
-        sensitive_fields: List of field names to decrypt
-        
+        sensitive_fields: List of field names to decrypt (if None, attempts to decrypt all string values)
+
     Returns:
         dict: New dictionary with decrypted sensitive fields
     """
     if not config:
         return config
-    
+
     decrypted_config = config.copy()
-    for field in sensitive_fields:
-        if field in decrypted_config and decrypted_config[field]:
-            decrypted_config[field] = decrypt_config_field(str(decrypted_config[field]))
-    
+
+    # If no sensitive_fields specified, try to decrypt all string values
+    if sensitive_fields is None:
+        for field, value in decrypted_config.items():
+            if isinstance(value, str) and value:
+                try:
+                    decrypted_config[field] = decrypt_config_field(value)
+                except:
+                    # If decryption fails, leave the value as-is (it might not be encrypted)
+                    pass
+    else:
+        for field in sensitive_fields:
+            if field in decrypted_config and decrypted_config[field]:
+                decrypted_config[field] = decrypt_config_field(str(decrypted_config[field]))
+
     return decrypted_config
