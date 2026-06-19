@@ -292,3 +292,217 @@ class DataSourceListResponse(BaseModel):
             ]
         }
     }
+
+
+# ============================================================================
+# Ingestion Job Schemas
+# ============================================================================
+
+
+class IngestionTriggerRequest(BaseModel):
+    """
+    Request schema for triggering manual ingestion.
+
+    Supports both full_sync (re-ingest all) and incremental sync modes.
+    """
+    data_source_id: int = Field(
+        ...,
+        description="ID of the data source to ingest",
+        examples=[1],
+        gt=0
+    )
+    sync_type: str = Field(
+        default="incremental",
+        description="Type of sync: 'full_sync' (re-ingest all) or 'incremental' (new/updated only)",
+        examples=["full_sync", "incremental"]
+    )
+
+    @field_validator('sync_type')
+    @classmethod
+    def validate_sync_type(cls, v: str) -> str:
+        """Validate sync_type is either full_sync or incremental."""
+        if v not in ['full_sync', 'incremental']:
+            raise ValueError("sync_type must be 'full_sync' or 'incremental'")
+        return v
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "data_source_id": 1,
+                    "sync_type": "full_sync"
+                },
+                {
+                    "data_source_id": 2,
+                    "sync_type": "incremental"
+                }
+            ]
+        }
+    }
+
+
+class IngestionTriggerResponse(BaseModel):
+    """
+    Response schema for triggered ingestion job.
+
+    Returns job details and task information.
+    """
+    job_id: int = Field(..., description="Ingestion job ID", examples=[123])
+    data_source_id: int = Field(..., description="Data source ID", examples=[1])
+    status: str = Field(..., description="Job status", examples=["pending"])
+    task_id: Optional[str] = Field(
+        None,
+        description="Celery task ID for tracking",
+        examples=["a1b2c3d4-e5f6-7890-abcd-ef1234567890"]
+    )
+    sync_type: str = Field(..., description="Sync type", examples=["full_sync"])
+    message: str = Field(
+        ...,
+        description="Success message",
+        examples=["Ingestion job created and task dispatched successfully"]
+    )
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "job_id": 123,
+                    "data_source_id": 1,
+                    "status": "pending",
+                    "task_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                    "sync_type": "full_sync",
+                    "message": "Ingestion job created and task dispatched successfully"
+                }
+            ]
+        }
+    }
+
+
+class IngestionJobResponse(BaseModel):
+    """
+    Response schema for ingestion job details.
+
+    Returns complete job information including progress tracking.
+    """
+    id: int = Field(..., description="Job ID", examples=[123])
+    data_source_id: int = Field(..., description="Data source ID", examples=[1])
+    data_source_name: Optional[str] = Field(
+        None,
+        description="Data source name",
+        examples=["Company Wiki"]
+    )
+    data_source_type: Optional[str] = Field(
+        None,
+        description="Data source type",
+        examples=["confluence"]
+    )
+    status: str = Field(..., description="Job status", examples=["running"])
+    started_at: Optional[datetime] = Field(
+        None,
+        description="Job start timestamp",
+        examples=["2024-01-15T10:00:00Z"]
+    )
+    completed_at: Optional[datetime] = Field(
+        None,
+        description="Job completion timestamp",
+        examples=["2024-01-15T10:30:00Z"]
+    )
+    documents_processed: int = Field(
+        ...,
+        description="Number of documents successfully processed",
+        examples=[42]
+    )
+    documents_failed: int = Field(
+        ...,
+        description="Number of documents that failed processing",
+        examples=[2]
+    )
+    error_message: Optional[str] = Field(
+        None,
+        description="Error message if job failed",
+        examples=["Connection timeout"]
+    )
+    metadata: Optional[Dict[str, Any]] = Field(
+        None,
+        description="Additional job metadata",
+        examples=[{"sync_type": "full_sync", "task_id": "abc-123"}]
+    )
+
+    model_config = {
+        "from_attributes": True,
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "id": 123,
+                    "data_source_id": 1,
+                    "data_source_name": "Company Wiki",
+                    "data_source_type": "confluence",
+                    "status": "running",
+                    "started_at": "2024-01-15T10:00:00Z",
+                    "completed_at": None,
+                    "documents_processed": 15,
+                    "documents_failed": 0,
+                    "error_message": None,
+                    "metadata": {
+                        "sync_type": "full_sync",
+                        "task_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                    }
+                }
+            ]
+        }
+    }
+
+
+class IngestionJobListResponse(BaseModel):
+    """
+    Response schema for paginated ingestion job list.
+
+    Returns list of jobs with pagination metadata.
+    """
+    items: list[IngestionJobResponse] = Field(
+        ...,
+        description="List of ingestion jobs",
+        examples=[[]]
+    )
+    total: int = Field(
+        ...,
+        description="Total number of jobs matching filters",
+        examples=[10]
+    )
+    limit: int = Field(
+        ...,
+        description="Number of items per page",
+        examples=[20]
+    )
+    offset: int = Field(
+        ...,
+        description="Number of items skipped",
+        examples=[0]
+    )
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "items": [
+                        {
+                            "id": 123,
+                            "data_source_id": 1,
+                            "data_source_name": "Company Wiki",
+                            "data_source_type": "confluence",
+                            "status": "success",
+                            "started_at": "2024-01-15T10:00:00Z",
+                            "completed_at": "2024-01-15T10:30:00Z",
+                            "documents_processed": 42,
+                            "documents_failed": 0,
+                            "error_message": None,
+                            "metadata": {"sync_type": "full_sync"}
+                        }
+                    ],
+                    "total": 10,
+                    "limit": 20,
+                    "offset": 0
+                }
+            ]
+        }
+    }

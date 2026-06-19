@@ -14,14 +14,19 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.database import get_db
 from middleware.auth import require_admin
 from models.user import User
-from models.data_source import DataSourceType
+from models.data_source import DataSourceType, JobStatus
 from schemas.admin import (
     DataSourceCreate,
     DataSourceUpdate,
     DataSourceResponse,
-    DataSourceListResponse
+    DataSourceListResponse,
+    IngestionTriggerRequest,
+    IngestionTriggerResponse,
+    IngestionJobResponse,
+    IngestionJobListResponse
 )
 from services.admin_service import DataSourceService, DataSourceError
+from services.ingestion_service import IngestionJobService, IngestionJobError
 
 # Logger
 logger = logging.getLogger(__name__)
@@ -558,3 +563,382 @@ async def delete_data_source(
             detail="An unexpected error occurred"
         )
 
+
+# ============================================================================
+# Ingestion Job Management Endpoints
+# ============================================================================
+
+
+@router.post(
+    "/ingestion/trigger",
+    response_model=IngestionTriggerResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Trigger manual data ingestion",
+    description="""
+    Trigger manual ingestion for a specific data source.
+
+    Supports two sync types:
+    - **full_sync**: Re-ingest all data (deletes existing and re-processes)
+    - **incremental**: Only ingest new or updated data since last sync
+
+    Creates an ingestion job record with status 'pending' and dispatches
+    a Celery task based on data source type:
+    - Confluence → ingest_confluence_docs task
+    - JIRA → ingest_jira_issues task
+    - Onboarding → Requires file upload endpoint (not supported here)
+
+    **Requires**: Admin role
+    """,
+    responses={
+        201: {
+            "description": "Ingestion job created and task dispatched",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "job_id": 123,
+                        "data_source_id": 1,
+                        "status": "pending",
+                        "task_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                        "sync_type": "full_sync",
+                        "message": "Ingestion job created and task dispatched successfully"
+                    }
+                }
+            }
+        },
+        400: {"description": "Invalid request or data source not active"},
+        403: {"description": "Admin access required"},
+        404: {"description": "Data source not found"},
+        422: {"description": "Validation error"},
+        500: {"description": "Internal server error"}
+    }
+)
+async def trigger_ingestion(
+    request: IngestionTriggerRequest,
+    admin: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+) -> IngestionTriggerResponse:
+    """
+    Trigger manual ingestion for a data source.
+
+    Args:
+        request: Ingestion trigger request with data_source_id and sync_type
+        admin: Authenticated admin user (from dependency)
+        db: Database session
+
+    Returns:
+        Ingestion trigger response with job details
+
+    Raises:
+        HTTPException 400: If data source is invalid or not active
+        HTTPException 403: If user is not admin
+        HTTPException 404: If data source not found
+        HTTPException 422: If request validation fails
+        HTTPException 500: If triggering fails
+    """
+    logger.info(
+        f"Admin {admin.email} triggering ingestion for data source "
+        f"{request.data_source_id} (sync_type: {request.sync_type})"
+    )
+
+    try:
+        service = IngestionJobService(db)
+
+        # Trigger ingestion
+        job, task_id = await service.trigger_ingestion(
+            data_source_id=request.data_source_id,
+            sync_type=request.sync_type
+        )
+
+        logger.info(
+            f"Successfully triggered ingestion job {job.id} for data source "
+            f"{request.data_source_id} (task_id: {task_id})"
+        )
+
+        return IngestionTriggerResponse(
+            job_id=job.id,
+            data_source_id=job.data_source_id,
+            status=job.status.value,
+            task_id=task_id,
+            sync_type=request.sync_type,
+            message="Ingestion job created and task dispatched successfully"
+        )
+
+    except IngestionJobError as e:
+        error_msg = str(e)
+        logger.error(f"Failed to trigger ingestion: {error_msg}")
+
+        # Return 404 if data source not found
+        if "not found" in error_msg.lower():
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=error_msg
+            )
+
+        # Return 400 for validation or activation errors
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=error_msg
+        )
+    except Exception as e:
+        logger.error(f"Unexpected error triggering ingestion: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred"
+        )
+
+
+@router.get(
+    "/ingestion/jobs",
+    response_model=IngestionJobListResponse,
+    summary="List ingestion jobs",
+    description="""
+    List ingestion jobs with optional filtering and pagination.
+
+    Supports filtering by:
+    - Job status (pending, running, success, failed)
+    - Data source ID
+
+    Returns paginated results with total count, ordered by started_at descending
+    (most recent first).
+
+    **Requires**: Admin role
+    """,
+    responses={
+        200: {
+            "description": "List of ingestion jobs retrieved successfully",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "items": [
+                            {
+                                "id": 123,
+                                "data_source_id": 1,
+                                "data_source_name": "Company Wiki",
+                                "data_source_type": "confluence",
+                                "status": "success",
+                                "started_at": "2024-01-15T10:00:00Z",
+                                "completed_at": "2024-01-15T10:30:00Z",
+                                "documents_processed": 42,
+                                "documents_failed": 0,
+                                "error_message": None,
+                                "metadata": {"sync_type": "full_sync"}
+                            }
+                        ],
+                        "total": 10,
+                        "limit": 20,
+                        "offset": 0
+                    }
+                }
+            }
+        },
+        403: {"description": "Admin access required"},
+        500: {"description": "Internal server error"}
+    }
+)
+async def list_ingestion_jobs(
+    job_status: Optional[JobStatus] = Query(
+        None,
+        description="Filter by job status"
+    ),
+    data_source_id: Optional[int] = Query(
+        None,
+        description="Filter by data source ID",
+        gt=0
+    ),
+    limit: int = Query(
+        20,
+        ge=1,
+        le=100,
+        description="Number of items per page (max 100)"
+    ),
+    offset: int = Query(
+        0,
+        ge=0,
+        description="Number of items to skip"
+    ),
+    admin: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+) -> Dict[str, Any]:
+    """
+    List ingestion jobs with filtering and pagination.
+
+    Args:
+        job_status: Optional filter by job status
+        data_source_id: Optional filter by data source ID
+        limit: Number of items per page (1-100)
+        offset: Number of items to skip
+        admin: Authenticated admin user (from dependency)
+        db: Database session
+
+    Returns:
+        Dictionary with items, total, limit, offset
+
+    Raises:
+        HTTPException 403: If user is not admin
+        HTTPException 500: If listing fails
+    """
+    logger.info(
+        f"Admin {admin.email} listing ingestion jobs "
+        f"(status={job_status}, data_source_id={data_source_id}, "
+        f"limit={limit}, offset={offset})"
+    )
+
+    try:
+        service = IngestionJobService(db)
+        jobs, total = await service.list_jobs(
+            status=job_status,
+            data_source_id=data_source_id,
+            limit=limit,
+            offset=offset
+        )
+
+        # Build response with data source details
+        items = []
+        for job in jobs:
+            item = {
+                "id": job.id,
+                "data_source_id": job.data_source_id,
+                "data_source_name": job.data_source.name if job.data_source else None,
+                "data_source_type": job.data_source.type.value if job.data_source else None,
+                "status": job.status.value,
+                "started_at": job.started_at,
+                "completed_at": job.completed_at,
+                "documents_processed": job.documents_processed,
+                "documents_failed": job.documents_failed,
+                "error_message": job.error_message,
+                "metadata": job.job_metadata
+            }
+            items.append(item)
+
+        logger.info(f"Retrieved {len(jobs)} ingestion jobs (total: {total})")
+
+        return {
+            "items": items,
+            "total": total,
+            "limit": limit,
+            "offset": offset
+        }
+
+    except IngestionJobError as e:
+        logger.error(f"Failed to list ingestion jobs: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to list ingestion jobs: {str(e)}"
+        )
+    except Exception as e:
+        logger.error(f"Unexpected error listing ingestion jobs: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred"
+        )
+
+
+@router.get(
+    "/ingestion/jobs/{job_id}",
+    response_model=IngestionJobResponse,
+    summary="Get ingestion job details",
+    description="""
+    Retrieve detailed information about a specific ingestion job.
+
+    Returns complete job information including:
+    - Current status (pending, running, success, failed)
+    - Progress tracking (documents processed/failed)
+    - Start and completion timestamps
+    - Error messages if failed
+    - Job metadata (sync_type, task_id, etc.)
+
+    **Requires**: Admin role
+    """,
+    responses={
+        200: {
+            "description": "Ingestion job retrieved successfully",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "id": 123,
+                        "data_source_id": 1,
+                        "data_source_name": "Company Wiki",
+                        "data_source_type": "confluence",
+                        "status": "running",
+                        "started_at": "2024-01-15T10:00:00Z",
+                        "completed_at": None,
+                        "documents_processed": 15,
+                        "documents_failed": 0,
+                        "error_message": None,
+                        "metadata": {
+                            "sync_type": "full_sync",
+                            "task_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                        }
+                    }
+                }
+            }
+        },
+        403: {"description": "Admin access required"},
+        404: {"description": "Ingestion job not found"},
+        500: {"description": "Internal server error"}
+    }
+)
+async def get_ingestion_job(
+    job_id: int,
+    admin: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+) -> Dict[str, Any]:
+    """
+    Get detailed information about an ingestion job.
+
+    Args:
+        job_id: ID of the job to retrieve
+        admin: Authenticated admin user (from dependency)
+        db: Database session
+
+    Returns:
+        Ingestion job details
+
+    Raises:
+        HTTPException 403: If user is not admin
+        HTTPException 404: If job not found
+        HTTPException 500: If retrieval fails
+    """
+    logger.info(f"Admin {admin.email} retrieving ingestion job ID: {job_id}")
+
+    try:
+        service = IngestionJobService(db)
+        job = await service.get_job(job_id, include_data_source=True)
+
+        if not job:
+            logger.warning(f"Ingestion job not found: {job_id}")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Ingestion job not found: {job_id}"
+            )
+
+        logger.info(f"Retrieved ingestion job: {job_id} (status: {job.status.value})")
+
+        return {
+            "id": job.id,
+            "data_source_id": job.data_source_id,
+            "data_source_name": job.data_source.name if job.data_source else None,
+            "data_source_type": job.data_source.type.value if job.data_source else None,
+            "status": job.status.value,
+            "started_at": job.started_at,
+            "completed_at": job.completed_at,
+            "documents_processed": job.documents_processed,
+            "documents_failed": job.documents_failed,
+            "error_message": job.error_message,
+            "metadata": job.job_metadata
+        }
+
+    except HTTPException:
+        raise
+    except IngestionJobError as e:
+        logger.error(f"Failed to get ingestion job: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get ingestion job: {str(e)}"
+        )
+    except Exception as e:
+        logger.error(f"Unexpected error getting ingestion job: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred"
+        )
