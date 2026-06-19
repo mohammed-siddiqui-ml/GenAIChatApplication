@@ -1,0 +1,170 @@
+# Promtail Configuration for GenAI Knowledge Retrieval System
+# Log Shipping Agent Configuration
+#
+# This configuration defines:
+# - Promtail server settings
+# - Log positions tracking
+# - Loki client configuration
+# - Scrape jobs for various services
+
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+  log_level: info
+
+# Position tracking to avoid re-reading logs
+positions:
+  filename: /tmp/positions.yaml
+
+# Loki client configuration
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+    batchwait: 1s
+    batchsize: 1048576  # 1MB
+    timeout: 10s
+    backoff_config:
+      min_period: 500ms
+      max_period: 5m
+      max_retries: 10
+    
+    # External labels added to all logs
+    external_labels:
+      cluster: 'genai-knowledge-retrieval'
+      environment: 'production'
+
+# Scrape configurations for different log sources
+scrape_configs:
+  # FastAPI Backend Application Logs
+  - job_name: backend
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: backend
+          service: fastapi
+          component: api
+          __path__: /var/log/backend/*.log
+    
+    pipeline_stages:
+      # Parse JSON logs
+      - json:
+          expressions:
+            timestamp: timestamp
+            level: level
+            logger: name
+            message: message
+            service: service
+            trace_id: trace_id
+            user_id: user_id
+            method: method
+            path: path
+            status_code: status_code
+            duration: duration
+      
+      # Extract timestamp
+      - timestamp:
+          source: timestamp
+          format: RFC3339
+      
+      # Set log level as label
+      - labels:
+          level:
+          service:
+          trace_id:
+          user_id:
+      
+      # Output stage
+      - output:
+          source: message
+
+  # Celery Worker Logs
+  - job_name: celery
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: celery
+          service: celery-worker
+          component: background-tasks
+          __path__: /var/log/celery/*.log
+    
+    pipeline_stages:
+      # Parse JSON logs
+      - json:
+          expressions:
+            timestamp: timestamp
+            level: level
+            logger: name
+            message: message
+            service: service
+            trace_id: trace_id
+            task_id: task_id
+            task_name: task_name
+      
+      # Extract timestamp
+      - timestamp:
+          source: timestamp
+          format: RFC3339
+      
+      # Set log level and metadata as labels
+      - labels:
+          level:
+          service:
+          task_name:
+      
+      # Output stage
+      - output:
+          source: message
+
+  # Nginx Access Logs
+  - job_name: nginx-access
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: nginx
+          service: nginx
+          component: reverse-proxy
+          log_type: access
+          __path__: /var/log/nginx/access.log
+    
+    pipeline_stages:
+      # Parse nginx access log format
+      - regex:
+          expression: '^(?P<remote_addr>[\w\.]+) - (?P<remote_user>[^ ]*) \[(?P<timestamp>[^\]]+)\] "(?P<method>\w+) (?P<path>[^ ]*) (?P<protocol>[^"]*)" (?P<status>\d+) (?P<bytes_sent>\d+) "(?P<http_referer>[^"]*)" "(?P<http_user_agent>[^"]*)"'
+      
+      # Extract timestamp
+      - timestamp:
+          source: timestamp
+          format: '02/Jan/2006:15:04:05 -0700'
+      
+      # Set labels
+      - labels:
+          method:
+          status:
+
+  # Nginx Error Logs
+  - job_name: nginx-error
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: nginx
+          service: nginx
+          component: reverse-proxy
+          log_type: error
+          __path__: /var/log/nginx/error.log
+    
+    pipeline_stages:
+      # Parse nginx error log format
+      - regex:
+          expression: '^(?P<timestamp>\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}) \[(?P<level>\w+)\] (?P<message>.*)$'
+      
+      # Extract timestamp
+      - timestamp:
+          source: timestamp
+          format: '2006/01/02 15:04:05'
+      
+      # Set labels
+      - labels:
+          level:

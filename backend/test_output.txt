@@ -1,0 +1,1822 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.10, pytest-9.1.0, pluggy-1.6.0 -- /mnt/d/workspace/auggie-agentic_sdlc_workflow/workspace/ChatApplication/project-code/backend/.venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /mnt/d/workspace/auggie-agentic_sdlc_workflow/workspace/ChatApplication/project-code/backend
+configfile: pytest.ini (WARNING: ignoring pytest config in pyproject.toml!)
+plugins: anyio-4.14.0, langsmith-0.8.16, asyncio-1.4.0, cov-7.1.0, mock-3.15.1
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 638 items
+
+tests/test_admin_service.py::test_validate_confluence_config_valid PASSED [  0%]
+tests/test_admin_service.py::test_validate_jira_config_valid PASSED      [  0%]
+tests/test_admin_service.py::test_validate_onboarding_config_valid PASSED [  0%]
+tests/test_admin_service.py::test_validate_confluence_config_missing_fields PASSED [  0%]
+tests/test_admin_service.py::test_validate_jira_config_invalid_project_key PASSED [  0%]
+tests/test_admin_service.py::test_validate_config_invalid_url PASSED     [  0%]
+tests/test_admin_service.py::test_validate_confluence_space_key_format PASSED [  1%]
+tests/test_admin_service.py::test_create_confluence_data_source PASSED   [  1%]
+tests/test_admin_service.py::test_create_jira_data_source PASSED         [  1%]
+tests/test_admin_service.py::test_create_onboarding_data_source PASSED   [  1%]
+tests/test_admin_service.py::test_get_data_source_by_id PASSED           [  1%]
+tests/test_admin_service.py::test_update_data_source_name_and_config PASSED [  1%]
+tests/test_admin_service.py::test_update_sync_schedule PASSED            [  2%]
+tests/test_admin_service.py::test_update_is_active_status PASSED         [  2%]
+tests/test_admin_service.py::test_delete_data_source PASSED              [  2%]
+tests/test_admin_service.py::test_list_data_sources_with_pagination PASSED [  2%]
+tests/test_admin_service.py::test_filter_data_sources_by_type PASSED     [  2%]
+tests/test_admin_service.py::test_filter_data_sources_by_is_active PASSED [  2%]
+tests/test_admin_service.py::test_encryption_on_create PASSED            [  2%]
+tests/test_admin_service.py::test_encryption_remains_in_database PASSED  [  3%]
+tests/test_admin_service.py::test_decryption_when_requested PASSED       [  3%]
+tests/test_admin_service.py::test_encryption_preserved_when_decrypt_false PASSED [  3%]
+tests/test_admin_service.py::test_update_preserves_encryption PASSED     [  3%]
+tests/test_admin_service.py::test_delete_data_source_no_documents PASSED [  3%]
+tests/test_admin_service.py::test_delete_data_source_with_documents_cascade PASSED [  3%]
+tests/test_admin_service.py::test_create_data_source_invalid_config PASSED [  4%]
+tests/test_admin_service.py::test_create_data_source_invalid_cron PASSED [  4%]
+tests/test_admin_service.py::test_update_nonexistent_data_source PASSED  [  4%]
+tests/test_admin_service.py::test_delete_nonexistent_data_source PASSED  [  4%]
+tests/test_admin_service.py::test_get_nonexistent_data_source PASSED     [  4%]
+tests/test_admin_service.py::test_update_with_invalid_config PASSED      [  4%]
+tests/test_admin_service.py::test_update_with_invalid_cron PASSED        [  5%]
+tests/test_admin_service.py::test_list_data_sources_empty PASSED         [  5%]
+tests/test_admin_service.py::test_list_data_sources_decrypt_config PASSED [  5%]
+tests/test_celery_config.py::TestCeleryConfiguration::test_broker_url_configured PASSED [  5%]
+tests/test_celery_config.py::TestCeleryConfiguration::test_result_backend_configured PASSED [  5%]
+tests/test_celery_config.py::TestCeleryConfiguration::test_broker_and_backend_different PASSED [  5%]
+tests/test_celery_config.py::TestTaskQueues::test_task_queues_configured PASSED [  5%]
+tests/test_celery_config.py::TestTaskQueues::test_default_queue_configured PASSED [  6%]
+tests/test_celery_config.py::TestTaskRouting::test_confluence_task_routing PASSED [  6%]
+tests/test_celery_config.py::TestTaskRouting::test_jira_task_routing PASSED [  6%]
+tests/test_celery_config.py::TestTaskRouting::test_embeddings_task_routing PASSED [  6%]
+tests/test_celery_config.py::TestTaskRouting::test_onboarding_task_routing PASSED [  6%]
+tests/test_celery_config.py::TestTaskSettings::test_result_expiration PASSED [  6%]
+tests/test_celery_config.py::TestTaskSettings::test_max_retries_configured PASSED [  7%]
+tests/test_celery_config.py::TestBeatSchedule::test_beat_schedule_configured PASSED [  7%]
+tests/test_celery_config.py::TestBeatSchedule::test_confluence_refresh_schedule PASSED [  7%]
+tests/test_celery_config.py::TestBeatSchedule::test_jira_refresh_schedule PASSED [  7%]
+tests/test_celery_execution.py::TestTaskExecution::test_health_check_task_execution PASSED [  7%]
+tests/test_celery_execution.py::TestTaskExecution::test_cleanup_task_execution PASSED [  7%]
+tests/test_celery_execution.py::TestTaskExecution::test_task_state_tracking PASSED [  7%]
+tests/test_celery_execution.py::TestTaskExecution::test_task_with_parameters PASSED [  8%]
+tests/test_celery_execution.py::TestTaskResults::test_task_result_stored FAILED [  8%]
+tests/test_celery_execution.py::TestTaskResults::test_task_return_value_matches PASSED [  8%]
+tests/test_celery_execution.py::TestTaskRetry::test_task_retry_configuration PASSED [  8%]
+tests/test_celery_execution.py::TestTaskRetry::test_exponential_backoff_implementation PASSED [  8%]
+tests/test_celery_execution.py::TestTaskRegistration::test_maintenance_tasks_registered PASSED [  8%]
+tests/test_celery_execution.py::TestTaskRegistration::test_task_names_correct PASSED [  9%]
+tests/test_celery_worker.py::TestBrokerConnection::test_broker_connection FAILED [  9%]
+tests/test_celery_worker.py::TestBrokerConnection::test_result_backend_connection PASSED [  9%]
+tests/test_celery_worker.py::TestWorkerConfiguration::test_worker_prefetch_multiplier PASSED [  9%]
+tests/test_celery_worker.py::TestWorkerConfiguration::test_worker_max_tasks_per_child PASSED [  9%]
+tests/test_celery_worker.py::TestWorkerConfiguration::test_task_acks_late_enabled PASSED [  9%]
+tests/test_celery_worker.py::TestWorkerConfiguration::test_task_reject_on_worker_lost PASSED [ 10%]
+tests/test_celery_worker.py::TestMonitoringSettings::test_task_events_enabled PASSED [ 10%]
+tests/test_celery_worker.py::TestMonitoringSettings::test_task_sent_events_enabled PASSED [ 10%]
+tests/test_celery_worker.py::TestMonitoringSettings::test_task_tracking_enabled PASSED [ 10%]
+tests/test_celery_worker.py::TestSerializationSettings::test_task_serializer PASSED [ 10%]
+tests/test_celery_worker.py::TestSerializationSettings::test_result_serializer PASSED [ 10%]
+tests/test_celery_worker.py::TestSerializationSettings::test_accept_content PASSED [ 10%]
+tests/test_celery_worker.py::TestTimezoneSettings::test_timezone_utc PASSED [ 11%]
+tests/test_celery_worker.py::TestTimezoneSettings::test_enable_utc PASSED [ 11%]
+tests/test_celery_worker.py::TestTaskLimits::test_hard_time_limit PASSED [ 11%]
+tests/test_celery_worker.py::TestTaskLimits::test_soft_time_limit PASSED [ 11%]
+tests/test_celery_worker.py::TestResultPersistence::test_result_persistent PASSED [ 11%]
+tests/test_celery_worker.py::TestResultPersistence::test_task_ignore_result PASSED [ 11%]
+tests/test_celery_worker.py::TestCeleryAppInitialization::test_celery_app_name PASSED [ 12%]
+tests/test_celery_worker.py::TestCeleryAppInitialization::test_celery_app_instance PASSED [ 12%]
+tests/test_crypto.py::test_encrypt_config_field PASSED                   [ 12%]
+tests/test_crypto.py::test_decrypt_config_field PASSED                   [ 12%]
+tests/test_crypto.py::test_encrypt_decrypt_round_trip PASSED             [ 12%]
+tests/test_crypto.py::test_encrypt_config_field_empty_string PASSED      [ 12%]
+tests/test_crypto.py::test_decrypt_config_field_empty_string PASSED      [ 13%]
+tests/test_crypto.py::test_key_derivation_consistency PASSED             [ 13%]
+tests/test_crypto.py::test_encrypt_config_dict PASSED                    [ 13%]
+tests/test_crypto.py::test_decrypt_config_dict PASSED                    [ 13%]
+tests/test_crypto.py::test_encrypt_config_dict_missing_field PASSED      [ 13%]
+tests/test_crypto.py::test_encrypt_config_dict_none_value PASSED         [ 13%]
+tests/test_crypto.py::test_decrypt_invalid_data PASSED                   [ 13%]
+tests/test_crypto.py::test_encryption_different_from_plaintext PASSED    [ 14%]
+tests/test_task_001_repository_structure.py::TestGitRepository::test_git_initialized PASSED [ 14%]
+tests/test_task_001_repository_structure.py::TestGitRepository::test_branches_exist PASSED [ 14%]
+tests/test_task_001_repository_structure.py::TestGitRepository::test_initial_commit_exists PASSED [ 14%]
+tests/test_task_001_repository_structure.py::TestDirectoryStructure::test_top_level_directories PASSED [ 14%]
+tests/test_task_001_repository_structure.py::TestDirectoryStructure::test_backend_structure PASSED [ 14%]
+tests/test_task_001_repository_structure.py::TestDirectoryStructure::test_frontend_structure FAILED [ 15%]
+tests/test_task_001_repository_structure.py::TestGitignore::test_gitignore_python_patterns PASSED [ 15%]
+tests/test_task_001_repository_structure.py::TestGitignore::test_nodejs_patterns PASSED [ 15%]
+tests/test_task_001_repository_structure.py::TestGitignore::test_docker_patterns PASSED [ 15%]
+tests/test_task_001_repository_structure.py::TestGitignore::test_env_patterns PASSED [ 15%]
+tests/test_task_001_repository_structure.py::TestDocumentation::test_readme_exists_and_content PASSED [ 15%]
+tests/test_task_001_repository_structure.py::TestConfigFiles::test_essential_config_files FAILED [ 15%]
+tests/test_task_001_repository_structure.py::TestConfigFiles::test_dockerfiles PASSED [ 16%]
+tests/test_task_001_repository_structure.py::TestConfigFiles::test_docker_compose PASSED [ 16%]
+tests/test_task_001_repository_structure.py::TestConfigFiles::test_setup_scripts PASSED [ 16%]
+tests/test_task_001_repository_structure.py::TestConfigFiles::test_infrastructure_docs PASSED [ 16%]
+tests/test_task_004_fastapi_structure.py::TestDirectoryStructure::test_src_directory_exists PASSED [ 16%]
+tests/test_task_004_fastapi_structure.py::TestDirectoryStructure::test_required_subdirectories_exist PASSED [ 16%]
+tests/test_task_004_fastapi_structure.py::TestDirectoryStructure::test_init_files_exist PASSED [ 17%]
+tests/test_task_004_fastapi_structure.py::TestDirectoryStructure::test_core_files_exist PASSED [ 17%]
+tests/test_task_004_fastapi_structure.py::TestApplicationStartup::test_app_instance_creation ERROR [ 17%]
+tests/test_task_004_fastapi_structure.py::TestApplicationStartup::test_app_metadata ERROR [ 17%]
+tests/test_task_004_fastapi_structure.py::TestApplicationStartup::test_root_endpoint ERROR [ 17%]
+tests/test_task_004_fastapi_structure.py::TestApplicationStartup::test_health_check_endpoint ERROR [ 17%]
+tests/test_task_004_fastapi_structure.py::TestApplicationStartup::test_cors_middleware_configured ERROR [ 18%]
+tests/test_task_004_fastapi_structure.py::TestConfigurationManagement::test_settings_import PASSED [ 18%]
+tests/test_task_004_fastapi_structure.py::TestConfigurationManagement::test_settings_values_loaded PASSED [ 18%]
+tests/test_task_004_fastapi_structure.py::TestConfigurationManagement::test_settings_validation PASSED [ 18%]
+tests/test_task_004_fastapi_structure.py::TestPackageImports::test_core_module_import PASSED [ 18%]
+tests/test_task_004_fastapi_structure.py::TestPackageImports::test_core_exports PASSED [ 18%]
+tests/test_task_004_fastapi_structure.py::TestPackageImports::test_api_modules_import PASSED [ 18%]
+tests/test_task_004_fastapi_structure.py::TestPackageImports::test_other_modules_import PASSED [ 19%]
+tests/test_task_004_fastapi_structure.py::TestLoggingSystem::test_logging_import PASSED [ 19%]
+tests/test_task_004_fastapi_structure.py::TestLoggingSystem::test_logging_initialization PASSED [ 19%]
+tests/test_task_004_fastapi_structure.py::TestLoggingSystem::test_logger_functionality PASSED [ 19%]
+tests/test_task_006_migration_setup.py::TestAlembicConfiguration::test_alembic_ini_exists PASSED [ 19%]
+tests/test_task_006_migration_setup.py::TestAlembicConfiguration::test_alembic_directory_exists PASSED [ 19%]
+tests/test_task_006_migration_setup.py::TestAlembicConfiguration::test_alembic_env_py_exists PASSED [ 20%]
+tests/test_task_006_migration_setup.py::TestAlembicConfiguration::test_alembic_script_template_exists PASSED [ 20%]
+tests/test_task_006_migration_setup.py::TestAlembicConfiguration::test_alembic_versions_directory_exists PASSED [ 20%]
+tests/test_task_006_migration_setup.py::TestInitialMigration::test_initial_migration_exists PASSED [ 20%]
+tests/test_task_006_migration_setup.py::TestInitialMigration::test_migration_has_upgrade_function PASSED [ 20%]
+tests/test_task_006_migration_setup.py::TestInitialMigration::test_migration_has_downgrade_function PASSED [ 20%]
+tests/test_task_006_migration_setup.py::TestInitialMigration::test_migration_creates_pgvector_extension PASSED [ 21%]
+tests/test_task_006_migration_setup.py::TestInitialMigration::test_migration_creates_all_tables PASSED [ 21%]
+tests/test_task_006_migration_setup.py::TestInitialMigration::test_migration_creates_enum_types PASSED [ 21%]
+tests/test_task_006_migration_setup.py::TestTestingScripts::test_verify_schema_sql_exists PASSED [ 21%]
+tests/test_task_006_migration_setup.py::TestTestingScripts::test_test_migration_script_exists PASSED [ 21%]
+tests/test_task_007_orm_models.py::TestModelStructure::test_all_models_registered PASSED [ 21%]
+tests/test_task_007_orm_models.py::TestModelStructure::test_user_model_columns PASSED [ 21%]
+tests/test_task_007_orm_models.py::TestModelStructure::test_enum_definitions PASSED [ 22%]
+tests/test_task_007_orm_models.py::TestModelMethods::test_user_has_role PASSED [ 22%]
+tests/test_task_007_orm_models.py::TestModelMethods::test_user_is_admin PASSED [ 22%]
+tests/test_task_007_orm_models.py::TestModelMethods::test_ingestion_job_is_complete PASSED [ 22%]
+tests/test_task_007_orm_models.py::TestModelMethods::test_ingestion_job_is_running PASSED [ 22%]
+tests/test_task_007_orm_models.py::TestModelMethods::test_to_dict_utility PASSED [ 22%]
+tests/test_task_007_orm_models.py::TestAsyncDatabaseOperations::test_create_user PASSED [ 23%]
+tests/test_task_007_orm_models.py::TestAsyncDatabaseOperations::test_create_chat_session_anonymous PASSED [ 23%]
+tests/test_task_007_orm_models.py::TestAsyncDatabaseOperations::test_create_chat_message_with_metadata PASSED [ 23%]
+tests/test_task_007_orm_models.py::TestAsyncDatabaseOperations::test_create_data_source_with_config PASSED [ 23%]
+tests/test_task_007_orm_models.py::TestAsyncDatabaseOperations::test_create_knowledge_document PASSED [ 23%]
+tests/test_task_007_orm_models.py::TestAsyncDatabaseOperations::test_create_audit_log PASSED [ 23%]
+tests/test_task_007_orm_models.py::TestRelationships::test_user_to_chat_sessions_relationship PASSED [ 23%]
+tests/test_task_007_orm_models.py::TestRelationships::test_chat_session_cascade_delete_messages PASSED [ 24%]
+tests/test_task_007_orm_models.py::TestRelationships::test_data_source_set_null_on_user_delete PASSED [ 24%]
+tests/test_task_007_orm_models.py::TestRelationships::test_data_source_cascade_delete_ingestion_jobs PASSED [ 24%]
+tests/test_task_008_database_session.py::TestEngineCreation::test_get_engine_creates_async_engine PASSED [ 24%]
+tests/test_task_008_database_session.py::TestEngineCreation::test_engine_pool_configuration PASSED [ 24%]
+tests/test_task_008_database_session.py::TestEngineCreation::test_engine_singleton_pattern PASSED [ 24%]
+tests/test_task_008_database_session.py::TestSessionFactory::test_get_session_factory_returns_callable PASSED [ 25%]
+tests/test_task_008_database_session.py::TestSessionFactory::test_session_factory_configuration PASSED [ 25%]
+tests/test_task_008_database_session.py::TestAsyncSessionLifecycle::test_get_db_yields_async_session PASSED [ 25%]
+tests/test_task_008_database_session.py::TestAsyncSessionLifecycle::test_session_commits_on_success PASSED [ 25%]
+tests/test_task_008_database_session.py::TestAsyncSessionLifecycle::test_session_rolls_back_on_error PASSED [ 25%]
+tests/test_task_008_database_session.py::TestAsyncSessionLifecycle::test_session_closes_after_use PASSED [ 25%]
+tests/test_task_008_database_session.py::TestDatabaseInitialization::test_init_db_executes_without_error PASSED [ 26%]
+tests/test_task_008_database_session.py::TestDatabaseInitialization::test_init_db_handles_connection_errors PASSED [ 26%]
+tests/test_task_008_database_session.py::TestDatabaseHealthCheck::test_check_db_health_returns_true_when_healthy PASSED [ 26%]
+tests/test_task_008_database_session.py::TestDatabaseHealthCheck::test_check_db_health_returns_false_on_error PASSED [ 26%]
+tests/test_task_008_database_session.py::TestConnectionPoolBehavior::test_concurrent_sessions_use_pool PASSED [ 26%]
+tests/test_task_008_database_session.py::TestConnectionPoolBehavior::test_session_isolation PASSED [ 26%]
+tests/test_task_008_database_session.py::TestFastAPIIntegration::test_get_db_can_be_used_as_dependency FAILED [ 26%]
+tests/test_task_008_database_session.py::TestFastAPIIntegration::test_database_dependency_in_route FAILED [ 27%]
+tests/test_task_008_database_session.py::TestDatabaseCleanup::test_close_db_disposes_engine PASSED [ 27%]
+tests/test_task_008_database_session.py::TestDatabaseCleanup::test_close_db_handles_errors_gracefully PASSED [ 27%]
+tests/test_task_009_redis_cache_layer.py::TestConnectionManagement::test_tc_a1_connection_pool_creation PASSED [ 27%]
+tests/test_task_009_redis_cache_layer.py::TestConnectionManagement::test_tc_a2_redis_client_singleton PASSED [ 27%]
+tests/test_task_009_redis_cache_layer.py::TestLifecycleManagement::test_tc_b1_init_redis_success PASSED [ 27%]
+tests/test_task_009_redis_cache_layer.py::TestLifecycleManagement::test_tc_b2_redis_health_check_pass PASSED [ 28%]
+tests/test_task_009_redis_cache_layer.py::TestLifecycleManagement::test_tc_b3_redis_health_check_fail PASSED [ 28%]
+tests/test_task_009_redis_cache_layer.py::TestCacheUtilities::test_tc_c1_cache_get_hit PASSED [ 28%]
+tests/test_task_009_redis_cache_layer.py::TestCacheUtilities::test_tc_c2_cache_get_miss PASSED [ 28%]
+tests/test_task_009_redis_cache_layer.py::TestCacheUtilities::test_tc_c3_cache_set_without_expiration PASSED [ 28%]
+tests/test_task_009_redis_cache_layer.py::TestCacheUtilities::test_tc_c4_cache_set_with_expiration PASSED [ 28%]
+tests/test_task_009_redis_cache_layer.py::TestSessionManagement::test_tc_d1_session_set_with_default_expiration PASSED [ 28%]
+tests/test_task_009_redis_cache_layer.py::TestSessionManagement::test_tc_d5_session_delete_logout PASSED [ 29%]
+tests/test_task_009_redis_cache_layer.py::TestRateLimiting::test_tc_e1_rate_limit_first_request PASSED [ 29%]
+tests/test_task_009_redis_cache_layer.py::TestRateLimiting::test_tc_e2_rate_limit_increment_existing PASSED [ 29%]
+tests/test_task_009_redis_cache_layer.py::TestRateLimiting::test_tc_e4_rate_limit_check_allow PASSED [ 29%]
+tests/test_task_009_redis_cache_layer.py::TestRateLimiting::test_tc_e5_rate_limit_check_block PASSED [ 29%]
+tests/test_task_009_redis_cache_layer.py::TestRateLimiting::test_tc_e7_rate_limit_get_remaining PASSED [ 29%]
+tests/test_task_009_redis_cache_layer.py::TestRateLimiting::test_tc_e9_rate_limit_counter_expires PASSED [ 30%]
+tests/test_task_009_redis_cache_layer.py::TestCeleryIntegration::test_tc_f1_celery_broker_url PASSED [ 30%]
+tests/test_task_009_redis_cache_layer.py::TestCeleryIntegration::test_tc_f2_celery_result_backend_url PASSED [ 30%]
+tests/test_task_009_redis_cache_layer.py::TestFastAPIIntegration::test_tc_h1_ready_endpoint_healthy_redis ERROR [ 30%]
+tests/test_task_009_redis_cache_layer.py::TestFastAPIIntegration::test_tc_h2_ready_endpoint_unhealthy_redis ERROR [ 30%]
+tests/test_task_010_minio_client.py::test_singleton_pattern PASSED       [ 30%]
+tests/test_task_010_minio_client.py::test_client_configuration PASSED    [ 31%]
+tests/test_task_010_minio_client.py::test_init_minio_creates_buckets PASSED [ 31%]
+tests/test_task_010_minio_client.py::test_init_minio_idempotent PASSED   [ 31%]
+tests/test_task_010_minio_client.py::test_upload_file_with_auto_content_type PASSED [ 31%]
+tests/test_task_010_minio_client.py::test_upload_file_with_manual_content_type PASSED [ 31%]
+tests/test_task_010_minio_client.py::test_upload_file_unknown_extension PASSED [ 31%]
+tests/test_task_010_minio_client.py::test_download_file_success PASSED   [ 31%]
+tests/test_task_010_minio_client.py::test_download_file_not_found PASSED [ 32%]
+tests/test_task_010_minio_client.py::test_delete_file_success PASSED     [ 32%]
+tests/test_task_010_minio_client.py::test_delete_file_idempotent PASSED  [ 32%]
+tests/test_task_010_minio_client.py::test_health_check_success PASSED    [ 32%]
+tests/test_task_010_minio_client.py::test_health_check_missing_buckets PASSED [ 32%]
+tests/test_task_010_minio_client.py::test_health_check_connection_failure PASSED [ 32%]
+tests/test_task_010_minio_client.py::test_get_file_info_success PASSED   [ 33%]
+tests/test_task_010_minio_client.py::test_get_file_info_not_found PASSED [ 33%]
+tests/test_task_010_minio_client.py::test_list_files_with_prefix PASSED  [ 33%]
+tests/test_task_010_minio_client.py::test_list_files_empty_bucket PASSED [ 33%]
+tests/test_task_010_minio_client.py::test_detect_content_type_pdf PASSED [ 33%]
+tests/test_task_010_minio_client.py::test_detect_content_type_images PASSED [ 33%]
+tests/test_task_010_minio_client.py::test_detect_content_type_documents PASSED [ 34%]
+tests/test_task_010_minio_client.py::test_detect_content_type_unknown PASSED [ 34%]
+tests/test_task_010_minio_client.py::test_init_minio_connection_error PASSED [ 34%]
+tests/test_task_010_minio_client.py::test_upload_file_s3_error PASSED    [ 34%]
+tests/test_task_011_auth_service.py::test_hash_password_bcrypt_cost_factor_12 PASSED [ 34%]
+tests/test_task_011_auth_service.py::test_verify_password_success PASSED [ 34%]
+tests/test_task_011_auth_service.py::test_verify_password_failure PASSED [ 34%]
+tests/test_task_011_auth_service.py::test_create_access_token_24_hour_expiry PASSED [ 35%]
+tests/test_task_011_auth_service.py::test_create_refresh_token_7_day_expiry PASSED [ 35%]
+tests/test_task_011_auth_service.py::test_decode_valid_token PASSED      [ 35%]
+tests/test_task_011_auth_service.py::test_reject_expired_token PASSED    [ 35%]
+tests/test_task_011_auth_service.py::test_reject_invalid_signature FAILED [ 35%]
+tests/test_task_011_auth_service.py::test_verify_token_valid PASSED      [ 35%]
+tests/test_task_011_auth_service.py::test_verify_token_invalid PASSED    [ 36%]
+tests/test_task_011_auth_service.py::test_get_token_expiration PASSED    [ 36%]
+tests/test_task_011_auth_service.py::test_login_with_valid_credentials PASSED [ 36%]
+tests/test_task_011_auth_service.py::test_login_with_invalid_email PASSED [ 36%]
+tests/test_task_011_auth_service.py::test_login_with_invalid_password PASSED [ 36%]
+tests/test_task_011_auth_service.py::test_login_with_inactive_user PASSED [ 36%]
+tests/test_task_011_auth_service.py::test_logout_adds_token_to_blacklist PASSED [ 36%]
+tests/test_task_011_auth_service.py::test_blacklisted_token_rejected PASSED [ 37%]
+tests/test_task_011_auth_service.py::test_refresh_access_token_with_valid_refresh_token PASSED [ 37%]
+tests/test_task_011_auth_service.py::test_reject_refresh_with_access_token PASSED [ 37%]
+tests/test_task_011_auth_service.py::test_set_auth_cookie PASSED         [ 37%]
+tests/test_task_011_auth_service.py::test_clear_auth_cookie PASSED       [ 37%]
+tests/test_task_011_auth_service.py::test_get_current_user_from_valid_token PASSED [ 37%]
+tests/test_task_011_auth_service.py::test_get_current_user_with_invalid_token PASSED [ 38%]
+tests/test_task_011_auth_service.py::test_admin_user_has_admin_role PASSED [ 38%]
+tests/test_task_011_auth_service.py::test_regular_user_not_admin PASSED  [ 38%]
+tests/test_task_011_auth_service.py::test_full_authentication_flow PASSED [ 38%]
+tests/test_task_011_auth_service.py::test_token_refresh_flow PASSED      [ 38%]
+tests/test_task_012_auth_endpoints.py::test_register_valid_credentials ERROR [ 38%]
+tests/test_task_012_auth_endpoints.py::test_register_invalid_email ERROR [ 39%]
+tests/test_task_012_auth_endpoints.py::test_register_weak_password ERROR [ 39%]
+tests/test_task_012_auth_endpoints.py::test_register_duplicate_email ERROR [ 39%]
+tests/test_task_012_auth_endpoints.py::test_login_valid_credentials ERROR [ 39%]
+tests/test_task_012_auth_endpoints.py::test_login_invalid_password ERROR [ 39%]
+tests/test_task_012_auth_endpoints.py::test_login_nonexistent_user ERROR [ 39%]
+tests/test_task_012_auth_endpoints.py::test_login_inactive_account ERROR [ 39%]
+tests/test_task_012_auth_endpoints.py::test_logout_success ERROR         [ 40%]
+tests/test_task_012_auth_endpoints.py::test_logout_without_authentication ERROR [ 40%]
+tests/test_task_012_auth_endpoints.py::test_get_current_user_success ERROR [ 40%]
+tests/test_task_012_auth_endpoints.py::test_get_profile_without_authentication ERROR [ 40%]
+tests/test_task_012_auth_endpoints.py::test_get_profile_invalid_token ERROR [ 40%]
+tests/test_task_012_auth_endpoints.py::test_password_complexity_validation ERROR [ 40%]
+tests/test_task_012_auth_endpoints.py::test_email_case_sensitivity ERROR [ 41%]
+tests/test_task_012_auth_endpoints.py::test_role_validation ERROR        [ 41%]
+tests/test_task_013_auth_middleware.py::TestTokenExtraction::test_extract_token_from_header PASSED [ 41%]
+tests/test_task_013_auth_middleware.py::TestTokenExtraction::test_extract_token_from_cookie PASSED [ 41%]
+tests/test_task_013_auth_middleware.py::TestTokenExtraction::test_missing_token PASSED [ 41%]
+tests/test_task_013_auth_middleware.py::TestTokenExtraction::test_prioritize_header_over_cookie PASSED [ 41%]
+tests/test_task_013_auth_middleware.py::TestUserAuthentication::test_authenticate_valid_token PASSED [ 42%]
+tests/test_task_013_auth_middleware.py::TestUserAuthentication::test_reject_invalid_token PASSED [ 42%]
+tests/test_task_013_auth_middleware.py::TestUserAuthentication::test_reject_token_for_nonexistent_user PASSED [ 42%]
+tests/test_task_013_auth_middleware.py::TestUserAuthentication::test_missing_token_raises_401 PASSED [ 42%]
+tests/test_task_013_auth_middleware.py::TestActiveUserValidation::test_allow_active_user PASSED [ 42%]
+tests/test_task_013_auth_middleware.py::TestActiveUserValidation::test_block_inactive_user PASSED [ 42%]
+tests/test_task_013_auth_middleware.py::TestAdminAuthorization::test_allow_admin_access PASSED [ 42%]
+tests/test_task_013_auth_middleware.py::TestAdminAuthorization::test_block_non_admin_user PASSED [ 43%]
+tests/test_task_013_auth_middleware.py::TestAdminAuthorization::test_block_inactive_admin PASSED [ 43%]
+tests/test_task_013_auth_middleware.py::TestCookieManagement::test_set_auth_cookie PASSED [ 43%]
+tests/test_task_013_auth_middleware.py::TestCookieManagement::test_clear_auth_cookie PASSED [ 43%]
+tests/test_task_014_chat_service.py::test_generate_unique_tokens PASSED  [ 43%]
+tests/test_task_014_chat_service.py::test_token_format_validation PASSED [ 43%]
+tests/test_task_014_chat_service.py::test_create_anonymous_session PASSED [ 44%]
+tests/test_task_014_chat_service.py::test_create_authenticated_session PASSED [ 44%]
+tests/test_task_014_chat_service.py::test_validate_session_from_cache PASSED [ 44%]
+tests/test_task_014_chat_service.py::test_validate_session_from_database PASSED [ 44%]
+tests/test_task_014_chat_service.py::test_validate_invalid_session_token PASSED [ 44%]
+tests/test_task_014_chat_service.py::test_filter_ended_sessions PASSED   [ 44%]
+tests/test_task_014_chat_service.py::test_retrieve_session_history PASSED [ 44%]
+tests/test_task_014_chat_service.py::test_retrieve_limited_history PASSED [ 45%]
+tests/test_task_014_chat_service.py::test_empty_session_history PASSED   [ 45%]
+tests/test_task_014_chat_service.py::test_history_invalid_token PASSED   [ 45%]
+tests/test_task_014_chat_service.py::test_end_active_session PASSED      [ 45%]
+tests/test_task_014_chat_service.py::test_end_invalid_session PASSED     [ 45%]
+tests/test_task_014_chat_service.py::test_activity_timestamp_updates PASSED [ 45%]
+tests/test_task_015_openai_client.py::test_init_with_valid_api_key PASSED [ 46%]
+tests/test_task_015_openai_client.py::test_init_without_api_key PASSED   [ 46%]
+tests/test_task_015_openai_client.py::test_init_with_custom_models PASSED [ 46%]
+tests/test_task_015_openai_client.py::test_init_with_circuit_breaker_disabled PASSED [ 46%]
+tests/test_task_015_openai_client.py::test_generate_embedding_success PASSED [ 46%]
+tests/test_task_015_openai_client.py::test_generate_embedding_empty_text PASSED [ 46%]
+tests/test_task_015_openai_client.py::test_generate_embeddings_batch PASSED [ 47%]
+tests/test_task_015_openai_client.py::test_batch_embeddings_all_empty PASSED [ 47%]
+tests/test_task_015_openai_client.py::test_batch_embeddings_chunking PASSED [ 47%]
+tests/test_task_015_openai_client.py::test_generate_completion_success PASSED [ 47%]
+tests/test_task_015_openai_client.py::test_generate_completion_empty_messages PASSED [ 47%]
+tests/test_task_015_openai_client.py::test_generate_completion_custom_params PASSED [ 47%]
+tests/test_task_015_openai_client.py::test_generate_completion_stream PASSED [ 47%]
+tests/test_task_015_openai_client.py::test_streaming_empty_messages PASSED [ 48%]
+tests/test_task_015_openai_client.py::test_retry_on_rate_limit PASSED    [ 48%]
+tests/test_task_015_openai_client.py::test_retry_exhaustion PASSED       [ 48%]
+tests/test_task_015_openai_client.py::test_no_retry_on_client_errors PASSED [ 48%]
+tests/test_task_015_openai_client.py::test_retry_on_server_errors PASSED [ 48%]
+tests/test_task_015_openai_client.py::test_circuit_breaker_initial_state PASSED [ 48%]
+tests/test_task_015_openai_client.py::test_circuit_breaker_opens_after_failures PASSED [ 49%]
+tests/test_task_015_openai_client.py::test_circuit_breaker_raises_when_open PASSED [ 49%]
+tests/test_task_015_openai_client.py::test_circuit_breaker_transitions_to_half_open PASSED [ 49%]
+tests/test_task_015_openai_client.py::test_circuit_breaker_closes_on_success PASSED [ 49%]
+tests/test_task_015_openai_client.py::test_circuit_breaker_reopens_on_half_open_failure PASSED [ 49%]
+tests/test_task_015_openai_client.py::test_circuit_breaker_integration PASSED [ 49%]
+tests/test_task_015_openai_client.py::test_count_tokens PASSED           [ 50%]
+tests/test_task_015_openai_client.py::test_count_tokens_with_model PASSED [ 50%]
+tests/test_task_015_openai_client.py::test_usage_stats_initial PASSED    [ 50%]
+tests/test_task_015_openai_client.py::test_usage_stats_update PASSED     [ 50%]
+tests/test_task_015_openai_client.py::test_usage_stats_cumulative PASSED [ 50%]
+tests/test_task_015_openai_client.py::test_usage_stats_tracking PASSED   [ 50%]
+tests/test_task_015_openai_client.py::test_reset_usage_stats PASSED      [ 50%]
+tests/test_task_015_openai_client.py::test_get_usage_stats PASSED        [ 51%]
+tests/test_task_015_openai_client.py::test_get_circuit_breaker_state PASSED [ 51%]
+tests/test_task_015_openai_client.py::test_get_circuit_breaker_state_disabled PASSED [ 51%]
+tests/test_task_016_text_processing.py::TestTokenCounting::test_count_tokens_simple_text PASSED [ 51%]
+tests/test_task_016_text_processing.py::TestTokenCounting::test_count_tokens_empty_string PASSED [ 51%]
+tests/test_task_016_text_processing.py::TestTokenCounting::test_count_tokens_special_characters PASSED [ 51%]
+tests/test_task_016_text_processing.py::TestTokenCounting::test_count_tokens_unicode PASSED [ 52%]
+tests/test_task_016_text_processing.py::TestTokenCounting::test_count_tokens_invalid_model PASSED [ 52%]
+tests/test_task_016_text_processing.py::TestNormalization::test_normalize_multiple_spaces PASSED [ 52%]
+tests/test_task_016_text_processing.py::TestNormalization::test_normalize_control_characters PASSED [ 52%]
+tests/test_task_016_text_processing.py::TestNormalization::test_normalize_mixed_line_endings PASSED [ 52%]
+tests/test_task_016_text_processing.py::TestNormalization::test_normalize_excessive_newlines PASSED [ 52%]
+tests/test_task_016_text_processing.py::TestNormalization::test_normalize_empty_string PASSED [ 52%]
+tests/test_task_016_text_processing.py::TestHTMLCleaning::test_clean_html_script_tags PASSED [ 53%]
+tests/test_task_016_text_processing.py::TestHTMLCleaning::test_clean_html_style_tags PASSED [ 53%]
+tests/test_task_016_text_processing.py::TestHTMLCleaning::test_clean_html_comments PASSED [ 53%]
+tests/test_task_016_text_processing.py::TestHTMLCleaning::test_clean_html_complex_nested PASSED [ 53%]
+tests/test_task_016_text_processing.py::TestHTMLCleaning::test_clean_html_malformed PASSED [ 53%]
+tests/test_task_016_text_processing.py::TestHTMLCleaning::test_clean_html_empty_and_plain_text PASSED [ 53%]
+tests/test_task_016_text_processing.py::TestMarkdownExtraction::test_extract_markdown_headers PASSED [ 54%]
+tests/test_task_016_text_processing.py::TestMarkdownExtraction::test_extract_markdown_bold_italic PASSED [ 54%]
+tests/test_task_016_text_processing.py::TestMarkdownExtraction::test_extract_markdown_links_images PASSED [ 54%]
+tests/test_task_016_text_processing.py::TestMarkdownExtraction::test_extract_markdown_code_blocks PASSED [ 54%]
+tests/test_task_016_text_processing.py::TestMarkdownExtraction::test_extract_markdown_lists PASSED [ 54%]
+tests/test_task_016_text_processing.py::TestMarkdownExtraction::test_extract_markdown_blockquotes PASSED [ 54%]
+tests/test_task_016_text_processing.py::TestMarkdownExtraction::test_extract_markdown_complex PASSED [ 55%]
+tests/test_task_016_text_processing.py::TestTextChunking::test_single_chunk_text PASSED [ 55%]
+tests/test_task_016_text_processing.py::TestTextChunking::test_multi_chunk_with_paragraphs PASSED [ 55%]
+tests/test_task_016_text_processing.py::TestTextChunking::test_verify_overlap PASSED [ 55%]
+tests/test_task_016_text_processing.py::TestTextChunking::test_token_based_sizing PASSED [ 55%]
+tests/test_task_016_text_processing.py::TestTextChunking::test_invalid_chunk_parameters PASSED [ 55%]
+tests/test_task_016_text_processing.py::TestTextChunking::test_empty_text_input PASSED [ 55%]
+tests/test_task_016_text_processing.py::TestDocumentBatching::test_batch_with_metadata_preservation PASSED [ 56%]
+tests/test_task_016_text_processing.py::TestDocumentBatching::test_chunk_index_metadata PASSED [ 56%]
+tests/test_task_016_text_processing.py::TestDocumentBatching::test_missing_content_key PASSED [ 56%]
+tests/test_task_016_text_processing.py::TestDocumentBatching::test_mixed_document_sizes PASSED [ 56%]
+tests/test_task_016_text_processing.py::TestDocumentBatching::test_custom_content_key PASSED [ 56%]
+tests/test_task_017_rag_service.py::TestRAGEngineInitialization::test_init_with_custom_openai_client PASSED [ 56%]
+tests/test_task_017_rag_service.py::TestRAGEngineInitialization::test_init_creates_default_openai_client PASSED [ 57%]
+tests/test_task_017_rag_service.py::TestQueryEmbedding::test_embed_query_generates_1536_dim_vector PASSED [ 57%]
+tests/test_task_017_rag_service.py::TestQueryEmbedding::test_embed_query_handles_empty_string PASSED [ 57%]
+tests/test_task_017_rag_service.py::TestVectorSearch::test_vector_search_returns_top_k_results PASSED [ 57%]
+tests/test_task_017_rag_service.py::TestVectorSearch::test_vector_search_filters_by_threshold PASSED [ 57%]
+tests/test_task_017_rag_service.py::TestContextAssembly::test_assemble_context_combines_documents PASSED [ 57%]
+tests/test_task_017_rag_service.py::TestContextAssembly::test_assemble_context_respects_token_limit PASSED [ 57%]
+tests/test_task_017_rag_service.py::TestPromptBuilding::test_build_prompt_includes_system_message PASSED [ 58%]
+tests/test_task_017_rag_service.py::TestPromptBuilding::test_build_prompt_includes_conversation_history PASSED [ 58%]
+tests/test_task_017_rag_service.py::TestNonStreamingQuery::test_query_returns_response_and_sources PASSED [ 58%]
+tests/test_task_017_rag_service.py::TestNonStreamingQuery::test_query_with_conversation_history PASSED [ 58%]
+tests/test_task_017_rag_service.py::TestStreamingQuery::test_streaming_query_returns_iterator PASSED [ 58%]
+tests/test_task_017_rag_service.py::TestErrorHandling::test_query_handles_embedding_error PASSED [ 58%]
+tests/test_task_017_rag_service.py::TestErrorHandling::test_query_handles_database_error PASSED [ 59%]
+tests/test_task_017_rag_service.py::TestErrorHandling::test_query_handles_llm_error PASSED [ 59%]
+tests/test_task_017_rag_service.py::TestErrorHandling::test_query_handles_no_search_results PASSED [ 59%]
+tests/test_task_018_chat_query_endpoint.py::TestQueryRequestValidation::test_valid_query_request PASSED [ 59%]
+tests/test_task_018_chat_query_endpoint.py::TestQueryRequestValidation::test_empty_query_validation PASSED [ 59%]
+tests/test_task_018_chat_query_endpoint.py::TestQueryRequestValidation::test_whitespace_only_query PASSED [ 59%]
+tests/test_task_018_chat_query_endpoint.py::TestQueryRequestValidation::test_query_length_max_boundary PASSED [ 60%]
+tests/test_task_018_chat_query_endpoint.py::TestQueryRequestValidation::test_query_length_valid_boundary PASSED [ 60%]
+tests/test_task_018_chat_query_endpoint.py::TestQueryRequestValidation::test_top_k_below_minimum PASSED [ 60%]
+tests/test_task_018_chat_query_endpoint.py::TestQueryRequestValidation::test_top_k_above_maximum PASSED [ 60%]
+tests/test_task_018_chat_query_endpoint.py::TestQueryRequestValidation::test_temperature_below_minimum PASSED [ 60%]
+tests/test_task_018_chat_query_endpoint.py::TestQueryRequestValidation::test_temperature_above_maximum PASSED [ 60%]
+tests/test_task_018_chat_query_endpoint.py::TestQueryRequestValidation::test_default_values PASSED [ 60%]
+tests/test_task_018_chat_query_endpoint.py::TestSessionTokenAuthentication::test_missing_session_token ERROR [ 61%]
+tests/test_task_018_chat_query_endpoint.py::TestSessionTokenAuthentication::test_empty_session_token ERROR [ 61%]
+tests/test_task_018_chat_query_endpoint.py::TestSessionTokenAuthentication::test_invalid_session_token ERROR [ 61%]
+tests/test_task_018_chat_query_endpoint.py::TestNonStreamingQuery::test_valid_non_streaming_query ERROR [ 61%]
+tests/test_task_018_chat_query_endpoint.py::TestNonStreamingQuery::test_custom_parameters ERROR [ 61%]
+tests/test_task_018_chat_query_endpoint.py::TestStreamingQuery::test_streaming_query_sse_format ERROR [ 61%]
+tests/test_task_018_chat_query_endpoint.py::TestDatabasePersistence::test_user_message_saved ERROR [ 62%]
+tests/test_task_018_chat_query_endpoint.py::TestDatabasePersistence::test_assistant_message_with_sources ERROR [ 62%]
+tests/test_task_018_chat_query_endpoint.py::TestDatabasePersistence::test_conversation_history_retrieval ERROR [ 62%]
+tests/test_task_019_websocket_server.py::TestConnectionHandling::test_tc_001_successful_connection_with_valid_session PASSED [ 62%]
+tests/test_task_019_websocket_server.py::TestConnectionHandling::test_tc_002_connection_rejection_with_invalid_session PASSED [ 62%]
+tests/test_task_019_websocket_server.py::TestConnectionHandling::test_tc_002b_connection_rejection_with_missing_auth PASSED [ 62%]
+tests/test_task_019_websocket_server.py::TestConnectionHandling::test_tc_002c_connection_rejection_with_missing_token PASSED [ 63%]
+tests/test_task_019_websocket_server.py::TestConnectionHandling::test_tc_009_disconnection_cleanup PASSED [ 63%]
+tests/test_task_019_websocket_server.py::TestQueryProcessing::test_tc_003_successful_query_with_streaming PASSED [ 63%]
+tests/test_task_019_websocket_server.py::TestQueryProcessing::test_tc_004_query_with_invalid_session_token PASSED [ 63%]
+tests/test_task_019_websocket_server.py::TestQueryProcessing::test_tc_005a_query_with_empty_query PASSED [ 63%]
+tests/test_task_019_websocket_server.py::TestQueryProcessing::test_tc_005b_query_with_missing_session_data PASSED [ 63%]
+tests/test_task_019_websocket_server.py::TestErrorHandling::test_tc_006_rag_engine_error_handling PASSED [ 63%]
+tests/test_task_019_websocket_server.py::TestErrorHandling::test_tc_006b_generic_exception_handling PASSED [ 64%]
+tests/test_task_019_websocket_server.py::TestMessagePersistence::test_tc_007_message_persistence PASSED [ 64%]
+tests/test_task_019_websocket_server.py::TestSetup::test_setup_socketio_integration FAILED [ 64%]
+tests/test_task_021_confluence_client.py::TestClientInitialization::test_init_with_valid_credentials PASSED [ 64%]
+tests/test_task_021_confluence_client.py::TestClientInitialization::test_init_without_url_raises_error PASSED [ 64%]
+tests/test_task_021_confluence_client.py::TestClientInitialization::test_init_without_username_raises_error PASSED [ 64%]
+tests/test_task_021_confluence_client.py::TestClientInitialization::test_init_without_api_token_raises_error PASSED [ 65%]
+tests/test_task_021_confluence_client.py::TestClientInitialization::test_init_with_rate_limiting_disabled PASSED [ 65%]
+tests/test_task_021_confluence_client.py::TestSpaceFetching::test_fetch_spaces_default_pagination PASSED [ 65%]
+tests/test_task_021_confluence_client.py::TestSpaceFetching::test_fetch_spaces_custom_pagination PASSED [ 65%]
+tests/test_task_021_confluence_client.py::TestSpaceFetching::test_fetch_spaces_with_type_filter PASSED [ 65%]
+tests/test_task_021_confluence_client.py::TestSpaceFetching::test_fetch_spaces_limit_capped PASSED [ 65%]
+tests/test_task_021_confluence_client.py::TestPageFetching::test_fetch_pages_default_expansion PASSED [ 65%]
+tests/test_task_021_confluence_client.py::TestPageFetching::test_fetch_page_by_id PASSED [ 66%]
+tests/test_task_021_confluence_client.py::TestPageFetching::test_get_all_pages_from_space_pagination PASSED [ 66%]
+tests/test_task_021_confluence_client.py::TestAttachments::test_fetch_attachments PASSED [ 66%]
+tests/test_task_021_confluence_client.py::TestAttachments::test_fetch_attachments_with_filename_filter PASSED [ 66%]
+tests/test_task_021_confluence_client.py::TestPageHistory::test_fetch_page_history PASSED [ 66%]
+tests/test_task_021_confluence_client.py::TestRateLimiting::test_rate_limiter_per_second_limit PASSED [ 66%]
+tests/test_task_021_confluence_client.py::TestRateLimiting::test_rate_limiter_allows_requests_within_limit PASSED [ 67%]
+tests/test_task_021_confluence_client.py::TestRateLimiting::test_client_with_rate_limiting_enabled PASSED [ 67%]
+tests/test_task_021_confluence_client.py::TestErrorHandling::test_retry_on_500_error PASSED [ 67%]
+tests/test_task_021_confluence_client.py::TestErrorHandling::test_fast_fail_on_401_auth_error PASSED [ 67%]
+tests/test_task_021_confluence_client.py::TestErrorHandling::test_fast_fail_on_403_forbidden_error PASSED [ 67%]
+tests/test_task_021_confluence_client.py::TestErrorHandling::test_handle_429_rate_limit PASSED [ 67%]
+tests/test_task_021_confluence_client.py::TestErrorHandling::test_max_retries_exhausted PASSED [ 68%]
+tests/test_task_021_confluence_client.py::TestErrorHandling::test_network_error_triggers_retry PASSED [ 68%]
+tests/test_task_021_confluence_client.py::TestConnection::test_connection_success PASSED [ 68%]
+tests/test_task_021_confluence_client.py::TestConnection::test_connection_fails_on_auth_error PASSED [ 68%]
+tests/test_task_021_confluence_client.py::TestStatistics::test_stats_track_requests PASSED [ 68%]
+tests/test_task_021_confluence_client.py::TestStatistics::test_stats_with_failures PASSED [ 68%]
+tests/test_task_021_confluence_client.py::TestStatistics::test_stats_zero_requests PASSED [ 68%]
+tests/test_task_022_jira_client.py::TestClientInitialization::test_init_with_valid_credentials PASSED [ 69%]
+tests/test_task_022_jira_client.py::TestClientInitialization::test_init_without_url_raises_error PASSED [ 69%]
+tests/test_task_022_jira_client.py::TestClientInitialization::test_init_without_username_raises_error PASSED [ 69%]
+tests/test_task_022_jira_client.py::TestClientInitialization::test_init_without_api_token_raises_error PASSED [ 69%]
+tests/test_task_022_jira_client.py::TestClientInitialization::test_init_with_rate_limiting_disabled PASSED [ 69%]
+tests/test_task_022_jira_client.py::TestIssueFetching::test_fetch_issues_default_pagination PASSED [ 69%]
+tests/test_task_022_jira_client.py::TestIssueFetching::test_fetch_issues_custom_pagination PASSED [ 70%]
+tests/test_task_022_jira_client.py::TestIssueFetching::test_fetch_issues_custom_fields PASSED [ 70%]
+tests/test_task_022_jira_client.py::TestIssueFetching::test_fetch_issues_max_results_capped PASSED [ 70%]
+tests/test_task_022_jira_client.py::TestIssueFetching::test_fetch_issues_empty_result PASSED [ 70%]
+tests/test_task_022_jira_client.py::TestFetchIssueByKey::test_fetch_issue_by_key_default PASSED [ 70%]
+tests/test_task_022_jira_client.py::TestFetchIssueByKey::test_fetch_issue_by_key_custom_fields PASSED [ 70%]
+tests/test_task_022_jira_client.py::TestFetchIssueByKey::test_fetch_issue_not_found PASSED [ 71%]
+tests/test_task_022_jira_client.py::TestCommentFetching::test_fetch_comments_multiple PASSED [ 71%]
+tests/test_task_022_jira_client.py::TestCommentFetching::test_fetch_comments_empty PASSED [ 71%]
+tests/test_task_022_jira_client.py::TestCommentFetching::test_fetch_comments_not_found PASSED [ 71%]
+tests/test_task_022_jira_client.py::TestIssueHistory::test_fetch_issue_history_full PASSED [ 71%]
+tests/test_task_022_jira_client.py::TestIssueHistory::test_fetch_issue_history_status_only PASSED [ 71%]
+tests/test_task_022_jira_client.py::TestIssueHistory::test_fetch_issue_history_empty PASSED [ 71%]
+tests/test_task_022_jira_client.py::TestAttachments::test_fetch_attachments_multiple PASSED [ 72%]
+tests/test_task_022_jira_client.py::TestAttachments::test_fetch_attachments_empty PASSED [ 72%]
+tests/test_task_022_jira_client.py::TestRateLimiting::test_rate_limiter_per_second_limit PASSED [ 72%]
+tests/test_task_022_jira_client.py::TestRateLimiting::test_rate_limiter_can_be_disabled PASSED [ 72%]
+tests/test_task_022_jira_client.py::TestErrorHandling::test_retry_on_500_error PASSED [ 72%]
+tests/test_task_022_jira_client.py::TestErrorHandling::test_no_retry_on_auth_error PASSED [ 72%]
+tests/test_task_022_jira_client.py::TestErrorHandling::test_handle_rate_limit_with_retry_after PASSED [ 73%]
+tests/test_task_022_jira_client.py::TestStatistics::test_track_request_statistics PASSED [ 73%]
+tests/test_task_022_jira_client.py::TestStatistics::test_statistics_with_zero_requests PASSED [ 73%]
+tests/test_task_023_confluence_ingestion.py::TestUnitFunctions::test_compute_document_hash PASSED [ 73%]
+tests/test_task_023_confluence_ingestion.py::TestUnitFunctions::test_get_data_source PASSED [ 73%]
+tests/test_task_023_confluence_ingestion.py::TestUnitFunctions::test_create_ingestion_job PASSED [ 73%]
+tests/test_task_023_confluence_ingestion.py::TestUnitFunctions::test_update_job_progress PASSED [ 73%]
+tests/test_task_023_confluence_ingestion.py::TestUnitFunctions::test_complete_job PASSED [ 74%]
+tests/test_task_023_confluence_ingestion.py::TestUnitFunctions::test_process_page_success PASSED [ 74%]
+tests/test_task_023_confluence_ingestion.py::TestUnitFunctions::test_process_page_deduplication PASSED [ 74%]
+tests/test_task_023_confluence_ingestion.py::TestIntegration::test_single_space_ingestion PASSED [ 74%]
+tests/test_task_023_confluence_ingestion.py::TestIntegration::test_empty_space PASSED [ 74%]
+tests/test_task_023_confluence_ingestion.py::TestErrorHandling::test_invalid_data_source_id PASSED [ 74%]
+tests/test_task_023_confluence_ingestion.py::TestErrorHandling::test_inactive_data_source PASSED [ 75%]
+tests/test_task_023_confluence_ingestion.py::TestErrorHandling::test_no_space_keys_configured PASSED [ 75%]
+tests/test_task_023_confluence_ingestion.py::TestErrorHandling::test_openai_api_error PASSED [ 75%]
+tests/test_task_023_confluence_ingestion.py::TestFunctional::test_content_type_validation PASSED [ 75%]
+tests/test_task_023_confluence_ingestion.py::TestFunctional::test_external_id_mapping PASSED [ 75%]
+tests/test_task_023_confluence_ingestion.py::TestFunctional::test_metadata_preservation PASSED [ 75%]
+tests/test_task_024_jira_ingestion.py::TestUnitFunctions::test_compute_document_hash PASSED [ 76%]
+tests/test_task_024_jira_ingestion.py::TestUnitFunctions::test_get_data_source_success PASSED [ 76%]
+tests/test_task_024_jira_ingestion.py::TestUnitFunctions::test_get_data_source_not_found PASSED [ 76%]
+tests/test_task_024_jira_ingestion.py::TestUnitFunctions::test_create_ingestion_job PASSED [ 76%]
+tests/test_task_024_jira_ingestion.py::TestUnitFunctions::test_update_job_progress PASSED [ 76%]
+tests/test_task_024_jira_ingestion.py::TestUnitFunctions::test_complete_job_success PASSED [ 76%]
+tests/test_task_024_jira_ingestion.py::TestUnitFunctions::test_complete_job_failed PASSED [ 76%]
+tests/test_task_024_jira_ingestion.py::TestIntegration::test_single_issue_ingestion PASSED [ 77%]
+tests/test_task_024_jira_ingestion.py::TestIntegration::test_empty_issue_list PASSED [ 77%]
+tests/test_task_024_jira_ingestion.py::TestErrorHandling::test_invalid_data_source_id PASSED [ 77%]
+tests/test_task_024_jira_ingestion.py::TestErrorHandling::test_inactive_data_source PASSED [ 77%]
+tests/test_task_024_jira_ingestion.py::TestErrorHandling::test_wrong_data_source_type PASSED [ 77%]
+tests/test_task_024_jira_ingestion.py::TestDeduplication::test_new_issue_creates_document PASSED [ 77%]
+tests/test_task_024_jira_ingestion.py::TestDeduplication::test_existing_issue_same_content_skips PASSED [ 78%]
+tests/test_task_024_jira_ingestion.py::TestFunctional::test_content_type_validation PASSED [ 78%]
+tests/test_task_024_jira_ingestion.py::TestFunctional::test_metadata_storage PASSED [ 78%]
+tests/test_task_025_onboarding_ingestion.py::TestUnitFunctions::test_get_file_extension PASSED [ 78%]
+tests/test_task_025_onboarding_ingestion.py::TestUnitFunctions::test_compute_document_hash PASSED [ 78%]
+tests/test_task_025_onboarding_ingestion.py::TestUnitFunctions::test_extract_text_from_pdf_success PASSED [ 78%]
+tests/test_task_025_onboarding_ingestion.py::TestUnitFunctions::test_extract_text_from_pdf_corrupted PASSED [ 78%]
+tests/test_task_025_onboarding_ingestion.py::TestUnitFunctions::test_extract_text_from_docx_success PASSED [ 79%]
+tests/test_task_025_onboarding_ingestion.py::TestUnitFunctions::test_extract_text_from_docx_corrupted PASSED [ 79%]
+tests/test_task_025_onboarding_ingestion.py::TestUnitFunctions::test_extract_text_from_pptx_success PASSED [ 79%]
+tests/test_task_025_onboarding_ingestion.py::TestUnitFunctions::test_extract_text_from_pptx_corrupted PASSED [ 79%]
+tests/test_task_025_onboarding_ingestion.py::TestUnitFunctions::test_extract_text_from_markdown_success PASSED [ 79%]
+tests/test_task_025_onboarding_ingestion.py::TestUnitFunctions::test_extract_text_from_markdown_invalid_encoding PASSED [ 79%]
+tests/test_task_025_onboarding_ingestion.py::TestDatabaseHelpers::test_get_data_source_success PASSED [ 80%]
+tests/test_task_025_onboarding_ingestion.py::TestDatabaseHelpers::test_get_data_source_not_found PASSED [ 80%]
+tests/test_task_025_onboarding_ingestion.py::TestDatabaseHelpers::test_create_ingestion_job PASSED [ 80%]
+tests/test_task_025_onboarding_ingestion.py::TestDatabaseHelpers::test_complete_job_success PASSED [ 80%]
+tests/test_task_025_onboarding_ingestion.py::TestDatabaseHelpers::test_complete_job_failure PASSED [ 80%]
+tests/test_task_025_onboarding_ingestion.py::TestFullPipeline::test_pdf_ingestion PASSED [ 80%]
+tests/test_task_025_onboarding_ingestion.py::TestFullPipeline::test_docx_ingestion PASSED [ 81%]
+tests/test_task_025_onboarding_ingestion.py::TestFullPipeline::test_deduplication_same_hash PASSED [ 81%]
+tests/test_task_025_onboarding_ingestion.py::TestErrorHandling::test_missing_file_in_minio PASSED [ 81%]
+tests/test_task_025_onboarding_ingestion.py::TestErrorHandling::test_unsupported_file_format PASSED [ 81%]
+tests/test_task_025_onboarding_ingestion.py::TestErrorHandling::test_empty_file_no_text PASSED [ 81%]
+tests/test_task_025_onboarding_ingestion.py::TestFunctionalWorkflows::test_complete_ingestion_workflow PASSED [ 81%]
+tests/test_task_028_ingestion_endpoints.py::TestTriggerIngestion::test_trigger_confluence_full_sync ERROR [ 81%]
+tests/test_task_028_ingestion_endpoints.py::TestTriggerIngestion::test_trigger_jira_incremental ERROR [ 82%]
+tests/test_task_028_ingestion_endpoints.py::TestTriggerIngestion::test_trigger_default_sync_type ERROR [ 82%]
+tests/test_task_028_ingestion_endpoints.py::TestTriggerIngestion::test_trigger_nonexistent_data_source ERROR [ 82%]
+tests/test_task_028_ingestion_endpoints.py::TestTriggerIngestion::test_trigger_inactive_data_source ERROR [ 82%]
+tests/test_task_028_ingestion_endpoints.py::TestTriggerIngestion::test_trigger_onboarding_without_file_path ERROR [ 82%]
+tests/test_task_028_ingestion_endpoints.py::TestTriggerIngestion::test_trigger_invalid_sync_type ERROR [ 82%]
+tests/test_task_028_ingestion_endpoints.py::TestTriggerIngestion::test_trigger_non_admin_rejected ERROR [ 83%]
+tests/test_task_028_ingestion_endpoints.py::TestListIngestionJobs::test_list_all_jobs ERROR [ 83%]
+tests/test_task_028_ingestion_endpoints.py::TestListIngestionJobs::test_filter_by_status ERROR [ 83%]
+tests/test_task_028_ingestion_endpoints.py::TestListIngestionJobs::test_filter_by_data_source ERROR [ 83%]
+tests/test_task_028_ingestion_endpoints.py::TestListIngestionJobs::test_pagination ERROR [ 83%]
+tests/test_task_028_ingestion_endpoints.py::TestListIngestionJobs::test_empty_result_set ERROR [ 83%]
+tests/test_task_028_ingestion_endpoints.py::TestListIngestionJobs::test_non_admin_rejected ERROR [ 84%]
+tests/test_task_028_ingestion_endpoints.py::TestGetJobDetails::test_get_job_by_id ERROR [ 84%]
+tests/test_task_028_ingestion_endpoints.py::TestGetJobDetails::test_get_nonexistent_job ERROR [ 84%]
+tests/test_task_028_ingestion_endpoints.py::TestGetJobDetails::test_non_admin_rejected ERROR [ 84%]
+tests/test_task_028_ingestion_endpoints.py::TestIngestionJobService::test_trigger_creates_pending_job PASSED [ 84%]
+tests/test_task_028_ingestion_endpoints.py::TestIngestionJobService::test_job_metadata_populated PASSED [ 84%]
+tests/test_task_028_ingestion_endpoints.py::TestIngestionJobService::test_get_job_retrieves_correct_job PASSED [ 84%]
+tests/test_task_028_ingestion_endpoints.py::TestIngestionJobService::test_get_nonexistent_job_returns_none PASSED [ 85%]
+tests/test_task_028_ingestion_endpoints.py::TestIngestionJobService::test_list_jobs_status_filter PASSED [ 85%]
+tests/test_task_028_ingestion_endpoints.py::TestIngestionJobService::test_list_jobs_data_source_filter PASSED [ 85%]
+tests/test_task_029_metrics.py::test_get_metrics_full_database ERROR     [ 85%]
+tests/test_task_029_metrics.py::test_get_metrics_empty_database ERROR    [ 85%]
+tests/test_task_029_metrics.py::test_document_metrics_active_vs_deleted PASSED [ 85%]
+tests/test_task_029_metrics.py::test_session_metrics_active_vs_ended PASSED [ 86%]
+tests/test_task_029_metrics.py::test_query_metrics_time_based_filtering PASSED [ 86%]
+tests/test_task_029_metrics.py::test_response_time_with_duration_metadata PASSED [ 86%]
+tests/test_task_029_metrics.py::test_response_time_no_duration_metadata PASSED [ 86%]
+tests/test_task_029_metrics.py::test_response_time_mixed_metadata PASSED [ 86%]
+tests/test_task_029_metrics.py::test_database_metrics_size_and_embeddings PASSED [ 86%]
+tests/test_task_029_metrics.py::test_ingestion_metrics_success_rate PASSED [ 86%]
+tests/test_task_029_metrics.py::test_ingestion_metrics_zero_jobs PASSED  [ 87%]
+tests/test_task_029_metrics.py::test_metrics_non_admin_user ERROR        [ 87%]
+tests/test_task_029_metrics.py::test_metrics_unauthenticated_user ERROR  [ 87%]
+tests/test_task_029_metrics.py::test_response_schema_validation ERROR    [ 87%]
+tests/test_task_030_audit_service.py::TestAuditServiceCreation::test_create_audit_log_full_data PASSED [ 87%]
+tests/test_task_030_audit_service.py::TestAuditServiceCreation::test_create_audit_log_minimal_data PASSED [ 87%]
+tests/test_task_030_audit_service.py::TestAuditServiceCreation::test_create_audit_log_complex_jsonb_changes PASSED [ 88%]
+tests/test_task_030_audit_service.py::TestAuditServiceQuerying::test_filter_by_user_id PASSED [ 88%]
+tests/test_task_030_audit_service.py::TestAuditServiceQuerying::test_filter_by_action PASSED [ 88%]
+tests/test_task_030_audit_service.py::TestAuditServiceQuerying::test_filter_by_date_range PASSED [ 88%]
+tests/test_task_030_audit_service.py::TestAuditServiceQuerying::test_pagination PASSED [ 88%]
+tests/test_task_030_audit_service.py::TestAuditServiceQuerying::test_combined_filters PASSED [ 88%]
+tests/test_task_030_audit_service.py::TestAuditServiceQuerying::test_results_ordered_by_created_at_desc PASSED [ 89%]
+tests/test_task_030_audit_service.py::TestAutomaticAuditLogging::test_data_source_create_logging ERROR [ 89%]
+tests/test_task_030_audit_service.py::TestAutomaticAuditLogging::test_data_source_update_logging ERROR [ 89%]
+tests/test_task_030_audit_service.py::TestAutomaticAuditLogging::test_data_source_delete_logging ERROR [ 89%]
+tests/test_task_030_audit_service.py::TestAutomaticAuditLogging::test_ip_address_extraction_x_forwarded_for ERROR [ 89%]
+tests/test_task_030_audit_service.py::TestAuditLogsEndpoint::test_authentication_required ERROR [ 89%]
+tests/test_task_030_audit_service.py::TestAuditLogsEndpoint::test_admin_role_required ERROR [ 89%]
+tests/test_task_030_audit_service.py::TestAuditLogsEndpoint::test_successful_retrieval ERROR [ 90%]
+tests/test_task_030_audit_service.py::TestAuditLogsEndpoint::test_filter_by_user ERROR [ 90%]
+tests/test_task_030_audit_service.py::TestAuditLogsEndpoint::test_invalid_limit ERROR [ 90%]
+tests/test_task_030_audit_service.py::TestAuditLogsEndpoint::test_invalid_date_format ERROR [ 90%]
+tests/test_task_030_audit_service.py::TestAuditLogsEndpoint::test_no_put_endpoint_exists ERROR [ 90%]
+tests/test_task_030_audit_service.py::TestAuditLogsEndpoint::test_no_delete_endpoint_exists ERROR [ 90%]
+tests/test_task_030_audit_service.py::TestAuditLogsEndpoint::test_empty_results ERROR [ 91%]
+tests/test_task_030_audit_service.py::TestAuditLogsEndpoint::test_filtering_multiple_criteria ERROR [ 91%]
+tests/test_task_030_audit_service.py::TestDataIntegrity::test_user_deletion_preserves_audit_logs PASSED [ 91%]
+tests/test_task_039_prometheus_metrics.py::TestMetricsModuleDefinition::test_metrics_import PASSED [ 91%]
+tests/test_task_039_prometheus_metrics.py::TestMetricsModuleDefinition::test_query_processing_duration_defined PASSED [ 91%]
+tests/test_task_039_prometheus_metrics.py::TestMetricsModuleDefinition::test_embedding_generation_duration_defined PASSED [ 91%]
+tests/test_task_039_prometheus_metrics.py::TestMetricsModuleDefinition::test_vector_search_duration_defined PASSED [ 92%]
+tests/test_task_039_prometheus_metrics.py::TestMetricsModuleDefinition::test_vector_search_results_defined PASSED [ 92%]
+tests/test_task_039_prometheus_metrics.py::TestMetricsModuleDefinition::test_llm_api_requests_total_defined PASSED [ 92%]
+tests/test_task_039_prometheus_metrics.py::TestMetricsModuleDefinition::test_llm_api_duration_defined PASSED [ 92%]
+tests/test_task_039_prometheus_metrics.py::TestMetricsModuleDefinition::test_llm_tokens_used_defined PASSED [ 92%]
+tests/test_task_039_prometheus_metrics.py::TestMetricsModuleDefinition::test_embedding_generation_total_defined PASSED [ 92%]
+tests/test_task_039_prometheus_metrics.py::TestHistogramBucketConfiguration::test_query_processing_duration_buckets PASSED [ 92%]
+tests/test_task_039_prometheus_metrics.py::TestHistogramBucketConfiguration::test_embedding_generation_duration_buckets PASSED [ 93%]
+tests/test_task_039_prometheus_metrics.py::TestHistogramBucketConfiguration::test_vector_search_duration_buckets PASSED [ 93%]
+tests/test_task_039_prometheus_metrics.py::TestHistogramBucketConfiguration::test_llm_api_duration_buckets PASSED [ 93%]
+tests/test_task_039_prometheus_metrics.py::TestPrometheusConfiguration::test_prometheus_yml_exists PASSED [ 93%]
+tests/test_task_039_prometheus_metrics.py::TestPrometheusConfiguration::test_prometheus_yml_valid_yaml PASSED [ 93%]
+tests/test_task_039_prometheus_metrics.py::TestPrometheusConfiguration::test_prometheus_global_scrape_interval PASSED [ 93%]
+tests/test_task_039_prometheus_metrics.py::TestPrometheusConfiguration::test_prometheus_scrape_config_exists PASSED [ 94%]
+tests/test_task_039_prometheus_metrics.py::TestPrometheusConfiguration::test_prometheus_backend_job_configured PASSED [ 94%]
+tests/test_task_039_prometheus_metrics.py::TestPrometheusConfiguration::test_prometheus_backend_metrics_path PASSED [ 94%]
+tests/test_task_039_prometheus_metrics.py::TestMetricsNamingConventions::test_metric_names_use_snake_case PASSED [ 94%]
+tests/test_task_039_prometheus_metrics.py::TestMetricsNamingConventions::test_duration_metrics_have_seconds_suffix PASSED [ 94%]
+tests/test_task_039_prometheus_metrics.py::TestMetricsNamingConventions::test_counter_metrics_have_total_suffix PASSED [ 94%]
+tests/test_task_039_prometheus_metrics.py::TestMainAppInstrumentation::test_instrumentator_import PASSED [ 94%]
+tests/test_task_039_prometheus_metrics.py::TestMainAppInstrumentation::test_instrumentator_configured PASSED [ 95%]
+tests/test_task_039_prometheus_metrics.py::TestMainAppInstrumentation::test_metrics_endpoint_configured PASSED [ 95%]
+tests/test_validators.py::test_validate_url_https PASSED                 [ 95%]
+tests/test_validators.py::test_validate_url_http PASSED                  [ 95%]
+tests/test_validators.py::test_validate_url_with_path PASSED             [ 95%]
+tests/test_validators.py::test_validate_url_invalid_format PASSED        [ 95%]
+tests/test_validators.py::test_validate_url_invalid_scheme PASSED        [ 96%]
+tests/test_validators.py::test_validate_url_empty PASSED                 [ 96%]
+tests/test_validators.py::test_validate_url_https_required PASSED        [ 96%]
+tests/test_validators.py::test_validate_url_missing_netloc PASSED        [ 96%]
+tests/test_validators.py::test_validate_cron_daily PASSED                [ 96%]
+tests/test_validators.py::test_validate_cron_every_15_minutes PASSED     [ 96%]
+tests/test_validators.py::test_validate_cron_yearly PASSED               [ 97%]
+tests/test_validators.py::test_validate_cron_weekdays PASSED             [ 97%]
+tests/test_validators.py::test_validate_cron_every_2_hours PASSED        [ 97%]
+tests/test_validators.py::test_validate_cron_list_pattern PASSED         [ 97%]
+tests/test_validators.py::test_validate_cron_invalid_field_count PASSED  [ 97%]
+tests/test_validators.py::test_validate_cron_minute_out_of_range PASSED  [ 97%]
+tests/test_validators.py::test_validate_cron_hour_out_of_range PASSED    [ 97%]
+tests/test_validators.py::test_validate_cron_day_out_of_range PASSED     [ 98%]
+tests/test_validators.py::test_validate_cron_month_out_of_range PASSED   [ 98%]
+tests/test_validators.py::test_validate_cron_weekday_out_of_range PASSED [ 98%]
+tests/test_validators.py::test_validate_cron_invalid_format PASSED       [ 98%]
+tests/test_validators.py::test_validate_cron_empty PASSED                [ 98%]
+tests/test_validators.py::test_validate_cron_field_wildcard PASSED       [ 98%]
+tests/test_validators.py::test_validate_cron_field_number PASSED         [ 99%]
+tests/test_validators.py::test_validate_cron_field_range PASSED          [ 99%]
+tests/test_validators.py::test_validate_cron_field_list PASSED           [ 99%]
+tests/test_validators.py::test_validate_cron_field_step PASSED           [ 99%]
+tests/test_validators.py::test_validate_cron_number_valid PASSED         [ 99%]
+tests/test_validators.py::test_validate_cron_number_out_of_range PASSED  [ 99%]
+tests/test_validators.py::test_validate_cron_range_valid PASSED          [100%]
+
+==================================== ERRORS ====================================
+_____ ERROR at setup of TestApplicationStartup.test_app_instance_creation ______
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:926: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+__________ ERROR at setup of TestApplicationStartup.test_app_metadata __________
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_________ ERROR at setup of TestApplicationStartup.test_root_endpoint __________
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_____ ERROR at setup of TestApplicationStartup.test_health_check_endpoint ______
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+___ ERROR at setup of TestApplicationStartup.test_cors_middleware_configured ___
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_ ERROR at setup of TestFastAPIIntegration.test_tc_h1_ready_endpoint_healthy_redis _
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:926: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_ ERROR at setup of TestFastAPIIntegration.test_tc_h2_ready_endpoint_unhealthy_redis _
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+______________ ERROR at setup of test_register_valid_credentials _______________
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:926: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+________________ ERROR at setup of test_register_invalid_email _________________
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+________________ ERROR at setup of test_register_weak_password _________________
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_______________ ERROR at setup of test_register_duplicate_email ________________
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+________________ ERROR at setup of test_login_valid_credentials ________________
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+________________ ERROR at setup of test_login_invalid_password _________________
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+________________ ERROR at setup of test_login_nonexistent_user _________________
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+________________ ERROR at setup of test_login_inactive_account _________________
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+____________________ ERROR at setup of test_logout_success _____________________
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_____________ ERROR at setup of test_logout_without_authentication _____________
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_______________ ERROR at setup of test_get_current_user_success ________________
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+__________ ERROR at setup of test_get_profile_without_authentication ___________
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_______________ ERROR at setup of test_get_profile_invalid_token _______________
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+____________ ERROR at setup of test_password_complexity_validation _____________
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+________________ ERROR at setup of test_email_case_sensitivity _________________
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+____________________ ERROR at setup of test_role_validation ____________________
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_ ERROR at setup of TestSessionTokenAuthentication.test_missing_session_token __
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:926: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+__ ERROR at setup of TestSessionTokenAuthentication.test_empty_session_token ___
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_ ERROR at setup of TestSessionTokenAuthentication.test_invalid_session_token __
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+____ ERROR at setup of TestNonStreamingQuery.test_valid_non_streaming_query ____
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+________ ERROR at setup of TestNonStreamingQuery.test_custom_parameters ________
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_____ ERROR at setup of TestStreamingQuery.test_streaming_query_sse_format _____
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+______ ERROR at setup of TestDatabasePersistence.test_user_message_saved _______
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_ ERROR at setup of TestDatabasePersistence.test_assistant_message_with_sources _
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_ ERROR at setup of TestDatabasePersistence.test_conversation_history_retrieval _
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+___ ERROR at setup of TestTriggerIngestion.test_trigger_confluence_full_sync ___
+tests/test_task_028_ingestion_endpoints.py:145: in async_client
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_____ ERROR at setup of TestTriggerIngestion.test_trigger_jira_incremental _____
+tests/test_task_028_ingestion_endpoints.py:145: in async_client
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+____ ERROR at setup of TestTriggerIngestion.test_trigger_default_sync_type _____
+tests/test_task_028_ingestion_endpoints.py:145: in async_client
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_ ERROR at setup of TestTriggerIngestion.test_trigger_nonexistent_data_source __
+tests/test_task_028_ingestion_endpoints.py:145: in async_client
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+___ ERROR at setup of TestTriggerIngestion.test_trigger_inactive_data_source ___
+tests/test_task_028_ingestion_endpoints.py:145: in async_client
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_ ERROR at setup of TestTriggerIngestion.test_trigger_onboarding_without_file_path _
+tests/test_task_028_ingestion_endpoints.py:145: in async_client
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+____ ERROR at setup of TestTriggerIngestion.test_trigger_invalid_sync_type _____
+tests/test_task_028_ingestion_endpoints.py:145: in async_client
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+____ ERROR at setup of TestTriggerIngestion.test_trigger_non_admin_rejected ____
+tests/test_task_028_ingestion_endpoints.py:145: in async_client
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+__________ ERROR at setup of TestListIngestionJobs.test_list_all_jobs __________
+tests/test_task_028_ingestion_endpoints.py:145: in async_client
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+________ ERROR at setup of TestListIngestionJobs.test_filter_by_status _________
+tests/test_task_028_ingestion_endpoints.py:145: in async_client
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+______ ERROR at setup of TestListIngestionJobs.test_filter_by_data_source ______
+tests/test_task_028_ingestion_endpoints.py:145: in async_client
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+___________ ERROR at setup of TestListIngestionJobs.test_pagination ____________
+tests/test_task_028_ingestion_endpoints.py:145: in async_client
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+________ ERROR at setup of TestListIngestionJobs.test_empty_result_set _________
+tests/test_task_028_ingestion_endpoints.py:145: in async_client
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_______ ERROR at setup of TestListIngestionJobs.test_non_admin_rejected ________
+tests/test_task_028_ingestion_endpoints.py:145: in async_client
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+____________ ERROR at setup of TestGetJobDetails.test_get_job_by_id ____________
+tests/test_task_028_ingestion_endpoints.py:145: in async_client
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_________ ERROR at setup of TestGetJobDetails.test_get_nonexistent_job _________
+tests/test_task_028_ingestion_endpoints.py:145: in async_client
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_________ ERROR at setup of TestGetJobDetails.test_non_admin_rejected __________
+tests/test_task_028_ingestion_endpoints.py:145: in async_client
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_______________ ERROR at setup of test_get_metrics_full_database _______________
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:926: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+______________ ERROR at setup of test_get_metrics_empty_database _______________
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+________________ ERROR at setup of test_metrics_non_admin_user _________________
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_____________ ERROR at setup of test_metrics_unauthenticated_user ______________
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+______________ ERROR at setup of test_response_schema_validation _______________
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_ ERROR at setup of TestAutomaticAuditLogging.test_data_source_create_logging __
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:926: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_ ERROR at setup of TestAutomaticAuditLogging.test_data_source_update_logging __
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_ ERROR at setup of TestAutomaticAuditLogging.test_data_source_delete_logging __
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_ ERROR at setup of TestAutomaticAuditLogging.test_ip_address_extraction_x_forwarded_for _
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_____ ERROR at setup of TestAuditLogsEndpoint.test_authentication_required _____
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_______ ERROR at setup of TestAuditLogsEndpoint.test_admin_role_required _______
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+______ ERROR at setup of TestAuditLogsEndpoint.test_successful_retrieval _______
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_________ ERROR at setup of TestAuditLogsEndpoint.test_filter_by_user __________
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+__________ ERROR at setup of TestAuditLogsEndpoint.test_invalid_limit __________
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_______ ERROR at setup of TestAuditLogsEndpoint.test_invalid_date_format _______
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+_____ ERROR at setup of TestAuditLogsEndpoint.test_no_put_endpoint_exists ______
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+____ ERROR at setup of TestAuditLogsEndpoint.test_no_delete_endpoint_exists ____
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+__________ ERROR at setup of TestAuditLogsEndpoint.test_empty_results __________
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+___ ERROR at setup of TestAuditLogsEndpoint.test_filtering_multiple_criteria ___
+.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+tests/conftest.py:56: in app
+    from main import app
+src/main.py:75: in <module>
+    app = FastAPI(
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+=================================== FAILURES ===================================
+___________________ TestTaskResults.test_task_result_stored ____________________
+.venv/lib/python3.12/site-packages/redis/connection.py:1033: in connect_check_health
+    sock = self._connect()
+           ^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/redis/connection.py:1581: in _connect
+    raise err
+.venv/lib/python3.12/site-packages/redis/connection.py:1565: in _connect
+    sock.connect(socket_address)
+E   ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+tests/test_celery_execution.py:84: in test_task_result_stored
+    assert async_result.ready(), "Result should be ready (task completed)"
+           ^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/celery/result.py:349: in ready
+    return self.state in self.backend.READY_STATES
+           ^^^^^^^^^^
+.venv/lib/python3.12/site-packages/celery/result.py:505: in state
+    return self._get_task_meta()['status']
+           ^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/celery/result.py:444: in _get_task_meta
+    return self._maybe_set_cache(self.backend.get_task_meta(self.id))
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/celery/backends/base.py:717: in get_task_meta
+    meta = self._get_task_meta_for(task_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/celery/backends/base.py:1112: in _get_task_meta_for
+    meta = self.get(self.get_key_for_task(task_id))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/celery/backends/redis.py:405: in get
+    return self.client.get(key)
+           ^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/redis/commands/core.py:3194: in get
+    return self.execute_command("GET", name, keys=[name])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/redis/client.py:787: in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/redis/client.py:793: in _execute_command
+    conn = self.connection or pool.get_connection()
+                              ^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/redis/utils.py:258: in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/redis/connection.py:3139: in get_connection
+    connection.connect()
+.venv/lib/python3.12/site-packages/redis/connection.py:1006: in connect
+    self.retry.call_with_retry(
+.venv/lib/python3.12/site-packages/redis/retry.py:132: in call_with_retry
+    raise error
+.venv/lib/python3.12/site-packages/redis/retry.py:120: in call_with_retry
+    return do()
+           ^^^^
+.venv/lib/python3.12/site-packages/redis/connection.py:1007: in <lambda>
+    lambda: self.connect_check_health(
+.venv/lib/python3.12/site-packages/redis/connection.py:1055: in connect_check_health
+    raise e
+E   redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.
+_________________ TestBrokerConnection.test_broker_connection __________________
+.venv/lib/python3.12/site-packages/kombu/transport/virtual/base.py:951: in create_channel
+    return self._avail_channels.pop()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   IndexError: pop from empty list
+
+During handling of the above exception, another exception occurred:
+.venv/lib/python3.12/site-packages/redis/connection.py:1033: in connect_check_health
+    sock = self._connect()
+           ^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/redis/connection.py:1581: in _connect
+    raise err
+.venv/lib/python3.12/site-packages/redis/connection.py:1565: in _connect
+    sock.connect(socket_address)
+E   ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+.venv/lib/python3.12/site-packages/kombu/connection.py:474: in _reraise_as_library_errors
+    yield
+.venv/lib/python3.12/site-packages/kombu/connection.py:461: in _ensure_connection
+    return retry_over_time(
+.venv/lib/python3.12/site-packages/kombu/utils/functional.py:318: in retry_over_time
+    return fun(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/kombu/connection.py:941: in _connection_factory
+    self._connection = self._establish_connection()
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/kombu/connection.py:863: in _establish_connection
+    conn = self.transport.establish_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/kombu/transport/virtual/base.py:975: in establish_connection
+    self._avail_channels.append(self.create_channel(self))
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/kombu/transport/virtual/base.py:953: in create_channel
+    channel = self.Channel(connection)
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/kombu/transport/redis.py:757: in __init__
+    self.client.ping()
+.venv/lib/python3.12/site-packages/redis/commands/core.py:2031: in ping
+    return self.execute_command("PING", **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/redis/client.py:787: in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/redis/client.py:793: in _execute_command
+    conn = self.connection or pool.get_connection()
+                              ^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/redis/utils.py:258: in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/redis/connection.py:3139: in get_connection
+    connection.connect()
+.venv/lib/python3.12/site-packages/redis/connection.py:1006: in connect
+    self.retry.call_with_retry(
+.venv/lib/python3.12/site-packages/redis/retry.py:132: in call_with_retry
+    raise error
+.venv/lib/python3.12/site-packages/redis/retry.py:120: in call_with_retry
+    return do()
+           ^^^^
+.venv/lib/python3.12/site-packages/redis/connection.py:1007: in <lambda>
+    lambda: self.connect_check_health(
+.venv/lib/python3.12/site-packages/redis/connection.py:1055: in connect_check_health
+    raise e
+E   redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.
+
+The above exception was the direct cause of the following exception:
+tests/test_celery_worker.py:19: in test_broker_connection
+    conn.ensure_connection(max_retries=3)
+.venv/lib/python3.12/site-packages/kombu/connection.py:408: in ensure_connection
+    self._ensure_connection(*args, **kwargs)
+.venv/lib/python3.12/site-packages/kombu/connection.py:460: in _ensure_connection
+    with ctx():
+         ^^^^^
+/home/mohammed/.local/share/uv/python/cpython-3.12.10-linux-x86_64-gnu/lib/python3.12/contextlib.py:158: in __exit__
+    self.gen.throw(value)
+.venv/lib/python3.12/site-packages/kombu/connection.py:478: in _reraise_as_library_errors
+    raise ConnectionError(str(exc)) from exc
+E   kombu.exceptions.OperationalError: Error 111 connecting to localhost:6379. Connection refused.
+________________ TestDirectoryStructure.test_frontend_structure ________________
+tests/test_task_001_repository_structure.py:101: in test_frontend_structure
+    assert app_jsx.exists(), "Frontend src/App.jsx does not exist"
+E   AssertionError: Frontend src/App.jsx does not exist
+E   assert False
+E    +  where False = exists()
+E    +    where exists = PosixPath('/mnt/d/workspace/auggie-agentic_sdlc_workflow/workspace/ChatApplication/project-code/frontend/src/App.jsx').exists
+_________________ TestConfigFiles.test_essential_config_files __________________
+tests/test_task_001_repository_structure.py:185: in test_essential_config_files
+    assert full_path.exists(), f"Configuration file '{file_path}' does not exist"
+E   AssertionError: Configuration file 'frontend/vite.config.js' does not exist
+E   assert False
+E    +  where False = exists()
+E    +    where exists = PosixPath('/mnt/d/workspace/auggie-agentic_sdlc_workflow/workspace/ChatApplication/project-code/frontend/vite.config.js').exists
+_________ TestFastAPIIntegration.test_get_db_can_be_used_as_dependency _________
+tests/test_task_008_database_session.py:358: in test_get_db_can_be_used_as_dependency
+    app = FastAPI()
+          ^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+___________ TestFastAPIIntegration.test_database_dependency_in_route ___________
+tests/test_task_008_database_session.py:371: in test_database_dependency_in_route
+    app = FastAPI()
+          ^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+________________________ test_reject_invalid_signature _________________________
+tests/test_task_011_auth_service.py:174: in test_reject_invalid_signature
+    with pytest.raises(JWTError):
+E   Failed: DID NOT RAISE JWTError
+__________________ TestSetup.test_setup_socketio_integration ___________________
+tests/test_task_019_websocket_server.py:576: in test_setup_socketio_integration
+    app = FastAPI()
+          ^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/applications.py:896: in __init__
+    ] = webhooks or routing.APIRouter()
+                    ^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/fastapi/routing.py:799: in __init__
+    super().__init__(
+E   TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+=========================== short test summary info ============================
+FAILED tests/test_celery_execution.py::TestTaskResults::test_task_result_stored - redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.
+FAILED tests/test_celery_worker.py::TestBrokerConnection::test_broker_connection - kombu.exceptions.OperationalError: Error 111 connecting to localhost:6379. Connection refused.
+FAILED tests/test_task_001_repository_structure.py::TestDirectoryStructure::test_frontend_structure - AssertionError: Frontend src/App.jsx does not exist
+assert False
+ +  where False = exists()
+ +    where exists = PosixPath('/mnt/d/workspace/auggie-agentic_sdlc_workflow/workspace/ChatApplication/project-code/frontend/src/App.jsx').exists
+FAILED tests/test_task_001_repository_structure.py::TestConfigFiles::test_essential_config_files - AssertionError: Configuration file 'frontend/vite.config.js' does not exist
+assert False
+ +  where False = exists()
+ +    where exists = PosixPath('/mnt/d/workspace/auggie-agentic_sdlc_workflow/workspace/ChatApplication/project-code/frontend/vite.config.js').exists
+FAILED tests/test_task_008_database_session.py::TestFastAPIIntegration::test_get_db_can_be_used_as_dependency - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+FAILED tests/test_task_008_database_session.py::TestFastAPIIntegration::test_database_dependency_in_route - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+FAILED tests/test_task_011_auth_service.py::test_reject_invalid_signature - Failed: DID NOT RAISE JWTError
+FAILED tests/test_task_019_websocket_server.py::TestSetup::test_setup_socketio_integration - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_004_fastapi_structure.py::TestApplicationStartup::test_app_instance_creation - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_004_fastapi_structure.py::TestApplicationStartup::test_app_metadata - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_004_fastapi_structure.py::TestApplicationStartup::test_root_endpoint - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_004_fastapi_structure.py::TestApplicationStartup::test_health_check_endpoint - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_004_fastapi_structure.py::TestApplicationStartup::test_cors_middleware_configured - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_009_redis_cache_layer.py::TestFastAPIIntegration::test_tc_h1_ready_endpoint_healthy_redis - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_009_redis_cache_layer.py::TestFastAPIIntegration::test_tc_h2_ready_endpoint_unhealthy_redis - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_012_auth_endpoints.py::test_register_valid_credentials - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_012_auth_endpoints.py::test_register_invalid_email - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_012_auth_endpoints.py::test_register_weak_password - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_012_auth_endpoints.py::test_register_duplicate_email - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_012_auth_endpoints.py::test_login_valid_credentials - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_012_auth_endpoints.py::test_login_invalid_password - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_012_auth_endpoints.py::test_login_nonexistent_user - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_012_auth_endpoints.py::test_login_inactive_account - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_012_auth_endpoints.py::test_logout_success - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_012_auth_endpoints.py::test_logout_without_authentication - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_012_auth_endpoints.py::test_get_current_user_success - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_012_auth_endpoints.py::test_get_profile_without_authentication - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_012_auth_endpoints.py::test_get_profile_invalid_token - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_012_auth_endpoints.py::test_password_complexity_validation - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_012_auth_endpoints.py::test_email_case_sensitivity - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_012_auth_endpoints.py::test_role_validation - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_018_chat_query_endpoint.py::TestSessionTokenAuthentication::test_missing_session_token - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_018_chat_query_endpoint.py::TestSessionTokenAuthentication::test_empty_session_token - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_018_chat_query_endpoint.py::TestSessionTokenAuthentication::test_invalid_session_token - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_018_chat_query_endpoint.py::TestNonStreamingQuery::test_valid_non_streaming_query - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_018_chat_query_endpoint.py::TestNonStreamingQuery::test_custom_parameters - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_018_chat_query_endpoint.py::TestStreamingQuery::test_streaming_query_sse_format - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_018_chat_query_endpoint.py::TestDatabasePersistence::test_user_message_saved - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_018_chat_query_endpoint.py::TestDatabasePersistence::test_assistant_message_with_sources - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_018_chat_query_endpoint.py::TestDatabasePersistence::test_conversation_history_retrieval - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_028_ingestion_endpoints.py::TestTriggerIngestion::test_trigger_confluence_full_sync - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_028_ingestion_endpoints.py::TestTriggerIngestion::test_trigger_jira_incremental - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_028_ingestion_endpoints.py::TestTriggerIngestion::test_trigger_default_sync_type - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_028_ingestion_endpoints.py::TestTriggerIngestion::test_trigger_nonexistent_data_source - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_028_ingestion_endpoints.py::TestTriggerIngestion::test_trigger_inactive_data_source - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_028_ingestion_endpoints.py::TestTriggerIngestion::test_trigger_onboarding_without_file_path - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_028_ingestion_endpoints.py::TestTriggerIngestion::test_trigger_invalid_sync_type - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_028_ingestion_endpoints.py::TestTriggerIngestion::test_trigger_non_admin_rejected - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_028_ingestion_endpoints.py::TestListIngestionJobs::test_list_all_jobs - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_028_ingestion_endpoints.py::TestListIngestionJobs::test_filter_by_status - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_028_ingestion_endpoints.py::TestListIngestionJobs::test_filter_by_data_source - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_028_ingestion_endpoints.py::TestListIngestionJobs::test_pagination - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_028_ingestion_endpoints.py::TestListIngestionJobs::test_empty_result_set - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_028_ingestion_endpoints.py::TestListIngestionJobs::test_non_admin_rejected - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_028_ingestion_endpoints.py::TestGetJobDetails::test_get_job_by_id - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_028_ingestion_endpoints.py::TestGetJobDetails::test_get_nonexistent_job - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_028_ingestion_endpoints.py::TestGetJobDetails::test_non_admin_rejected - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_029_metrics.py::test_get_metrics_full_database - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_029_metrics.py::test_get_metrics_empty_database - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_029_metrics.py::test_metrics_non_admin_user - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_029_metrics.py::test_metrics_unauthenticated_user - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_029_metrics.py::test_response_schema_validation - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_030_audit_service.py::TestAutomaticAuditLogging::test_data_source_create_logging - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_030_audit_service.py::TestAutomaticAuditLogging::test_data_source_update_logging - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_030_audit_service.py::TestAutomaticAuditLogging::test_data_source_delete_logging - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_030_audit_service.py::TestAutomaticAuditLogging::test_ip_address_extraction_x_forwarded_for - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_030_audit_service.py::TestAuditLogsEndpoint::test_authentication_required - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_030_audit_service.py::TestAuditLogsEndpoint::test_admin_role_required - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_030_audit_service.py::TestAuditLogsEndpoint::test_successful_retrieval - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_030_audit_service.py::TestAuditLogsEndpoint::test_filter_by_user - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_030_audit_service.py::TestAuditLogsEndpoint::test_invalid_limit - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_030_audit_service.py::TestAuditLogsEndpoint::test_invalid_date_format - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_030_audit_service.py::TestAuditLogsEndpoint::test_no_put_endpoint_exists - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_030_audit_service.py::TestAuditLogsEndpoint::test_no_delete_endpoint_exists - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_030_audit_service.py::TestAuditLogsEndpoint::test_empty_results - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+ERROR tests/test_task_030_audit_service.py::TestAuditLogsEndpoint::test_filtering_multiple_criteria - TypeError: Router.__init__() got an unexpected keyword argument 'on_startup'
+====== 8 failed, 562 passed, 246 warnings, 68 errors in 122.75s (0:02:02) ======

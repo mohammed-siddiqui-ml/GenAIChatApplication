@@ -1,0 +1,142 @@
+{
+  "description": "Example log entries in structured JSON format",
+  "examples": [
+    {
+      "name": "FastAPI Request Log - Successful",
+      "log": {
+        "timestamp": "2024-01-15T10:30:45.123456Z",
+        "level": "INFO",
+        "service": "fastapi",
+        "message": "Request completed: GET /api/v1/chat/sessions - 200",
+        "trace_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+        "user_id": "user_12345",
+        "environment": "production",
+        "application": "GenAI Knowledge Retrieval System",
+        "method": "GET",
+        "path": "/api/v1/chat/sessions",
+        "status_code": 200,
+        "duration": "45.67ms"
+      }
+    },
+    {
+      "name": "FastAPI Request Log - Error",
+      "log": {
+        "timestamp": "2024-01-15T10:35:12.987654Z",
+        "level": "ERROR",
+        "service": "fastapi",
+        "message": "Request failed: POST /api/v1/chat/message - Database connection timeout",
+        "trace_id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+        "user_id": "user_67890",
+        "environment": "production",
+        "application": "GenAI Knowledge Retrieval System",
+        "method": "POST",
+        "path": "/api/v1/chat/message",
+        "duration": "5002.34ms",
+        "error": "Database connection timeout after 5000ms"
+      }
+    },
+    {
+      "name": "FastAPI Request Log - Unauthenticated",
+      "log": {
+        "timestamp": "2024-01-15T10:40:22.456789Z",
+        "level": "INFO",
+        "service": "fastapi",
+        "message": "Request completed: GET /api/v1/health - 200",
+        "trace_id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+        "user_id": "",
+        "environment": "production",
+        "application": "GenAI Knowledge Retrieval System",
+        "method": "GET",
+        "path": "/api/v1/health",
+        "status_code": 200,
+        "duration": "2.15ms"
+      }
+    },
+    {
+      "name": "Celery Task Log - Success",
+      "log": {
+        "timestamp": "2024-01-15T11:00:00.123456Z",
+        "level": "INFO",
+        "service": "celery-worker",
+        "message": "Task completed successfully",
+        "trace_id": "d4e5f6a7-b8c9-0123-def1-234567890123",
+        "user_id": "",
+        "environment": "production",
+        "application": "GenAI Knowledge Retrieval System",
+        "task_id": "d4e5f6a7-b8c9-0123-def1-234567890123",
+        "task_name": "tasks.ingestion.confluence.refresh_confluence_data"
+      }
+    },
+    {
+      "name": "Celery Task Log - Error",
+      "log": {
+        "timestamp": "2024-01-15T11:05:30.987654Z",
+        "level": "ERROR",
+        "service": "celery-worker",
+        "message": "Task failed: Connection refused to Confluence API",
+        "trace_id": "e5f6a7b8-c9d0-1234-ef12-345678901234",
+        "user_id": "",
+        "environment": "production",
+        "application": "GenAI Knowledge Retrieval System",
+        "task_id": "e5f6a7b8-c9d0-1234-ef12-345678901234",
+        "task_name": "tasks.ingestion.confluence.sync_confluence_page",
+        "error": "ConnectionRefusedError: [Errno 111] Connection refused"
+      }
+    },
+    {
+      "name": "Application Startup Log",
+      "log": {
+        "timestamp": "2024-01-15T09:00:00.000000Z",
+        "level": "INFO",
+        "service": "fastapi",
+        "message": "Starting up GenAI Knowledge Retrieval System...",
+        "trace_id": "",
+        "user_id": "",
+        "environment": "production",
+        "application": "GenAI Knowledge Retrieval System"
+      }
+    },
+    {
+      "name": "Database Query Log",
+      "log": {
+        "timestamp": "2024-01-15T10:30:45.100000Z",
+        "level": "DEBUG",
+        "service": "fastapi",
+        "message": "Executing database query: SELECT * FROM chat_sessions WHERE user_id = $1",
+        "trace_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+        "user_id": "user_12345",
+        "environment": "production",
+        "application": "GenAI Knowledge Retrieval System"
+      }
+    },
+    {
+      "name": "Critical System Error",
+      "log": {
+        "timestamp": "2024-01-15T14:22:33.999999Z",
+        "level": "CRITICAL",
+        "service": "fastapi",
+        "message": "Out of memory: Unable to allocate buffer",
+        "trace_id": "f6a7b8c9-d0e1-2345-f123-456789012345",
+        "user_id": "",
+        "environment": "production",
+        "application": "GenAI Knowledge Retrieval System",
+        "error": "MemoryError: Unable to allocate 2.5 GiB for an array with shape (1000000, 384) and data type float64"
+      }
+    }
+  ],
+  "log_levels": {
+    "DEBUG": "Detailed information, typically of interest only when diagnosing problems",
+    "INFO": "Confirmation that things are working as expected",
+    "WARNING": "An indication that something unexpected happened, but the application is still working",
+    "ERROR": "Due to a more serious problem, the software has not been able to perform some function",
+    "CRITICAL": "A serious error, indicating that the program itself may be unable to continue running"
+  },
+  "query_examples": {
+    "filter_by_trace_id": "{service=\"fastapi\"} |= \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\"",
+    "filter_by_user": "{service=\"fastapi\"} | json | user_id=\"user_12345\"",
+    "all_errors": "{level=\"ERROR\"}",
+    "slow_requests": "{service=\"fastapi\"} | json | duration > 1000",
+    "celery_tasks": "{service=\"celery-worker\"}",
+    "failed_tasks": "{service=\"celery-worker\", level=\"ERROR\"}"
+  }
+}

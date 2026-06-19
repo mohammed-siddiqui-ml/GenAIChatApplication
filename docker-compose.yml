@@ -267,7 +267,7 @@ services:
     ports:
       - "3100:3100"
     volumes:
-      - ./config/loki-config.yml:/etc/loki/local-config.yaml:ro
+      - ./infrastructure/loki/loki-config.yml:/etc/loki/local-config.yaml:ro
       - loki_data:/loki
     networks:
       - monitoring_network
@@ -278,6 +278,24 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+    restart: unless-stopped
+
+  # Promtail log shipping agent
+  promtail:
+    image: grafana/promtail:latest
+    container_name: knowledge_promtail
+    volumes:
+      - ./infrastructure/loki/promtail-config.yml:/etc/promtail/config.yml:ro
+      - backend_logs:/var/log/backend:ro
+      - celery_logs:/var/log/celery:ro
+      - nginx_logs:/var/log/nginx:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      - loki
+    networks:
+      - monitoring_network
     restart: unless-stopped
 
 volumes:

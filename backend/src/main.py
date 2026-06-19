@@ -91,6 +91,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Configure Logging Middleware for request context and structured logging
+from middleware.logging_middleware import LoggingMiddleware
+app.add_middleware(LoggingMiddleware)
+
 # Configure Prometheus metrics instrumentation
 # This automatically collects HTTP request metrics (count, duration, error rate)
 instrumentator = Instrumentator(

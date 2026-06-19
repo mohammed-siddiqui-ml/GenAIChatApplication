@@ -150,6 +150,23 @@ celery_app.autodiscover_tasks(["tasks.ingestion", "tasks.embeddings", "tasks.mai
 
 
 # ============================================================================
+# Structured Logging Configuration for Celery
+# ============================================================================
+
+# Configure structured JSON logging for Celery workers
+import logging
+from middleware.logging_middleware import CeleryLoggingContextFilter
+
+# Get celery logger and add context filter
+celery_logger = logging.getLogger("celery")
+celery_logger.addFilter(CeleryLoggingContextFilter())
+
+# Add filter to task logger as well
+task_logger = logging.getLogger("celery.task")
+task_logger.addFilter(CeleryLoggingContextFilter())
+
+
+# ============================================================================
 # Celery Application Instance Export
 # ============================================================================
 
