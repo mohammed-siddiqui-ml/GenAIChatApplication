@@ -36,6 +36,7 @@ import {
   AccountCircle,
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
+import { DataSourceManager } from '../components/admin';
 
 const drawerWidth = 260;
 
@@ -69,12 +70,7 @@ function DashboardOverview() {
 function DataSourcesPage() {
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>
-        Data Sources
-      </Typography>
-      <Typography color="text.secondary">
-        Configure and manage data sources (Confluence, Issue Tracker, Onboarding).
-      </Typography>
+      <DataSourceManager />
     </Box>
   );
 }
