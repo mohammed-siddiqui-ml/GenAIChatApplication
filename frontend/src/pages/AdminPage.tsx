@@ -36,7 +36,7 @@ import {
   AccountCircle,
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
-import { DataSourceManager } from '../components/admin';
+import { DataSourceManager, IngestionMonitor } from '../components/admin';
 
 const drawerWidth = 260;
 
@@ -78,12 +78,7 @@ function DataSourcesPage() {
 function IngestionJobsPage() {
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>
-        Ingestion Jobs
-      </Typography>
-      <Typography color="text.secondary">
-        Monitor and manage data ingestion jobs and schedules.
-      </Typography>
+      <IngestionMonitor />
     </Box>
   );
 }

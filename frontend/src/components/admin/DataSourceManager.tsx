@@ -184,9 +184,14 @@ export function DataSourceManager() {
     <Box>
       {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" component="h1">
-          Data Sources
-        </Typography>
+        <Box>
+          <Typography variant="h4" component="h1">
+            Data Sources
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Configure and manage data sources
+          </Typography>
+        </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Button
             variant="outlined"

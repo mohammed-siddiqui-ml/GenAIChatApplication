@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AdminPage } from '../AdminPage';
 import { AuthProvider } from '../../contexts/AuthContext';
 import * as authService from '../../services/authService';
@@ -26,12 +27,26 @@ const mockUserNoUsername: User = {
   createdAt: '2024-01-01T00:00:00Z',
 };
 
+// Create test QueryClient with disabled retries
+const createTestQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+      mutations: {
+        retry: false,
+      },
+    },
+  });
+
 // Helper function to render AdminPage with all required providers
 const renderAdminPage = async (
   route = '/admin',
   user: User | null = mockUserWithUsername
 ) => {
   const theme = createTheme();
+  const queryClient = createTestQueryClient();
 
   // Mock the authService to return the test user
   vi.mocked(authService.getCurrentUser).mockResolvedValue(user);
@@ -44,15 +59,17 @@ const renderAdminPage = async (
   }
 
   const result = render(
-    <ThemeProvider theme={theme}>
-      <AuthProvider>
-        <MemoryRouter initialEntries={[route]}>
-          <Routes>
-            <Route path="/admin/*" element={<AdminPage />} />
-          </Routes>
-        </MemoryRouter>
-      </AuthProvider>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider theme={theme}>
+        <AuthProvider>
+          <MemoryRouter initialEntries={[route]}>
+            <Routes>
+              <Route path="/admin/*" element={<AdminPage />} />
+            </Routes>
+          </MemoryRouter>
+        </AuthProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 
   // Wait for AuthProvider to finish loading
