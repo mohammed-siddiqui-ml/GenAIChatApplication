@@ -1,6 +1,6 @@
 /**
  * DataSourceManager Component
- * 
+ *
  * Admin UI for managing data sources (Confluence, JIRA, Onboarding, Custom).
  * Features:
  * - Data source list table with columns: name, type, status, last sync, actions
@@ -76,8 +76,11 @@ interface ToastState {
 export function DataSourceManager() {
   const queryClient = useQueryClient();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [editingDataSource, setEditingDataSource] = useState<DataSource | null>(null);
-  const [deletingDataSource, setDeletingDataSource] = useState<DataSource | null>(null);
+  const [editingDataSource, setEditingDataSource] = useState<DataSource | null>(
+    null
+  );
+  const [deletingDataSource, setDeletingDataSource] =
+    useState<DataSource | null>(null);
   const [toast, setToast] = useState<ToastState>({
     open: false,
     message: '',
@@ -105,13 +108,22 @@ export function DataSourceManager() {
       showToast('Data source created successfully', 'success');
     },
     onError: (err: any) => {
-      showToast(err.response?.data?.detail || 'Failed to create data source', 'error');
+      showToast(
+        err.response?.data?.detail || 'Failed to create data source',
+        'error'
+      );
     },
   });
 
   // Update data source mutation
   const updateMutation = useMutation({
-    mutationFn: async ({ id, formData }: { id: number; formData: Partial<DataSourceFormData> }) => {
+    mutationFn: async ({
+      id,
+      formData,
+    }: {
+      id: number;
+      formData: Partial<DataSourceFormData>;
+    }) => {
       const response = await api.put(`/v1/admin/data-sources/${id}`, formData);
       return response.data;
     },
@@ -121,7 +133,10 @@ export function DataSourceManager() {
       showToast('Data source updated successfully', 'success');
     },
     onError: (err: any) => {
-      showToast(err.response?.data?.detail || 'Failed to update data source', 'error');
+      showToast(
+        err.response?.data?.detail || 'Failed to update data source',
+        'error'
+      );
     },
   });
 
@@ -137,7 +152,10 @@ export function DataSourceManager() {
       showToast('Data source deleted successfully', 'success');
     },
     onError: (err: any) => {
-      showToast(err.response?.data?.detail || 'Failed to delete data source', 'error');
+      showToast(
+        err.response?.data?.detail || 'Failed to delete data source',
+        'error'
+      );
     },
   });
 
@@ -149,11 +167,15 @@ export function DataSourceManager() {
     setToast({ ...toast, open: false });
   };
 
-  const handleCreate = (formData: DataSourceFormData | Partial<DataSourceFormData>) => {
+  const handleCreate = (
+    formData: DataSourceFormData | Partial<DataSourceFormData>
+  ) => {
     createMutation.mutate(formData as DataSourceFormData);
   };
 
-  const handleEdit = (formData: DataSourceFormData | Partial<DataSourceFormData>) => {
+  const handleEdit = (
+    formData: DataSourceFormData | Partial<DataSourceFormData>
+  ) => {
     if (editingDataSource) {
       updateMutation.mutate({ id: editingDataSource.id, formData });
     }
@@ -183,7 +205,14 @@ export function DataSourceManager() {
   return (
     <Box>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 3,
+        }}
+      >
         <Box>
           <Typography variant="h4" component="h1">
             Data Sources
@@ -214,7 +243,8 @@ export function DataSourceManager() {
       {/* Error State */}
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
-          Failed to load data sources: {(error as any)?.message || 'Unknown error'}
+          Failed to load data sources:{' '}
+          {(error as any)?.message || 'Unknown error'}
         </Alert>
       )}
 
@@ -254,12 +284,19 @@ export function DataSourceManager() {
                   </Typography>
                 </TableCell>
                 <TableCell>
-                  <Chip label={dataSource.type} size="small" variant="outlined" />
+                  <Chip
+                    label={dataSource.type}
+                    size="small"
+                    variant="outlined"
+                  />
                 </TableCell>
                 <TableCell>{getStatusChip(dataSource)}</TableCell>
                 <TableCell>{formatDate(dataSource.last_sync_at)}</TableCell>
                 <TableCell>
-                  <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}
+                  >
                     {dataSource.sync_schedule || 'Not scheduled'}
                   </Typography>
                 </TableCell>
@@ -307,7 +344,7 @@ export function DataSourceManager() {
       {/* Edit Modal */}
       {editingDataSource && (
         <DataSourceFormModal
-          open={true}
+          open
           onClose={() => setEditingDataSource(null)}
           onSubmit={handleEdit}
           initialData={{
@@ -325,7 +362,7 @@ export function DataSourceManager() {
       {/* Delete Confirmation Dialog */}
       {deletingDataSource && (
         <DeleteConfirmDialog
-          open={true}
+          open
           onClose={() => setDeletingDataSource(null)}
           onConfirm={handleDelete}
           dataSourceName={deletingDataSource.name}
@@ -340,7 +377,11 @@ export function DataSourceManager() {
         onClose={handleCloseToast}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <Alert onClose={handleCloseToast} severity={toast.severity} sx={{ width: '100%' }}>
+        <Alert
+          onClose={handleCloseToast}
+          severity={toast.severity}
+          sx={{ width: '100%' }}
+        >
           {toast.message}
         </Alert>
       </Snackbar>

@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
-import { useWebSocket } from '../useWebSocket';
-import { SocketProvider } from '../../contexts/SocketContext';
 import { io } from 'socket.io-client';
 import React, { ReactNode } from 'react';
+import { useWebSocket } from '../useWebSocket';
+import { SocketProvider } from '../../contexts/SocketContext';
 
 // Mock socket.io-client
 vi.mock('socket.io-client');
@@ -18,17 +18,17 @@ describe('useWebSocket', () => {
   beforeEach(() => {
     // Create mock socket instance with event handlers
     const eventHandlers: Record<string, Function[]> = {};
-    
+
     mockSocket = {
       on: vi.fn((event: string, handler: Function) => {
         if (!eventHandlers[event]) eventHandlers[event] = [];
         eventHandlers[event].push(handler);
-        
+
         if (event === 'connect') connectHandler = handler;
         if (event === 'disconnect') disconnectHandler = handler;
         if (event === 'connect_error') connectErrorHandler = handler;
         if (event === 'error') errorHandler = handler;
-        
+
         return mockSocket;
       }),
       emit: vi.fn(),
@@ -49,18 +49,18 @@ describe('useWebSocket', () => {
     vi.clearAllMocks();
   });
 
-  const wrapper = ({ children }: { children: ReactNode }) => {
-    return React.createElement(SocketProvider, null, children);
-  };
+  const wrapper = ({ children }: { children: ReactNode }) =>
+    React.createElement(SocketProvider, null, children);
 
   // TC-003: useWebSocket Auto-Connects with Valid Credentials
   it('TC-003: auto-connects with valid credentials when autoConnect is true', async () => {
     const { result } = renderHook(
-      () => useWebSocket({
-        sessionToken: 'test_session_token_123',
-        sessionId: '550e8400-e29b-41d4-a716-446655440000',
-        autoConnect: true,
-      }),
+      () =>
+        useWebSocket({
+          sessionToken: 'test_session_token_123',
+          sessionId: '550e8400-e29b-41d4-a716-446655440000',
+          autoConnect: true,
+        }),
       { wrapper }
     );
 
@@ -84,13 +84,12 @@ describe('useWebSocket', () => {
 
   // TC-004: useWebSocket Handles Missing Credentials
   it('TC-004: does not connect without credentials', async () => {
-    const { result } = renderHook(
-      () => useWebSocket({ autoConnect: true }),
-      { wrapper }
-    );
+    const { result } = renderHook(() => useWebSocket({ autoConnect: true }), {
+      wrapper,
+    });
 
     // Wait a bit to ensure no connection attempt
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     expect(mockSocket.connect).not.toHaveBeenCalled();
     expect(result.current.isConnected).toBe(false);
@@ -100,11 +99,12 @@ describe('useWebSocket', () => {
   // TC-005: useWebSocket Handles Connection Error
   it('TC-005: handles connection errors correctly', async () => {
     const { result } = renderHook(
-      () => useWebSocket({
-        sessionToken: 'token',
-        sessionId: 'id',
-        autoConnect: true,
-      }),
+      () =>
+        useWebSocket({
+          sessionToken: 'token',
+          sessionId: 'id',
+          autoConnect: true,
+        }),
       { wrapper }
     );
 
@@ -125,11 +125,12 @@ describe('useWebSocket', () => {
   // Test manual connect
   it('manual connect with valid credentials', async () => {
     const { result } = renderHook(
-      () => useWebSocket({
-        sessionToken: 'token',
-        sessionId: 'id',
-        autoConnect: false,
-      }),
+      () =>
+        useWebSocket({
+          sessionToken: 'token',
+          sessionId: 'id',
+          autoConnect: false,
+        }),
       { wrapper }
     );
 
@@ -146,11 +147,12 @@ describe('useWebSocket', () => {
   // Test manual disconnect
   it('manual disconnect works correctly', async () => {
     const { result } = renderHook(
-      () => useWebSocket({
-        sessionToken: 'token',
-        sessionId: 'id',
-        autoConnect: true,
-      }),
+      () =>
+        useWebSocket({
+          sessionToken: 'token',
+          sessionId: 'id',
+          autoConnect: true,
+        }),
       { wrapper }
     );
 

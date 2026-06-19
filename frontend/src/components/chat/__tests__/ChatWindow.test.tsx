@@ -40,18 +40,22 @@ describe('ChatWindow', () => {
   // TC-CW-001: Initial render with default props
   it('should render with default title and connection status', () => {
     render(<ChatWindow sessionId="test-session-123" />);
-    
+
     // Verify default title
     expect(screen.getByText('Chat Assistant')).toBeInTheDocument();
-    
+
     // Verify connection status (connected)
     expect(screen.getByText('Connected')).toBeInTheDocument();
-    
+
     // Verify empty state
-    expect(screen.getByText('No messages yet. Start a conversation!')).toBeInTheDocument();
-    
+    expect(
+      screen.getByText('No messages yet. Start a conversation!')
+    ).toBeInTheDocument();
+
     // Verify input is present
-    expect(screen.getByPlaceholderText('Type your message...')).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText('Type your message...')
+    ).toBeInTheDocument();
   });
 
   // TC-CW-002: Render with initial messages
@@ -73,8 +77,13 @@ describe('ChatWindow', () => {
       },
     ];
 
-    render(<ChatWindow sessionId="test-session-123" initialMessages={initialMessages} />);
-    
+    render(
+      <ChatWindow
+        sessionId="test-session-123"
+        initialMessages={initialMessages}
+      />
+    );
+
     // Verify messages are displayed
     expect(screen.getByText('Hello')).toBeInTheDocument();
     expect(screen.getByText('Hi there!')).toBeInTheDocument();
@@ -84,28 +93,30 @@ describe('ChatWindow', () => {
   it('should send message and show in message list', async () => {
     const user = userEvent.setup();
     const onMessageSent = vi.fn();
-    
-    render(<ChatWindow sessionId="test-session-123" onMessageSent={onMessageSent} />);
-    
+
+    render(
+      <ChatWindow sessionId="test-session-123" onMessageSent={onMessageSent} />
+    );
+
     // Type message
     const textarea = screen.getByPlaceholderText('Type your message...');
     await user.type(textarea, 'Hello');
-    
+
     // Click send button
     const sendButton = screen.getByRole('button');
     await user.click(sendButton);
-    
+
     // Verify user message appears
     await waitFor(() => {
       expect(screen.getByText('Hello')).toBeInTheDocument();
     });
-    
+
     // Verify WebSocket sendMessage called
     expect(mockSendMessage).toHaveBeenCalledWith('Hello');
-    
+
     // Verify parent callback called
     expect(onMessageSent).toHaveBeenCalledWith('Hello');
-    
+
     // Verify typing indicator shows
     expect(screen.getByText('Assistant is typing')).toBeInTheDocument();
   });
@@ -113,12 +124,12 @@ describe('ChatWindow', () => {
   // TC-CW-006: Connection status indicator
   it('should show connecting status when not connected', () => {
     mockUseSocket.isConnected = false;
-    
+
     render(<ChatWindow sessionId="test-session-123" />);
-    
+
     // Verify "Connecting..." status
     expect(screen.getByText('Connecting...')).toBeInTheDocument();
-    
+
     // Verify input placeholder reflects connection status
     expect(screen.getByPlaceholderText('Connecting...')).toBeInTheDocument();
   });
@@ -126,7 +137,7 @@ describe('ChatWindow', () => {
   // Custom title
   it('should render with custom title', () => {
     render(<ChatWindow sessionId="test-session-123" title="Custom Chat" />);
-    
+
     expect(screen.getByText('Custom Chat')).toBeInTheDocument();
   });
 });

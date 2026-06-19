@@ -15,7 +15,7 @@ describe('DeleteConfirmDialog', () => {
   it('should display dialog when open prop is true', () => {
     render(
       <DeleteConfirmDialog
-        open={true}
+        open
         onClose={mockOnClose}
         onConfirm={mockOnConfirm}
         dataSourceName="Test Data Source"
@@ -31,7 +31,7 @@ describe('DeleteConfirmDialog', () => {
   it('should display data source name in confirmation message', () => {
     render(
       <DeleteConfirmDialog
-        open={true}
+        open
         onClose={mockOnClose}
         onConfirm={mockOnConfirm}
         dataSourceName="My Important Source"
@@ -46,7 +46,7 @@ describe('DeleteConfirmDialog', () => {
   it('should show warning about cascade deletion', () => {
     render(
       <DeleteConfirmDialog
-        open={true}
+        open
         onClose={mockOnClose}
         onConfirm={mockOnConfirm}
         dataSourceName="Test"
@@ -54,10 +54,18 @@ describe('DeleteConfirmDialog', () => {
       />
     );
 
-    expect(screen.getByText(/This operation cannot be undone/)).toBeInTheDocument();
-    expect(screen.getByText(/Delete the data source permanently/)).toBeInTheDocument();
-    expect(screen.getByText(/Remove all associated knowledge documents/)).toBeInTheDocument();
-    expect(screen.getByText(/Remove all associated document embeddings/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/This operation cannot be undone/)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Delete the data source permanently/)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Remove all associated knowledge documents/)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Remove all associated document embeddings/)
+    ).toBeInTheDocument();
   });
 
   // TC-024: Cancel deletion
@@ -66,7 +74,7 @@ describe('DeleteConfirmDialog', () => {
 
     render(
       <DeleteConfirmDialog
-        open={true}
+        open
         onClose={mockOnClose}
         onConfirm={mockOnConfirm}
         dataSourceName="Test"
@@ -87,7 +95,7 @@ describe('DeleteConfirmDialog', () => {
 
     render(
       <DeleteConfirmDialog
-        open={true}
+        open
         onClose={mockOnClose}
         onConfirm={mockOnConfirm}
         dataSourceName="Test"
@@ -105,11 +113,11 @@ describe('DeleteConfirmDialog', () => {
   it('should disable buttons when isDeleting is true', () => {
     render(
       <DeleteConfirmDialog
-        open={true}
+        open
         onClose={mockOnClose}
         onConfirm={mockOnConfirm}
         dataSourceName="Test"
-        isDeleting={true}
+        isDeleting
       />
     );
 
@@ -139,7 +147,7 @@ describe('DeleteConfirmDialog', () => {
   it('should style Delete button as error', () => {
     render(
       <DeleteConfirmDialog
-        open={true}
+        open
         onClose={mockOnClose}
         onConfirm={mockOnConfirm}
         dataSourceName="Test"

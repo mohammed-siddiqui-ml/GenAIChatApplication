@@ -1,6 +1,6 @@
 /**
  * DataSourceFormModal Component
- * 
+ *
  * Modal dialog for creating/editing data sources with form validation.
  * Features:
  * - Required field validation (name, type, config)
@@ -99,15 +99,16 @@ export function DataSourceFormModal({
   // Validate cron expression
   const validateCronExpression = (cron: string): boolean => {
     if (!cron.trim()) return true; // Empty is valid (optional field)
-    
+
     // Basic cron validation: 5 or 6 fields separated by spaces
     const parts = cron.trim().split(/\s+/);
     if (parts.length < 5 || parts.length > 6) {
       return false;
     }
-    
+
     // Each part should be a valid cron field (number, *, /, -, or ,)
-    const cronFieldRegex = /^(\*|([0-9]|[1-5][0-9])([-,\/]([0-9]|[1-5][0-9]))*)$/;
+    const cronFieldRegex =
+      /^(\*|([0-9]|[1-5][0-9])([-,\/]([0-9]|[1-5][0-9]))*)$/;
     return parts.every((part) => cronFieldRegex.test(part) || part === '*');
   };
 
@@ -126,7 +127,11 @@ export function DataSourceFormModal({
     // Validate config JSON
     try {
       const parsedConfig = JSON.parse(configText);
-      if (typeof parsedConfig !== 'object' || parsedConfig === null || Array.isArray(parsedConfig)) {
+      if (
+        typeof parsedConfig !== 'object' ||
+        parsedConfig === null ||
+        Array.isArray(parsedConfig)
+      ) {
         newErrors.config = 'Config must be a valid JSON object';
       }
     } catch (err) {
@@ -134,8 +139,12 @@ export function DataSourceFormModal({
     }
 
     // Validate cron expression
-    if (formData.sync_schedule && !validateCronExpression(formData.sync_schedule)) {
-      newErrors.sync_schedule = 'Invalid cron expression (e.g., "0 2 * * *" for daily at 2 AM)';
+    if (
+      formData.sync_schedule &&
+      !validateCronExpression(formData.sync_schedule)
+    ) {
+      newErrors.sync_schedule =
+        'Invalid cron expression (e.g., "0 2 * * *" for daily at 2 AM)';
     }
 
     setErrors(newErrors);
@@ -171,28 +180,44 @@ export function DataSourceFormModal({
   const getConfigPlaceholder = () => {
     switch (formData.type) {
       case 'confluence':
-        return JSON.stringify({
-          url: 'https://wiki.example.com',
-          username: 'admin',
-          api_token: 'your_token',
-          space_key: 'DOCS',
-        }, null, 2);
+        return JSON.stringify(
+          {
+            url: 'https://wiki.example.com',
+            username: 'admin',
+            api_token: 'your_token',
+            space_key: 'DOCS',
+          },
+          null,
+          2
+        );
       case 'jira':
-        return JSON.stringify({
-          url: 'https://jira.example.com',
-          username: 'admin',
-          api_token: 'your_token',
-          project_key: 'PROJ',
-        }, null, 2);
+        return JSON.stringify(
+          {
+            url: 'https://jira.example.com',
+            username: 'admin',
+            api_token: 'your_token',
+            project_key: 'PROJ',
+          },
+          null,
+          2
+        );
       case 'onboarding':
-        return JSON.stringify({
-          storage_path: '/path/to/onboarding/docs',
-        }, null, 2);
+        return JSON.stringify(
+          {
+            storage_path: '/path/to/onboarding/docs',
+          },
+          null,
+          2
+        );
       case 'custom':
-        return JSON.stringify({
-          url: 'https://api.example.com',
-          api_key: 'your_key',
-        }, null, 2);
+        return JSON.stringify(
+          {
+            url: 'https://api.example.com',
+            api_key: 'your_key',
+          },
+          null,
+          2
+        );
       default:
         return '{}';
     }
@@ -200,7 +225,9 @@ export function DataSourceFormModal({
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>{isEditMode ? 'Edit Data Source' : 'Create Data Source'}</DialogTitle>
+      <DialogTitle>
+        {isEditMode ? 'Edit Data Source' : 'Create Data Source'}
+      </DialogTitle>
       <DialogContent>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
           {/* Name Field */}
@@ -259,8 +286,13 @@ export function DataSourceFormModal({
               placeholder={getConfigPlaceholder()}
               sx={{ fontFamily: 'monospace' }}
             />
-            <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-              Enter configuration as JSON. Example for {formData.type} shown in placeholder.
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ mt: 0.5, display: 'block' }}
+            >
+              Enter configuration as JSON. Example for {formData.type} shown in
+              placeholder.
             </Typography>
           </Box>
 
@@ -276,7 +308,10 @@ export function DataSourceFormModal({
               }
             }}
             error={!!errors.sync_schedule}
-            helperText={errors.sync_schedule || 'Optional. E.g., "0 2 * * *" for daily at 2 AM'}
+            helperText={
+              errors.sync_schedule ||
+              'Optional. E.g., "0 2 * * *" for daily at 2 AM'
+            }
             fullWidth
             placeholder="0 2 * * *"
           />
@@ -286,7 +321,9 @@ export function DataSourceFormModal({
             control={
               <Switch
                 checked={formData.is_active}
-                onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                onChange={(e) =>
+                  setFormData({ ...formData, is_active: e.target.checked })
+                }
               />
             }
             label="Active"
@@ -298,10 +335,11 @@ export function DataSourceFormModal({
               <strong>Required fields by type:</strong>
             </Typography>
             <Typography variant="body2" component="div">
-              • <strong>Confluence:</strong> url, username, api_token, space_key<br />
-              • <strong>JIRA:</strong> url, username, api_token, project_key<br />
-              • <strong>Onboarding:</strong> storage_path<br />
-              • <strong>Custom:</strong> url
+              • <strong>Confluence:</strong> url, username, api_token, space_key
+              <br />• <strong>JIRA:</strong> url, username, api_token,
+              project_key
+              <br />• <strong>Onboarding:</strong> storage_path
+              <br />• <strong>Custom:</strong> url
             </Typography>
           </Alert>
         </Box>
@@ -310,8 +348,12 @@ export function DataSourceFormModal({
         <Button onClick={onClose} disabled={isSubmitting}>
           Cancel
         </Button>
-        <Button onClick={handleSubmit} variant="contained" disabled={isSubmitting}>
-          {isSubmitting ? 'Saving...' : (isEditMode ? 'Update' : 'Create')}
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Saving...' : isEditMode ? 'Update' : 'Create'}
         </Button>
       </DialogActions>
     </Dialog>

@@ -1,6 +1,6 @@
 /**
  * Chat Service
- * 
+ *
  * Provides functions for chat session management and query submission.
  * Supports both REST API with SSE streaming and WebSocket communication.
  */
@@ -85,13 +85,13 @@ const SESSION_STORAGE_KEY = 'chat_session';
 
 /**
  * Get current session from localStorage
- * 
+ *
  * @returns Session data or null if no session exists
  */
 export function getSession(): SessionData | null {
   const sessionStr = localStorage.getItem(SESSION_STORAGE_KEY);
   if (!sessionStr) return null;
-  
+
   try {
     return JSON.parse(sessionStr) as SessionData;
   } catch (error) {
@@ -102,7 +102,7 @@ export function getSession(): SessionData | null {
 
 /**
  * Store session in localStorage
- * 
+ *
  * @param sessionData - Session data to store
  */
 function setSession(sessionData: SessionData): void {
@@ -118,10 +118,10 @@ export function clearSession(): void {
 
 /**
  * Create a new chat session
- * 
+ *
  * Calls POST /api/v1/chat/sessions to create a new session.
  * Stores the session token in localStorage for subsequent requests.
- * 
+ *
  * @returns Session data
  * @throws Error if session creation fails
  */
@@ -152,9 +152,9 @@ export async function createSession(): Promise<SessionData> {
 
 /**
  * Get or create session
- * 
+ *
  * Returns existing session from localStorage, or creates a new one if none exists.
- * 
+ *
  * @returns Session data
  */
 export async function getOrCreateSession(): Promise<SessionData> {
@@ -365,11 +365,15 @@ export async function sendQueryNonStreaming(
       temperature: options?.temperature || 0.7,
     };
 
-    const response = await api.post<QueryResponse>('/v1/chat/query', queryParams, {
-      headers: {
-        'X-Session-Token': session.sessionToken,
-      },
-    });
+    const response = await api.post<QueryResponse>(
+      '/v1/chat/query',
+      queryParams,
+      {
+        headers: {
+          'X-Session-Token': session.sessionToken,
+        },
+      }
+    );
 
     return response.data;
   } catch (error) {

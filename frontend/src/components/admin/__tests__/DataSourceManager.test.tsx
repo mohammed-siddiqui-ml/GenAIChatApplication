@@ -89,7 +89,9 @@ describe('DataSourceManager', () => {
     renderWithProviders(<DataSourceManager />);
 
     await waitFor(() => {
-      expect(screen.getByText('No data sources found. Create one to get started.')).toBeInTheDocument();
+      expect(
+        screen.getByText('No data sources found. Create one to get started.')
+      ).toBeInTheDocument();
     });
 
     expect(screen.getByText('Add Data Source')).toBeInTheDocument();
@@ -289,7 +291,9 @@ describe('DataSourceManager', () => {
     renderWithProviders(<DataSourceManager />);
 
     await waitFor(() => {
-      expect(screen.getByText(/Failed to load data sources/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Failed to load data sources/)
+      ).toBeInTheDocument();
     });
   });
 });

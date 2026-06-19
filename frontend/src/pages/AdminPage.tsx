@@ -36,7 +36,12 @@ import {
   AccountCircle,
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
-import { DataSourceManager, IngestionMonitor } from '../components/admin';
+import {
+  DataSourceManager,
+  IngestionMonitor,
+  MetricsDashboard,
+  AuditLogViewer,
+} from '../components/admin';
 
 const drawerWidth = 260;
 
@@ -61,7 +66,8 @@ function DashboardOverview() {
         Dashboard Overview
       </Typography>
       <Typography color="text.secondary">
-        Welcome to the admin dashboard. Select a section from the sidebar to get started.
+        Welcome to the admin dashboard. Select a section from the sidebar to get
+        started.
       </Typography>
     </Box>
   );
@@ -86,12 +92,7 @@ function IngestionJobsPage() {
 function MetricsPage() {
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>
-        System Metrics
-      </Typography>
-      <Typography color="text.secondary">
-        View system health, performance metrics, and usage statistics.
-      </Typography>
+      <MetricsDashboard />
     </Box>
   );
 }
@@ -99,12 +100,7 @@ function MetricsPage() {
 function AuditLogsPage() {
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>
-        Audit Logs
-      </Typography>
-      <Typography color="text.secondary">
-        Review system activity logs and user actions.
-      </Typography>
+      <AuditLogViewer />
     </Box>
   );
 }
@@ -196,11 +192,14 @@ export function AdminPage() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            {navigationItems.find((item) => item.path === location.pathname)?.title ||
-              'Admin Dashboard'}
+            {navigationItems.find((item) => item.path === location.pathname)
+              ?.title || 'Admin Dashboard'}
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant="body2" sx={{ display: { xs: 'none', sm: 'block' } }}>
+            <Typography
+              variant="body2"
+              sx={{ display: { xs: 'none', sm: 'block' } }}
+            >
               {user?.username || user?.email}
             </Typography>
             <IconButton

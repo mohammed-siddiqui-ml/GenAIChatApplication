@@ -90,8 +90,8 @@ export function SocketProvider({ children }: SocketProviderProps) {
   }, [socket]);
 
   // Cleanup on unmount
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       if (socket) {
         // Remove all event listeners before disconnecting
         socket.off('connect');
@@ -99,8 +99,9 @@ export function SocketProvider({ children }: SocketProviderProps) {
         socket.off('connect_error');
         socket.disconnect();
       }
-    };
-  }, [socket]);
+    },
+    [socket]
+  );
 
   const contextValue = useMemo(
     () => ({

@@ -141,11 +141,11 @@ export function MessageList({
 
   // Create row component with messages in closure
   // eslint-disable-next-line react/no-unstable-nested-components
-  const RowRenderer = ({ index }: { index: number }) => {
+  function RowRenderer({ index }: { index: number }) {
     const message = messages[index];
     if (!message) return null;
     return <MessageBubble message={message} />;
-  };
+  }
 
   if (messages.length === 0 && !isTyping) {
     return (

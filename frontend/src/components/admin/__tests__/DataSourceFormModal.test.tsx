@@ -17,7 +17,7 @@ describe('DataSourceFormModal', () => {
 
     render(
       <DataSourceFormModal
-        open={true}
+        open
         onClose={mockOnClose}
         onSubmit={mockOnSubmit}
         isSubmitting={false}
@@ -41,7 +41,7 @@ describe('DataSourceFormModal', () => {
 
     render(
       <DataSourceFormModal
-        open={true}
+        open
         onClose={mockOnClose}
         onSubmit={mockOnSubmit}
         isSubmitting={false}
@@ -74,7 +74,7 @@ describe('DataSourceFormModal', () => {
 
     render(
       <DataSourceFormModal
-        open={true}
+        open
         onClose={mockOnClose}
         onSubmit={mockOnSubmit}
         isSubmitting={false}
@@ -92,7 +92,9 @@ describe('DataSourceFormModal', () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText('Config must be a valid JSON object')).toBeInTheDocument();
+      expect(
+        screen.getByText('Config must be a valid JSON object')
+      ).toBeInTheDocument();
     });
   });
 
@@ -102,7 +104,7 @@ describe('DataSourceFormModal', () => {
 
     render(
       <DataSourceFormModal
-        open={true}
+        open
         onClose={mockOnClose}
         onSubmit={mockOnSubmit}
         isSubmitting={false}
@@ -129,7 +131,7 @@ describe('DataSourceFormModal', () => {
 
     render(
       <DataSourceFormModal
-        open={true}
+        open
         onClose={mockOnClose}
         onSubmit={mockOnSubmit}
         isSubmitting={false}
@@ -158,7 +160,7 @@ describe('DataSourceFormModal', () => {
 
     render(
       <DataSourceFormModal
-        open={true}
+        open
         onClose={mockOnClose}
         onSubmit={mockOnSubmit}
         isSubmitting={false}
@@ -191,7 +193,7 @@ describe('DataSourceFormModal', () => {
 
     render(
       <DataSourceFormModal
-        open={true}
+        open
         onClose={mockOnClose}
         onSubmit={mockOnSubmit}
         initialData={initialData}
@@ -220,7 +222,7 @@ describe('DataSourceFormModal', () => {
 
     render(
       <DataSourceFormModal
-        open={true}
+        open
         onClose={mockOnClose}
         onSubmit={mockOnSubmit}
         initialData={initialData}
@@ -232,7 +234,9 @@ describe('DataSourceFormModal', () => {
     // MUI Select doesn't associate the label with the combobox in accessible name,
     // so we query for all comboboxes and find the disabled one (Type field)
     const comboboxes = screen.getAllByRole('combobox');
-    const disabledCombobox = comboboxes.find(cb => cb.getAttribute('aria-disabled') === 'true');
+    const disabledCombobox = comboboxes.find(
+      (cb) => cb.getAttribute('aria-disabled') === 'true'
+    );
     expect(disabledCombobox).toBeDefined();
     expect(disabledCombobox).toHaveAttribute('aria-disabled', 'true');
   });
@@ -243,7 +247,7 @@ describe('DataSourceFormModal', () => {
 
     render(
       <DataSourceFormModal
-        open={true}
+        open
         onClose={mockOnClose}
         onSubmit={mockOnSubmit}
         isSubmitting={false}
@@ -281,7 +285,7 @@ describe('DataSourceFormModal', () => {
 
     render(
       <DataSourceFormModal
-        open={true}
+        open
         onClose={mockOnClose}
         onSubmit={mockOnSubmit}
         isSubmitting={false}

@@ -6,7 +6,11 @@ import type { Source } from '../types';
 interface UseChatOptions {
   socket: Socket | null;
   sessionId: string;
-  onError?: (error: { error: string; type?: string; timestamp: string }) => void;
+  onError?: (error: {
+    error: string;
+    type?: string;
+    timestamp: string;
+  }) => void;
 }
 
 interface ChatMessage {
@@ -20,7 +24,7 @@ interface ChatMessage {
 
 /**
  * Custom hook for chat operations using WebSocket
- * 
+ *
  * Handles:
  * - Sending messages via chat:query event
  * - Receiving streaming responses via chat:chunk
@@ -29,7 +33,7 @@ interface ChatMessage {
  * - Error handling via chat:error
  * - Optimistic updates for user messages
  * - Message state management
- * 
+ *
  * @param options - Configuration options
  * @returns Chat state and operations
  */
@@ -131,7 +135,11 @@ export function useChat({ socket, onError }: UseChatOptions) {
       sourcesRef.current = data.sources.map((src) => ({
         id: src.id,
         title: src.title,
-        type: src.type as 'confluence' | 'issue' | 'onboarding' | 'documentation',
+        type: src.type as
+          | 'confluence'
+          | 'issue'
+          | 'onboarding'
+          | 'documentation',
         url: src.url,
         excerpt: '', // Backend doesn't send excerpt in this event
         relevanceScore: src.similarity,

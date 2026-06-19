@@ -1,6 +1,6 @@
 /**
  * IngestionMonitor Component
- * 
+ *
  * Admin dashboard for monitoring and managing data ingestion jobs.
  * Features:
  * - Job list table with status, progress, and details
@@ -90,7 +90,9 @@ interface ToastState {
 export function IngestionMonitor() {
   const queryClient = useQueryClient();
   const [isTriggerDialogOpen, setIsTriggerDialogOpen] = useState(false);
-  const [selectedDataSourceId, setSelectedDataSourceId] = useState<number | ''>('');
+  const [selectedDataSourceId, setSelectedDataSourceId] = useState<number | ''>(
+    ''
+  );
   const [toast, setToast] = useState<ToastState>({
     open: false,
     message: '',
@@ -98,7 +100,11 @@ export function IngestionMonitor() {
   });
 
   // Fetch ingestion jobs with auto-refresh every 5 seconds
-  const { data: jobsData, isLoading: jobsLoading, error: jobsError } = useQuery<IngestionJobListResponse>({
+  const {
+    data: jobsData,
+    isLoading: jobsLoading,
+    error: jobsError,
+  } = useQuery<IngestionJobListResponse>({
     queryKey: ['ingestionJobs'],
     queryFn: async () => {
       const response = await api.get('/v1/admin/ingestion/jobs');
@@ -135,7 +141,10 @@ export function IngestionMonitor() {
       showToast('Ingestion job triggered successfully', 'success');
     },
     onError: (err: any) => {
-      showToast(err.response?.data?.detail || 'Failed to trigger ingestion', 'error');
+      showToast(
+        err.response?.data?.detail || 'Failed to trigger ingestion',
+        'error'
+      );
     },
   });
 
@@ -167,7 +176,9 @@ export function IngestionMonitor() {
   };
 
   // Status color mapping
-  const getStatusColor = (status: string): 'default' | 'info' | 'success' | 'error' => {
+  const getStatusColor = (
+    status: string
+  ): 'default' | 'info' | 'success' | 'error' => {
     switch (status) {
       case 'pending':
         return 'default';
@@ -183,7 +194,10 @@ export function IngestionMonitor() {
   };
 
   // Calculate job duration
-  const calculateDuration = (startedAt: string | null, completedAt: string | null): string => {
+  const calculateDuration = (
+    startedAt: string | null,
+    completedAt: string | null
+  ): string => {
     if (!startedAt) return '-';
 
     const start = new Date(startedAt).getTime();
@@ -196,11 +210,11 @@ export function IngestionMonitor() {
 
     if (hours > 0) {
       return `${hours}h ${minutes % 60}m`;
-    } else if (minutes > 0) {
-      return `${minutes}m ${seconds % 60}s`;
-    } else {
-      return `${seconds}s`;
     }
+    if (minutes > 0) {
+      return `${minutes}m ${seconds % 60}s`;
+    }
+    return `${seconds}s`;
   };
 
   // Calculate progress percentage for running jobs
@@ -223,7 +237,14 @@ export function IngestionMonitor() {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 3,
+        }}
+      >
         <Box>
           <Typography variant="h4" gutterBottom>
             Ingestion Monitoring
@@ -281,7 +302,8 @@ export function IngestionMonitor() {
               <TableRow>
                 <TableCell colSpan={7} align="center">
                   <Typography color="text.secondary">
-                    No ingestion jobs found. Trigger an ingestion to get started.
+                    No ingestion jobs found. Trigger an ingestion to get
+                    started.
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -291,7 +313,9 @@ export function IngestionMonitor() {
                   <TableCell>{job.id}</TableCell>
                   <TableCell>
                     <Box>
-                      <Typography variant="body2">{job.data_source_name || 'Unknown'}</Typography>
+                      <Typography variant="body2">
+                        {job.data_source_name || 'Unknown'}
+                      </Typography>
                       <Typography variant="caption" color="text.secondary">
                         {job.data_source_type || '-'}
                       </Typography>
@@ -308,21 +332,29 @@ export function IngestionMonitor() {
                     {job.status === 'running' ? (
                       <Box sx={{ width: '100%' }}>
                         <LinearProgress
-                          variant={job.documents_processed > 0 ? 'determinate' : 'indeterminate'}
+                          variant={
+                            job.documents_processed > 0
+                              ? 'determinate'
+                              : 'indeterminate'
+                          }
                           value={calculateProgress(job)}
                         />
                         <Typography variant="caption" color="text.secondary">
-                          Processed: {job.documents_processed} | Failed: {job.documents_failed}
+                          Processed: {job.documents_processed} | Failed:{' '}
+                          {job.documents_failed}
                         </Typography>
                       </Box>
                     ) : (
                       <Typography variant="body2">
-                        {job.documents_processed} processed / {job.documents_failed} failed
+                        {job.documents_processed} processed /{' '}
+                        {job.documents_failed} failed
                       </Typography>
                     )}
                   </TableCell>
                   <TableCell>
-                    <Typography variant="body2">{formatTimestamp(job.started_at)}</Typography>
+                    <Typography variant="body2">
+                      {formatTimestamp(job.started_at)}
+                    </Typography>
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2">
@@ -347,11 +379,17 @@ export function IngestionMonitor() {
       </TableContainer>
 
       {/* Trigger Ingestion Dialog */}
-      <Dialog open={isTriggerDialogOpen} onClose={handleTriggerCancel} maxWidth="sm" fullWidth>
+      <Dialog
+        open={isTriggerDialogOpen}
+        onClose={handleTriggerCancel}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>Trigger Data Ingestion</DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Select a data source to trigger manual ingestion. The ingestion will run incrementally.
+            Select a data source to trigger manual ingestion. The ingestion will
+            run incrementally.
           </Typography>
           <FormControl fullWidth sx={{ mt: 2 }}>
             <InputLabel id="data-source-select-label">Data Source</InputLabel>
@@ -360,7 +398,9 @@ export function IngestionMonitor() {
               id="data-source-select"
               value={selectedDataSourceId}
               label="Data Source"
-              onChange={(e) => setSelectedDataSourceId(e.target.value as number)}
+              onChange={(e) =>
+                setSelectedDataSourceId(e.target.value as number)
+              }
             >
               {dataSourcesData?.items.map((source) => (
                 <MenuItem key={source.id} value={source.id}>
@@ -371,7 +411,10 @@ export function IngestionMonitor() {
           </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleTriggerCancel} disabled={triggerMutation.isPending}>
+          <Button
+            onClick={handleTriggerCancel}
+            disabled={triggerMutation.isPending}
+          >
             Cancel
           </Button>
           <Button
@@ -391,7 +434,11 @@ export function IngestionMonitor() {
         onClose={handleCloseToast}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <Alert onClose={handleCloseToast} severity={toast.severity} sx={{ width: '100%' }}>
+        <Alert
+          onClose={handleCloseToast}
+          severity={toast.severity}
+          sx={{ width: '100%' }}
+        >
           {toast.message}
         </Alert>
       </Snackbar>

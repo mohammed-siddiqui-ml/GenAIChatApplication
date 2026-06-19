@@ -51,17 +51,19 @@ describe('MessageList', () => {
   // TC-ML-001: Empty state display
   it('should display empty state when no messages', () => {
     render(<MessageList messages={[]} />);
-    
-    expect(screen.getByText('No messages yet. Start a conversation!')).toBeInTheDocument();
+
+    expect(
+      screen.getByText('No messages yet. Start a conversation!')
+    ).toBeInTheDocument();
   });
 
   // TC-ML-002: Render user message
   it('should render user message with correct styling', () => {
     render(<MessageList messages={[mockUserMessage]} />);
-    
+
     // Verify message content is displayed
     expect(screen.getByText('Hello, I need help')).toBeInTheDocument();
-    
+
     // Verify timestamp is displayed
     expect(screen.getByText(/10:00/)).toBeInTheDocument();
   });
@@ -69,7 +71,7 @@ describe('MessageList', () => {
   // TC-ML-003: Render assistant message with markdown
   it('should render assistant message with markdown', () => {
     render(<MessageList messages={[mockAssistantMessage]} />);
-    
+
     // Verify markdown content is rendered
     expect(screen.getByTestId('markdown-content')).toBeInTheDocument();
     expect(screen.getByText('**Bold** text')).toBeInTheDocument();
@@ -78,7 +80,7 @@ describe('MessageList', () => {
   // TC-ML-004: Render system message
   it('should render system message with plain text', () => {
     render(<MessageList messages={[mockSystemMessage]} />);
-    
+
     // Verify system message content
     expect(screen.getByText('Error: Connection timeout')).toBeInTheDocument();
   });
@@ -106,14 +108,14 @@ describe('MessageList', () => {
     };
 
     render(<MessageList messages={[messageWithSources]} />);
-    
+
     // Verify "Sources:" label
     expect(screen.getByText('Sources:')).toBeInTheDocument();
-    
+
     // Verify source links
     expect(screen.getByText('API Documentation')).toBeInTheDocument();
     expect(screen.getByText('PROJ-123: Feature Request')).toBeInTheDocument();
-    
+
     // Verify links have correct attributes
     const links = screen.getAllByRole('link');
     expect(links[0]).toHaveAttribute('target', '_blank');
@@ -123,29 +125,29 @@ describe('MessageList', () => {
   // TC-ML-006: Render multiple messages
   it('should render multiple messages in correct order', () => {
     const messages = [mockUserMessage, mockAssistantMessage, mockSystemMessage];
-    
+
     render(<MessageList messages={messages} />);
-    
+
     // Verify all messages are rendered
     expect(screen.getByText('Hello, I need help')).toBeInTheDocument();
     expect(screen.getByText('**Bold** text')).toBeInTheDocument();
     expect(screen.getByText('Error: Connection timeout')).toBeInTheDocument();
-    
+
     // Verify virtualized list is used
     expect(screen.getByTestId('virtualized-list')).toBeInTheDocument();
   });
 
   // TC-ML-007: Typing indicator display
   it('should show typing indicator when isTyping is true', () => {
-    render(<MessageList messages={[]} isTyping={true} />);
-    
+    render(<MessageList messages={[]} isTyping />);
+
     // Typing indicator should be visible (even with no messages)
     expect(screen.getByText('Assistant is typing')).toBeInTheDocument();
   });
 
   it('should hide typing indicator when isTyping is false', () => {
     render(<MessageList messages={[mockUserMessage]} isTyping={false} />);
-    
+
     // Typing indicator should not be visible
     expect(screen.queryByText('Assistant is typing')).not.toBeInTheDocument();
   });

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import { SocketProvider, useSocketContext } from '../SocketContext';
 import { io } from 'socket.io-client';
+import { SocketProvider, useSocketContext } from '../SocketContext';
 
 // Mock socket.io-client
 vi.mock('socket.io-client');
@@ -34,17 +34,19 @@ describe('SocketContext', () => {
 
   // TC-001: SocketContext Provides Socket Instance
   it('TC-001: provides socket instance after connection', async () => {
-    const TestComponent = () => {
+    function TestComponent() {
       const { socket, isConnected, connect } = useSocketContext();
 
       return (
         <div>
           <div data-testid="socket-exists">{socket ? 'exists' : 'null'}</div>
           <div data-testid="is-connected">{isConnected ? 'true' : 'false'}</div>
-          <button onClick={() => connect('token', 'session-id')}>Connect</button>
+          <button onClick={() => connect('token', 'session-id')}>
+            Connect
+          </button>
         </div>
       );
-    };
+    }
 
     render(
       <SocketProvider>
@@ -61,8 +63,14 @@ describe('SocketContext', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('socket-exists').textContent).toBe('exists');
-      expect(mockSocket.on).toHaveBeenCalledWith('connect', expect.any(Function));
-      expect(mockSocket.on).toHaveBeenCalledWith('disconnect', expect.any(Function));
+      expect(mockSocket.on).toHaveBeenCalledWith(
+        'connect',
+        expect.any(Function)
+      );
+      expect(mockSocket.on).toHaveBeenCalledWith(
+        'disconnect',
+        expect.any(Function)
+      );
     });
   });
 
@@ -77,15 +85,19 @@ describe('SocketContext', () => {
       return mockSocket;
     });
 
-    const TestComponent = () => {
+    function TestComponent() {
       const { isConnected, connect } = useSocketContext();
       return (
         <div>
-          <div data-testid="connection-state">{isConnected ? 'connected' : 'disconnected'}</div>
-          <button onClick={() => connect('token', 'session-id')}>Connect</button>
+          <div data-testid="connection-state">
+            {isConnected ? 'connected' : 'disconnected'}
+          </div>
+          <button onClick={() => connect('token', 'session-id')}>
+            Connect
+          </button>
         </div>
       );
-    };
+    }
 
     render(
       <SocketProvider>
@@ -94,7 +106,9 @@ describe('SocketContext', () => {
     );
 
     // Initially disconnected
-    expect(screen.getByTestId('connection-state').textContent).toBe('disconnected');
+    expect(screen.getByTestId('connection-state').textContent).toBe(
+      'disconnected'
+    );
 
     // Trigger connection
     screen.getByText('Connect').click();
@@ -108,7 +122,9 @@ describe('SocketContext', () => {
     connectHandler!();
 
     await waitFor(() => {
-      expect(screen.getByTestId('connection-state').textContent).toBe('connected');
+      expect(screen.getByTestId('connection-state').textContent).toBe(
+        'connected'
+      );
     });
 
     // Simulate disconnect event
@@ -116,21 +132,25 @@ describe('SocketContext', () => {
     disconnectHandler!();
 
     await waitFor(() => {
-      expect(screen.getByTestId('connection-state').textContent).toBe('disconnected');
+      expect(screen.getByTestId('connection-state').textContent).toBe(
+        'disconnected'
+      );
     });
   });
 
   // TC-014: Connection Cleanup on Unmount
   it('TC-014: cleans up socket connection on unmount', async () => {
-    const TestComponent = () => {
+    function TestComponent() {
       const { socket, connect } = useSocketContext();
       return (
         <div>
           <div data-testid="socket-status">{socket ? 'mounted' : 'null'}</div>
-          <button onClick={() => connect('token', 'session-id')}>Connect</button>
+          <button onClick={() => connect('token', 'session-id')}>
+            Connect
+          </button>
         </div>
       );
-    };
+    }
 
     const { unmount } = render(
       <SocketProvider>
@@ -154,20 +174,28 @@ describe('SocketContext', () => {
 
   // Test provider without children
   it('provides context value without errors', () => {
-    const { container } = render(<SocketProvider><div>test</div></SocketProvider>);
+    const { container } = render(
+      <SocketProvider>
+        <div>test</div>
+      </SocketProvider>
+    );
     expect(container).toBeTruthy();
   });
 
   // Test error when using context outside provider
   it('throws error when useSocketContext used outside provider', () => {
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
 
-    const TestComponent = () => {
+    function TestComponent() {
       useSocketContext();
       return <div>should not render</div>;
-    };
+    }
 
-    expect(() => render(<TestComponent />)).toThrow('useSocketContext must be used within SocketProvider');
+    expect(() => render(<TestComponent />)).toThrow(
+      'useSocketContext must be used within SocketProvider'
+    );
 
     consoleError.mockRestore();
   });

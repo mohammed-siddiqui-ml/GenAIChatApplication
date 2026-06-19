@@ -26,7 +26,9 @@ describe('useChat', () => {
 
   // TC-006: useChat Sends Message Correctly
   it('TC-006: sends message with correct payload', () => {
-    const { result } = renderHook(() => useChat({ socket: mockSocket, sessionId: 'test-session' }));
+    const { result } = renderHook(() =>
+      useChat({ socket: mockSocket, sessionId: 'test-session' })
+    );
 
     act(() => {
       result.current.sendMessage('Hello, world!');
@@ -48,7 +50,9 @@ describe('useChat', () => {
 
   // TC-007: useChat Handles Streaming Chunks
   it('TC-007: handles streaming chunks correctly', async () => {
-    const { result } = renderHook(() => useChat({ socket: mockSocket, sessionId: 'test-session' }));
+    const { result } = renderHook(() =>
+      useChat({ socket: mockSocket, sessionId: 'test-session' })
+    );
 
     // Send message
     act(() => {
@@ -60,7 +64,7 @@ describe('useChat', () => {
       eventHandlers['chat:chunk']({
         chunk: 'React is ',
         chunk_index: 0,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     });
 
@@ -79,19 +83,23 @@ describe('useChat', () => {
       eventHandlers['chat:chunk']({
         chunk: 'a JavaScript library',
         chunk_index: 1,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     });
 
     await waitFor(() => {
-      expect(result.current.messages[1].content).toBe('React is a JavaScript library');
+      expect(result.current.messages[1].content).toBe(
+        'React is a JavaScript library'
+      );
       expect(result.current.isStreaming).toBe(true);
     });
   });
 
   // TC-008: useChat Handles Sources Event
   it('TC-008: stores sources temporarily', async () => {
-    const { result } = renderHook(() => useChat({ socket: mockSocket, sessionId: 'test-session' }));
+    const { result } = renderHook(() =>
+      useChat({ socket: mockSocket, sessionId: 'test-session' })
+    );
 
     // Send message
     act(() => {
@@ -103,7 +111,7 @@ describe('useChat', () => {
       eventHandlers['chat:chunk']({
         chunk: 'Response',
         chunk_index: 0,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     });
 
@@ -116,7 +124,7 @@ describe('useChat', () => {
         type: 'documentation',
         similarity: 0.95,
         chunk_index: 0,
-        metadata: {}
+        metadata: {},
       },
       {
         id: '2',
@@ -125,12 +133,15 @@ describe('useChat', () => {
         type: 'documentation',
         similarity: 0.87,
         chunk_index: 0,
-        metadata: {}
+        metadata: {},
       },
     ];
 
     act(() => {
-      eventHandlers['chat:sources']({ sources: testSources, timestamp: new Date().toISOString() });
+      eventHandlers['chat:sources']({
+        sources: testSources,
+        timestamp: new Date().toISOString(),
+      });
     });
 
     // Sources stored but not yet attached to message
@@ -141,7 +152,9 @@ describe('useChat', () => {
 
   // TC-009: useChat Finalizes Message on Done Event
   it('TC-009: finalizes message with sources on done event', async () => {
-    const { result } = renderHook(() => useChat({ socket: mockSocket, sessionId: 'test-session' }));
+    const { result } = renderHook(() =>
+      useChat({ socket: mockSocket, sessionId: 'test-session' })
+    );
 
     // Send message
     act(() => {
@@ -153,7 +166,7 @@ describe('useChat', () => {
       eventHandlers['chat:chunk']({
         chunk: 'Complete response',
         chunk_index: 0,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     });
 
@@ -166,12 +179,15 @@ describe('useChat', () => {
         type: 'documentation',
         similarity: 0.95,
         chunk_index: 0,
-        metadata: {}
+        metadata: {},
       },
     ];
 
     act(() => {
-      eventHandlers['chat:sources']({ sources: testSources, timestamp: new Date().toISOString() });
+      eventHandlers['chat:sources']({
+        sources: testSources,
+        timestamp: new Date().toISOString(),
+      });
     });
 
     // Receive done event
@@ -179,17 +195,22 @@ describe('useChat', () => {
       eventHandlers['chat:done']({});
     });
 
-    await waitFor(() => {
-      expect(result.current.messages[1].isStreaming).toBe(false);
-      expect(result.current.messages[1].sources).toBeDefined();
-      expect(result.current.isStreaming).toBe(false);
-    }, { timeout: 2000 });
+    await waitFor(
+      () => {
+        expect(result.current.messages[1].isStreaming).toBe(false);
+        expect(result.current.messages[1].sources).toBeDefined();
+        expect(result.current.isStreaming).toBe(false);
+      },
+      { timeout: 2000 }
+    );
   });
 
   // TC-010: useChat Handles Chat Error
   it('TC-010: removes streaming message on error', async () => {
     const onError = vi.fn();
-    const { result } = renderHook(() => useChat({ socket: mockSocket, sessionId: 'test-session', onError }));
+    const { result } = renderHook(() =>
+      useChat({ socket: mockSocket, sessionId: 'test-session', onError })
+    );
 
     // Send message
     act(() => {
@@ -201,14 +222,17 @@ describe('useChat', () => {
       eventHandlers['chat:chunk']({
         chunk: 'Partial response',
         chunk_index: 0,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     });
 
     expect(result.current.messages).toHaveLength(2);
 
     // Simulate error
-    const errorData = { error: 'Failed to retrieve context', timestamp: new Date().toISOString() };
+    const errorData = {
+      error: 'Failed to retrieve context',
+      timestamp: new Date().toISOString(),
+    };
     act(() => {
       eventHandlers['chat:error'](errorData);
     });
@@ -222,7 +246,9 @@ describe('useChat', () => {
 
   // TC-011: useChat Optimistic Updates
   it('TC-011: adds user message immediately (optimistic update)', () => {
-    const { result } = renderHook(() => useChat({ socket: mockSocket, sessionId: 'test-session' }));
+    const { result } = renderHook(() =>
+      useChat({ socket: mockSocket, sessionId: 'test-session' })
+    );
 
     act(() => {
       result.current.sendMessage('Test query');
@@ -240,7 +266,9 @@ describe('useChat', () => {
 
   // TC-012: useChat Clear Messages
   it('TC-012: clears all messages', async () => {
-    const { result } = renderHook(() => useChat({ socket: mockSocket, sessionId: 'test-session' }));
+    const { result } = renderHook(() =>
+      useChat({ socket: mockSocket, sessionId: 'test-session' })
+    );
 
     // Send multiple messages
     act(() => {
@@ -251,7 +279,7 @@ describe('useChat', () => {
       eventHandlers['chat:chunk']({
         chunk: 'Response 1',
         chunk_index: 0,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     });
 
@@ -273,7 +301,9 @@ describe('useChat', () => {
 
   // TC-013: Multiple Concurrent Streaming Messages
   it('TC-013: handles multiple messages correctly', async () => {
-    const { result } = renderHook(() => useChat({ socket: mockSocket, sessionId: 'test-session' }));
+    const { result } = renderHook(() =>
+      useChat({ socket: mockSocket, sessionId: 'test-session' })
+    );
 
     // Send first message
     act(() => {
@@ -284,7 +314,7 @@ describe('useChat', () => {
       eventHandlers['chat:chunk']({
         chunk: 'TypeScript is ',
         chunk_index: 0,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     });
 
@@ -304,7 +334,7 @@ describe('useChat', () => {
       eventHandlers['chat:chunk']({
         chunk: 'React is ',
         chunk_index: 0,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     });
 
@@ -319,24 +349,52 @@ describe('useChat', () => {
 
   // Test cleanup on unmount
   it('cleans up event listeners on unmount', () => {
-    const { unmount } = renderHook(() => useChat({ socket: mockSocket, sessionId: 'test-session' }));
+    const { unmount } = renderHook(() =>
+      useChat({ socket: mockSocket, sessionId: 'test-session' })
+    );
 
-    expect(mockSocket.on).toHaveBeenCalledWith('chat:chunk', expect.any(Function));
-    expect(mockSocket.on).toHaveBeenCalledWith('chat:sources', expect.any(Function));
-    expect(mockSocket.on).toHaveBeenCalledWith('chat:done', expect.any(Function));
-    expect(mockSocket.on).toHaveBeenCalledWith('chat:error', expect.any(Function));
+    expect(mockSocket.on).toHaveBeenCalledWith(
+      'chat:chunk',
+      expect.any(Function)
+    );
+    expect(mockSocket.on).toHaveBeenCalledWith(
+      'chat:sources',
+      expect.any(Function)
+    );
+    expect(mockSocket.on).toHaveBeenCalledWith(
+      'chat:done',
+      expect.any(Function)
+    );
+    expect(mockSocket.on).toHaveBeenCalledWith(
+      'chat:error',
+      expect.any(Function)
+    );
 
     unmount();
 
-    expect(mockSocket.off).toHaveBeenCalledWith('chat:chunk', expect.any(Function));
-    expect(mockSocket.off).toHaveBeenCalledWith('chat:sources', expect.any(Function));
-    expect(mockSocket.off).toHaveBeenCalledWith('chat:done', expect.any(Function));
-    expect(mockSocket.off).toHaveBeenCalledWith('chat:error', expect.any(Function));
+    expect(mockSocket.off).toHaveBeenCalledWith(
+      'chat:chunk',
+      expect.any(Function)
+    );
+    expect(mockSocket.off).toHaveBeenCalledWith(
+      'chat:sources',
+      expect.any(Function)
+    );
+    expect(mockSocket.off).toHaveBeenCalledWith(
+      'chat:done',
+      expect.any(Function)
+    );
+    expect(mockSocket.off).toHaveBeenCalledWith(
+      'chat:error',
+      expect.any(Function)
+    );
   });
 
   // Test sending message with options
   it('sends message with options', () => {
-    const { result } = renderHook(() => useChat({ socket: mockSocket, sessionId: 'test-session' }));
+    const { result } = renderHook(() =>
+      useChat({ socket: mockSocket, sessionId: 'test-session' })
+    );
 
     const options = { top_k: 15, temperature: 0.9 };
 

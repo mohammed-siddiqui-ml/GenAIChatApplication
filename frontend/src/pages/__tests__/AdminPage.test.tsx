@@ -73,9 +73,12 @@ const renderAdminPage = async (
   );
 
   // Wait for AuthProvider to finish loading
-  await waitFor(() => {
-    expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
-  }, { timeout: 1000 });
+  await waitFor(
+    () => {
+      expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
+    },
+    { timeout: 1000 }
+  );
 
   return result;
 };
@@ -148,12 +151,16 @@ describe('AdminPage', () => {
       await renderAdminPage();
 
       // Click Data Sources navigation item (get first button if multiple)
-      const dataSourcesButtons = screen.getAllByRole('button', { name: /data sources/i });
+      const dataSourcesButtons = screen.getAllByRole('button', {
+        name: /data sources/i,
+      });
       fireEvent.click(dataSourcesButtons[0]);
 
       // Verify Data Sources content is displayed
       await waitFor(() => {
-        expect(screen.getByText(/Configure and manage data sources/i)).toBeInTheDocument();
+        expect(
+          screen.getByText(/Configure and manage data sources/i)
+        ).toBeInTheDocument();
       });
     });
 
@@ -161,23 +168,29 @@ describe('AdminPage', () => {
       await renderAdminPage('/admin/metrics');
 
       // Find the Metrics navigation buttons (may be multiple due to mobile/desktop drawers)
-      const metricsButtons = screen.getAllByRole('button', { name: /metrics/i });
+      const metricsButtons = screen.getAllByRole('button', {
+        name: /metrics/i,
+      });
 
       // At least one should have selected state
-      const hasSelected = metricsButtons.some(
-        button => button.classList.contains('Mui-selected')
+      const hasSelected = metricsButtons.some((button) =>
+        button.classList.contains('Mui-selected')
       );
       expect(hasSelected).toBe(true);
 
       // Click Ingestion Jobs
-      const ingestionButtons = screen.getAllByRole('button', { name: /ingestion jobs/i });
+      const ingestionButtons = screen.getAllByRole('button', {
+        name: /ingestion jobs/i,
+      });
       fireEvent.click(ingestionButtons[0]);
 
       // Verify new route is highlighted
       await waitFor(() => {
-        const updatedIngestionButtons = screen.getAllByRole('button', { name: /ingestion jobs/i });
-        const hasSelectedIngestion = updatedIngestionButtons.some(
-          button => button.classList.contains('Mui-selected')
+        const updatedIngestionButtons = screen.getAllByRole('button', {
+          name: /ingestion jobs/i,
+        });
+        const hasSelectedIngestion = updatedIngestionButtons.some((button) =>
+          button.classList.contains('Mui-selected')
         );
         expect(hasSelectedIngestion).toBe(true);
       });
@@ -217,10 +230,13 @@ describe('AdminPage', () => {
       fireEvent.click(hamburger);
 
       // Drawer should be open (navigation items should be visible)
-      await waitFor(() => {
-        const dataSourcesElements = screen.getAllByText('Data Sources');
-        expect(dataSourcesElements.length).toBeGreaterThan(0);
-      }, { timeout: 2000 });
+      await waitFor(
+        () => {
+          const dataSourcesElements = screen.getAllByText('Data Sources');
+          expect(dataSourcesElements.length).toBeGreaterThan(0);
+        },
+        { timeout: 2000 }
+      );
     });
 
     it('TC-010: Mobile drawer closes on navigation', async () => {
@@ -233,13 +249,17 @@ describe('AdminPage', () => {
 
       // Click navigation item (use first button)
       await waitFor(() => {
-        const dataSourcesButtons = screen.getAllByRole('button', { name: /data sources/i });
+        const dataSourcesButtons = screen.getAllByRole('button', {
+          name: /data sources/i,
+        });
         fireEvent.click(dataSourcesButtons[0]);
       });
 
       // Content should be visible
       await waitFor(() => {
-        expect(screen.getByText(/Configure and manage data sources/i)).toBeInTheDocument();
+        expect(
+          screen.getByText(/Configure and manage data sources/i)
+        ).toBeInTheDocument();
       });
     });
   });
@@ -286,14 +306,18 @@ describe('AdminPage', () => {
       await renderAdminPage('/admin/data-sources');
 
       // Check for unique page content, not the navigation item
-      expect(screen.getByText(/Configure and manage data sources/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Configure and manage data sources/i)
+      ).toBeInTheDocument();
     });
 
     it('TC-014: Ingestion Jobs route shows correct content', async () => {
       await renderAdminPage('/admin/ingestion');
 
       // Check for unique page content
-      expect(screen.getByText(/Monitor and manage data ingestion jobs/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Monitor and manage data ingestion jobs/i)
+      ).toBeInTheDocument();
     });
 
     it('TC-015: Metrics route shows correct content', async () => {
@@ -301,14 +325,18 @@ describe('AdminPage', () => {
 
       // "System Metrics" should be unique to the page content
       expect(screen.getByText('System Metrics')).toBeInTheDocument();
-      expect(screen.getByText(/View system health, performance metrics/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/View system health, performance metrics/i)
+      ).toBeInTheDocument();
     });
 
     it('TC-016: Audit Logs route shows correct content', async () => {
       await renderAdminPage('/admin/audit');
 
       // Check for unique page content
-      expect(screen.getByText(/Review system activity logs/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Review system activity logs/i)
+      ).toBeInTheDocument();
     });
   });
 

@@ -2,7 +2,11 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import * as chatService from '../chatService';
 import api from '../api';
 import socketService from '../socket';
-import type { QueryResponse, SourceCitation, StreamEvent } from '../chatService';
+import type {
+  QueryResponse,
+  SourceCitation,
+  StreamEvent,
+} from '../chatService';
 
 // Mock the api module
 vi.mock('../api', () => ({
@@ -112,7 +116,10 @@ describe('chatService', () => {
 
       const result = await chatService.getOrCreateSession();
 
-      expect(api.post).toHaveBeenCalledWith('/v1/chat/sessions', expect.any(Object));
+      expect(api.post).toHaveBeenCalledWith(
+        '/v1/chat/sessions',
+        expect.any(Object)
+      );
       expect(result).toEqual(mockSessionData);
     });
 
@@ -140,7 +147,9 @@ describe('chatService', () => {
       const mockError = new Error('Network error');
       vi.mocked(api.post).mockRejectedValueOnce(mockError);
 
-      await expect(chatService.createSession()).rejects.toThrow('Failed to create chat session');
+      await expect(chatService.createSession()).rejects.toThrow(
+        'Failed to create chat session'
+      );
       expect(localStorageMock.setItem).not.toHaveBeenCalled();
     });
   });
@@ -182,9 +191,18 @@ describe('chatService', () => {
         top_k: 10,
         temperature: 0.7,
       });
-      expect(streamCallback).toHaveBeenCalledWith({ type: 'chunk', content: 'Test response' });
-      expect(streamCallback).toHaveBeenCalledWith({ type: 'sources', sources: [] });
-      expect(streamCallback).toHaveBeenCalledWith({ type: 'done', metadata: { duration: 1.5 } });
+      expect(streamCallback).toHaveBeenCalledWith({
+        type: 'chunk',
+        content: 'Test response',
+      });
+      expect(streamCallback).toHaveBeenCalledWith({
+        type: 'sources',
+        sources: [],
+      });
+      expect(streamCallback).toHaveBeenCalledWith({
+        type: 'done',
+        metadata: { duration: 1.5 },
+      });
       expect(mockSocket.off).toHaveBeenCalledTimes(4);
     });
 
@@ -235,9 +253,9 @@ describe('chatService', () => {
 
       const streamCallback = vi.fn();
 
-      await expect(chatService.sendQueryWebSocket('Test query', streamCallback)).rejects.toThrow(
-        'Query processing failed'
-      );
+      await expect(
+        chatService.sendQueryWebSocket('Test query', streamCallback)
+      ).rejects.toThrow('Query processing failed');
       expect(streamCallback).toHaveBeenCalledWith({
         type: 'error',
         error: 'Query processing failed',
@@ -265,7 +283,8 @@ describe('chatService', () => {
       ].join('');
 
       const mockReader = {
-        read: vi.fn()
+        read: vi
+          .fn()
           .mockResolvedValueOnce({
             done: false,
             value: new TextEncoder().encode(sseData),
@@ -302,8 +321,14 @@ describe('chatService', () => {
         type: 'chunk',
         content: ' a subset of AI',
       });
-      expect(streamCallback).toHaveBeenCalledWith({ type: 'sources', sources: [] });
-      expect(streamCallback).toHaveBeenCalledWith({ type: 'done', metadata: { duration: 1.5 } });
+      expect(streamCallback).toHaveBeenCalledWith({
+        type: 'sources',
+        sources: [],
+      });
+      expect(streamCallback).toHaveBeenCalledWith({
+        type: 'done',
+        metadata: { duration: 1.5 },
+      });
     });
 
     // TC-013: SSE Event Parsing - Multiple Chunks
@@ -318,7 +343,8 @@ describe('chatService', () => {
       ].join('');
 
       const mockReader = {
-        read: vi.fn()
+        read: vi
+          .fn()
           .mockResolvedValueOnce({
             done: false,
             value: new TextEncoder().encode(sseData),
@@ -338,9 +364,18 @@ describe('chatService', () => {
       const streamCallback = vi.fn();
       await chatService.sendQuerySSE('Test query', streamCallback);
 
-      expect(streamCallback).toHaveBeenCalledWith({ type: 'chunk', content: 'Part 1' });
-      expect(streamCallback).toHaveBeenCalledWith({ type: 'chunk', content: 'Part 2' });
-      expect(streamCallback).toHaveBeenCalledWith({ type: 'chunk', content: 'Part 3' });
+      expect(streamCallback).toHaveBeenCalledWith({
+        type: 'chunk',
+        content: 'Part 1',
+      });
+      expect(streamCallback).toHaveBeenCalledWith({
+        type: 'chunk',
+        content: 'Part 2',
+      });
+      expect(streamCallback).toHaveBeenCalledWith({
+        type: 'chunk',
+        content: 'Part 3',
+      });
     });
 
     // TC-014: SSE Buffer Handles Incomplete Messages
@@ -348,7 +383,8 @@ describe('chatService', () => {
       localStorageMock.setItem('chat_session', JSON.stringify(mockSessionData));
 
       const mockReader = {
-        read: vi.fn()
+        read: vi
+          .fn()
           .mockResolvedValueOnce({
             done: false,
             value: new TextEncoder().encode('data: {"type":"chu'),
@@ -359,7 +395,9 @@ describe('chatService', () => {
           })
           .mockResolvedValueOnce({
             done: false,
-            value: new TextEncoder().encode('data: {"type":"done","metadata":{}}\n\n'),
+            value: new TextEncoder().encode(
+              'data: {"type":"done","metadata":{}}\n\n'
+            ),
           })
           .mockResolvedValueOnce({ done: true, value: undefined }),
       };
@@ -376,8 +414,14 @@ describe('chatService', () => {
       const streamCallback = vi.fn();
       await chatService.sendQuerySSE('Test query', streamCallback);
 
-      expect(streamCallback).toHaveBeenCalledWith({ type: 'chunk', content: 'Test' });
-      expect(streamCallback).toHaveBeenCalledWith({ type: 'done', metadata: {} });
+      expect(streamCallback).toHaveBeenCalledWith({
+        type: 'chunk',
+        content: 'Test',
+      });
+      expect(streamCallback).toHaveBeenCalledWith({
+        type: 'done',
+        metadata: {},
+      });
     });
 
     // TC-015: SSE Invalid JSON Handling
@@ -391,7 +435,8 @@ describe('chatService', () => {
       ].join('');
 
       const mockReader = {
-        read: vi.fn()
+        read: vi
+          .fn()
           .mockResolvedValueOnce({
             done: false,
             value: new TextEncoder().encode(sseData),
@@ -412,8 +457,14 @@ describe('chatService', () => {
       await chatService.sendQuerySSE('Test query', streamCallback);
 
       // Should still process valid events
-      expect(streamCallback).toHaveBeenCalledWith({ type: 'chunk', content: 'Valid' });
-      expect(streamCallback).toHaveBeenCalledWith({ type: 'done', metadata: {} });
+      expect(streamCallback).toHaveBeenCalledWith({
+        type: 'chunk',
+        content: 'Valid',
+      });
+      expect(streamCallback).toHaveBeenCalledWith({
+        type: 'done',
+        metadata: {},
+      });
     });
 
     // TC-017: SSE Fetch Network Error
@@ -424,7 +475,9 @@ describe('chatService', () => {
 
       const streamCallback = vi.fn();
 
-      await expect(chatService.sendQuerySSE('Test query', streamCallback)).rejects.toThrow();
+      await expect(
+        chatService.sendQuerySSE('Test query', streamCallback)
+      ).rejects.toThrow();
       expect(streamCallback).toHaveBeenCalledWith({
         type: 'error',
         error: 'Network error',
@@ -444,9 +497,9 @@ describe('chatService', () => {
 
       const streamCallback = vi.fn();
 
-      await expect(chatService.sendQuerySSE('Test query', streamCallback)).rejects.toThrow(
-        'Query failed: Internal Server Error'
-      );
+      await expect(
+        chatService.sendQuerySSE('Test query', streamCallback)
+      ).rejects.toThrow('Query failed: Internal Server Error');
     });
   });
 
@@ -475,7 +528,8 @@ describe('chatService', () => {
 
       const sseData = 'data: {"type":"done","metadata":{}}\n\n';
       const mockReader = {
-        read: vi.fn()
+        read: vi
+          .fn()
           .mockResolvedValueOnce({
             done: false,
             value: new TextEncoder().encode(sseData),
@@ -497,7 +551,10 @@ describe('chatService', () => {
       await chatService.sendQuery('Test query', streamCallback);
 
       expect(global.fetch).toHaveBeenCalled();
-      expect(streamCallback).toHaveBeenCalledWith({ type: 'done', metadata: {} });
+      expect(streamCallback).toHaveBeenCalledWith({
+        type: 'done',
+        metadata: {},
+      });
     });
   });
 
@@ -555,7 +612,10 @@ describe('chatService', () => {
 
       const result = await chatService.sendQueryNonStreaming('Test query');
 
-      expect(api.post).toHaveBeenCalledWith('/v1/chat/sessions', expect.any(Object));
+      expect(api.post).toHaveBeenCalledWith(
+        '/v1/chat/sessions',
+        expect.any(Object)
+      );
       expect(api.post).toHaveBeenCalledWith(
         '/v1/chat/query',
         expect.any(Object),

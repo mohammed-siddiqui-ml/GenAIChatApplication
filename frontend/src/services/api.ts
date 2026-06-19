@@ -15,11 +15,10 @@ const api: AxiosInstance = axios.create({
 // Request interceptor - no need to manually add auth token
 // JWT is sent automatically via HTTP-only cookie
 api.interceptors.request.use(
-  (config) => {
+  (config) =>
     // Cookie is automatically included with withCredentials: true
     // No need to manually add Authorization header for cookie-based auth
-    return config;
-  },
+    config,
   (error: AxiosError) => Promise.reject(error)
 );
 

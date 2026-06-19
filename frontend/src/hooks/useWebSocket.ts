@@ -15,13 +15,13 @@ interface ConnectionState {
 
 /**
  * Custom hook for managing WebSocket connection lifecycle
- * 
+ *
  * Handles:
  * - Connection establishment with session authentication
  * - Automatic reconnection on disconnect
  * - Connection state management
  * - Error handling and recovery
- * 
+ *
  * @param options - Configuration options
  * @returns Connection state and control functions
  */

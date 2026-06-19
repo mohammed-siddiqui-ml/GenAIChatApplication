@@ -1,6 +1,6 @@
 /**
  * DeleteConfirmDialog Component
- * 
+ *
  * Confirmation dialog for deleting data sources.
  * Warns users about cascade deletion of associated documents and embeddings.
  */
@@ -39,7 +39,8 @@ export function DeleteConfirmDialog({
       </DialogTitle>
       <DialogContent>
         <Typography variant="body1" gutterBottom>
-          Are you sure you want to delete the data source <strong>"{dataSourceName}"</strong>?
+          Are you sure you want to delete the data source{' '}
+          <strong>"{dataSourceName}"</strong>?
         </Typography>
         <Alert severity="warning" sx={{ mt: 2 }}>
           <Typography variant="body2">
@@ -56,7 +57,12 @@ export function DeleteConfirmDialog({
         <Button onClick={onClose} disabled={isDeleting}>
           Cancel
         </Button>
-        <Button onClick={onConfirm} variant="contained" color="error" disabled={isDeleting}>
+        <Button
+          onClick={onConfirm}
+          variant="contained"
+          color="error"
+          disabled={isDeleting}
+        >
           {isDeleting ? 'Deleting...' : 'Delete'}
         </Button>
       </DialogActions>
