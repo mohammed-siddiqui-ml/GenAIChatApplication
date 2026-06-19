@@ -23,10 +23,12 @@ from schemas.admin import (
     IngestionTriggerRequest,
     IngestionTriggerResponse,
     IngestionJobResponse,
-    IngestionJobListResponse
+    IngestionJobListResponse,
+    SystemMetricsResponse
 )
 from services.admin_service import DataSourceService, DataSourceError
 from services.ingestion_service import IngestionJobService, IngestionJobError
+from services.metrics_service import MetricsService, MetricsServiceError
 
 # Logger
 logger = logging.getLogger(__name__)
@@ -938,6 +940,113 @@ async def get_ingestion_job(
         )
     except Exception as e:
         logger.error(f"Unexpected error getting ingestion job: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred"
+        )
+
+
+@router.get(
+    "/metrics",
+    response_model=SystemMetricsResponse,
+    summary="Get system metrics and monitoring statistics",
+    description="""
+    Retrieve aggregated system metrics for monitoring and analytics.
+
+    Returns comprehensive statistics including:
+    - **Documents**: Total and active document counts
+    - **Chat Sessions**: All-time total and currently active sessions
+    - **Queries**: Counts for today, this week, this month, and all-time
+    - **Response Times**: Average response time from assistant messages
+    - **Database**: Database size (bytes and MB) and total embeddings count
+    - **Ingestion Jobs**: Success rate, counts, and last run timestamps
+
+    **Requires**: Admin role
+
+    **Performance Note**: This endpoint aggregates data from multiple tables.
+    Response time may vary based on database size.
+    """,
+    responses={
+        200: {
+            "description": "System metrics retrieved successfully",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "total_documents": 1234,
+                        "active_documents": 1200,
+                        "sessions": {
+                            "total_all_time": 1234,
+                            "active_sessions": 42
+                        },
+                        "queries": {
+                            "total_today": 127,
+                            "total_this_week": 543,
+                            "total_this_month": 2341,
+                            "total_all_time": 15432
+                        },
+                        "average_response_time_ms": 1250.5,
+                        "database": {
+                            "database_size_bytes": 524288000,
+                            "database_size_mb": 500.0,
+                            "total_embeddings": 5432
+                        },
+                        "ingestion": {
+                            "total_jobs": 156,
+                            "successful_jobs": 142,
+                            "failed_jobs": 8,
+                            "success_rate": 91.03,
+                            "last_successful_run": "2024-01-15T14:30:00Z",
+                            "last_failed_run": "2024-01-14T08:15:00Z"
+                        },
+                        "timestamp": "2024-01-15T14:30:00Z"
+                    }
+                }
+            }
+        },
+        403: {"description": "Admin access required"},
+        500: {"description": "Internal server error"}
+    }
+)
+async def get_system_metrics(
+    admin: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db)
+) -> Dict[str, Any]:
+    """
+    Get system metrics and monitoring statistics.
+
+    Args:
+        admin: Authenticated admin user (from dependency)
+        db: Database session
+
+    Returns:
+        dict: System metrics including documents, sessions, queries, database, and ingestion stats
+
+    Raises:
+        HTTPException 403: If user is not admin
+        HTTPException 500: If metrics collection fails
+    """
+    logger.info(f"Admin {admin.email} retrieving system metrics")
+
+    try:
+        service = MetricsService(db)
+        metrics = await service.get_all_metrics()
+
+        logger.info(
+            f"System metrics retrieved: {metrics['total_documents']} docs, "
+            f"{metrics['sessions']['active_sessions']} active sessions, "
+            f"{metrics['queries']['total_today']} queries today"
+        )
+
+        return metrics
+
+    except MetricsServiceError as e:
+        logger.error(f"Failed to get system metrics: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get system metrics: {str(e)}"
+        )
+    except Exception as e:
+        logger.error(f"Unexpected error getting system metrics: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred"

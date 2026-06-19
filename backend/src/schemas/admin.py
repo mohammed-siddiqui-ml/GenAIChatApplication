@@ -506,3 +506,202 @@ class IngestionJobListResponse(BaseModel):
             ]
         }
     }
+
+
+class QueryMetrics(BaseModel):
+    """Query metrics statistics."""
+
+    total_today: int = Field(
+        ...,
+        description="Total queries today",
+        ge=0,
+        examples=[127]
+    )
+    total_this_week: int = Field(
+        ...,
+        description="Total queries this week",
+        ge=0,
+        examples=[543]
+    )
+    total_this_month: int = Field(
+        ...,
+        description="Total queries this month",
+        ge=0,
+        examples=[2341]
+    )
+    total_all_time: int = Field(
+        ...,
+        description="Total queries all-time",
+        ge=0,
+        examples=[15432]
+    )
+
+
+class SessionMetrics(BaseModel):
+    """Chat session statistics."""
+
+    total_all_time: int = Field(
+        ...,
+        description="Total chat sessions all-time",
+        ge=0,
+        examples=[1234]
+    )
+    active_sessions: int = Field(
+        ...,
+        description="Currently active sessions (no end time)",
+        ge=0,
+        examples=[42]
+    )
+
+
+class IngestionMetrics(BaseModel):
+    """Ingestion job statistics."""
+
+    total_jobs: int = Field(
+        ...,
+        description="Total ingestion jobs",
+        ge=0,
+        examples=[156]
+    )
+    successful_jobs: int = Field(
+        ...,
+        description="Number of successful jobs",
+        ge=0,
+        examples=[142]
+    )
+    failed_jobs: int = Field(
+        ...,
+        description="Number of failed jobs",
+        ge=0,
+        examples=[8]
+    )
+    success_rate: float = Field(
+        ...,
+        description="Success rate percentage (0-100)",
+        ge=0,
+        le=100,
+        examples=[91.03]
+    )
+    last_successful_run: Optional[datetime] = Field(
+        None,
+        description="Timestamp of last successful job completion",
+        examples=["2024-01-15T14:30:00Z"]
+    )
+    last_failed_run: Optional[datetime] = Field(
+        None,
+        description="Timestamp of last failed job completion",
+        examples=["2024-01-14T08:15:00Z"]
+    )
+
+
+class DatabaseMetrics(BaseModel):
+    """Database statistics."""
+
+    database_size_bytes: int = Field(
+        ...,
+        description="Total database size in bytes",
+        ge=0,
+        examples=[524288000]
+    )
+    database_size_mb: float = Field(
+        ...,
+        description="Total database size in megabytes",
+        ge=0,
+        examples=[500.0]
+    )
+    total_embeddings: int = Field(
+        ...,
+        description="Total number of embeddings",
+        ge=0,
+        examples=[5432]
+    )
+
+
+class SystemMetricsResponse(BaseModel):
+    """
+    System metrics and monitoring response.
+
+    Provides aggregated statistics for system monitoring including:
+    - Document count
+    - Chat session statistics
+    - Query statistics (today, week, month)
+    - Average response times
+    - Database size and embedding count
+    - Ingestion job statistics
+    """
+
+    total_documents: int = Field(
+        ...,
+        description="Total number of knowledge documents",
+        ge=0,
+        examples=[1234]
+    )
+    active_documents: int = Field(
+        ...,
+        description="Number of active (non-deleted) documents",
+        ge=0,
+        examples=[1200]
+    )
+    sessions: SessionMetrics = Field(
+        ...,
+        description="Chat session statistics"
+    )
+    queries: QueryMetrics = Field(
+        ...,
+        description="Query statistics"
+    )
+    average_response_time_ms: Optional[float] = Field(
+        None,
+        description="Average response time in milliseconds (from chat_messages metadata)",
+        ge=0,
+        examples=[1250.5]
+    )
+    database: DatabaseMetrics = Field(
+        ...,
+        description="Database statistics"
+    )
+    ingestion: IngestionMetrics = Field(
+        ...,
+        description="Ingestion job statistics"
+    )
+    timestamp: datetime = Field(
+        ...,
+        description="Timestamp when metrics were collected",
+        examples=["2024-01-15T14:30:00Z"]
+    )
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "total_documents": 1234,
+                    "active_documents": 1200,
+                    "sessions": {
+                        "total_all_time": 1234,
+                        "active_sessions": 42
+                    },
+                    "queries": {
+                        "total_today": 127,
+                        "total_this_week": 543,
+                        "total_this_month": 2341,
+                        "total_all_time": 15432
+                    },
+                    "average_response_time_ms": 1250.5,
+                    "database": {
+                        "database_size_bytes": 524288000,
+                        "database_size_mb": 500.0,
+                        "total_embeddings": 5432
+                    },
+                    "ingestion": {
+                        "total_jobs": 156,
+                        "successful_jobs": 142,
+                        "failed_jobs": 8,
+                        "success_rate": 91.03,
+                        "last_successful_run": "2024-01-15T14:30:00Z",
+                        "last_failed_run": "2024-01-14T08:15:00Z"
+                    },
+                    "timestamp": "2024-01-15T14:30:00Z"
+                }
+            ]
+        }
+    }
