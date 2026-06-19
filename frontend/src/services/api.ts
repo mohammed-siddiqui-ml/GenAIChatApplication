@@ -31,7 +31,10 @@ api.interceptors.response.use(
       // Handle unauthorized - redirect to login for admin routes
       // Only redirect if not already on login page
       const currentPath = window.location.pathname;
-      if (!currentPath.includes('/login') && !currentPath.includes('/register')) {
+      if (
+        !currentPath.includes('/login') &&
+        !currentPath.includes('/register')
+      ) {
         localStorage.removeItem('user');
         // Check if this is an admin route that requires auth
         if (currentPath.startsWith('/admin')) {

@@ -17,26 +17,31 @@ interface ProtectedRouteProps {
 
 /**
  * ProtectedRoute component
- * 
+ *
  * @param children - Child components to render if authorized
  * @param requireAdmin - If true, only admin users can access (default: false)
  * @returns Protected content or redirect to login
  */
-export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRouteProps) {
+export function ProtectedRoute({
+  children,
+  requireAdmin = false,
+}: ProtectedRouteProps) {
   const { isAuthenticated, isAdmin, isLoading } = useAuth();
   const location = useLocation();
 
   // Show loading state while checking authentication
   if (isLoading) {
     return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-        fontSize: '1.2rem',
-        color: '#666'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          fontSize: '1.2rem',
+          color: '#666',
+        }}
+      >
         Loading...
       </div>
     );
@@ -53,15 +58,17 @@ export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRout
     // User is authenticated but not an admin
     // Redirect to home page or show unauthorized message
     return (
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-        fontSize: '1.2rem',
-        color: '#d32f2f'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          fontSize: '1.2rem',
+          color: '#d32f2f',
+        }}
+      >
         <h1>Unauthorized</h1>
         <p>You do not have permission to access this page.</p>
         <p>Admin access required.</p>

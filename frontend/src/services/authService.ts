@@ -1,6 +1,6 @@
 /**
  * Authentication Service
- * 
+ *
  * Provides authentication functions for login, logout, and user management.
  * JWT tokens are stored in HTTP-only cookies (managed by backend).
  * User state is persisted in localStorage for UI state only.
@@ -57,13 +57,19 @@ function transformUser(backendUser: UserResponse): User {
 
 /**
  * Login user with email and password
- * 
+ *
  * @param email - User email
  * @param password - User password
  * @returns Login response with user data
  * @throws Error if login fails
  */
-export async function login(email: string, password: string): Promise<{ user: User; tokens: { access_token: string; refresh_token: string } }> {
+export async function login(
+  email: string,
+  password: string
+): Promise<{
+  user: User;
+  tokens: { access_token: string; refresh_token: string };
+}> {
   try {
     const response = await api.post<LoginResponse>('/v1/auth/login', {
       email,
@@ -90,7 +96,7 @@ export async function login(email: string, password: string): Promise<{ user: Us
 /**
  * Logout current user
  * Clears HTTP-only cookie and removes local user state
- * 
+ *
  * @throws Error if logout fails
  */
 export async function logout(): Promise<void> {
@@ -107,7 +113,7 @@ export async function logout(): Promise<void> {
 /**
  * Get current authenticated user
  * Validates JWT token from HTTP-only cookie
- * 
+ *
  * @returns Current user or null if not authenticated
  */
 export async function getCurrentUser(): Promise<User | null> {
@@ -122,16 +128,19 @@ export async function getCurrentUser(): Promise<User | null> {
 
 /**
  * Refresh access token using refresh token
- * 
+ *
  * @param refreshToken - Refresh token
  * @returns New access token
  * @throws Error if refresh fails
  */
 export async function refreshToken(refreshToken: string): Promise<string> {
   try {
-    const response = await api.post<{ access_token: string }>('/v1/auth/refresh', {
-      refresh_token: refreshToken,
-    });
+    const response = await api.post<{ access_token: string }>(
+      '/v1/auth/refresh',
+      {
+        refresh_token: refreshToken,
+      }
+    );
     return response.data.access_token;
   } catch (error) {
     console.error('Token refresh error:', error);
@@ -141,7 +150,7 @@ export async function refreshToken(refreshToken: string): Promise<string> {
 
 /**
  * Check if user is authenticated by validating the cookie
- * 
+ *
  * @returns True if user is authenticated
  */
 export async function isAuthenticated(): Promise<boolean> {

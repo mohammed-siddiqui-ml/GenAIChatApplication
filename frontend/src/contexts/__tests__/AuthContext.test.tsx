@@ -112,7 +112,10 @@ describe('AuthContext', () => {
         expect(result.current.user).toEqual(mockUser);
       });
 
-      expect(authService.login).toHaveBeenCalledWith('test@example.com', 'password');
+      expect(authService.login).toHaveBeenCalledWith(
+        'test@example.com',
+        'password'
+      );
       expect(result.current.isAuthenticated).toBe(true);
       expect(localStorage.getItem('user')).toBe(JSON.stringify(mockUser));
     });
@@ -129,7 +132,9 @@ describe('AuthContext', () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      await expect(result.current.login('test@example.com', 'wrong')).rejects.toThrow('Invalid credentials');
+      await expect(
+        result.current.login('test@example.com', 'wrong')
+      ).rejects.toThrow('Invalid credentials');
       expect(result.current.user).toBeNull();
       expect(localStorage.getItem('user')).toBeNull();
     });
@@ -161,7 +166,9 @@ describe('AuthContext', () => {
     it('should handle refreshUser successfully', async () => {
       const updatedUser = { ...mockUser, username: 'updated' };
       localStorage.setItem('user', JSON.stringify(mockUser));
-      vi.mocked(authService.getCurrentUser).mockResolvedValueOnce(mockUser).mockResolvedValueOnce(updatedUser);
+      vi.mocked(authService.getCurrentUser)
+        .mockResolvedValueOnce(mockUser)
+        .mockResolvedValueOnce(updatedUser);
 
       const { result } = renderHook(() => useAuth(), {
         wrapper: AuthProvider,

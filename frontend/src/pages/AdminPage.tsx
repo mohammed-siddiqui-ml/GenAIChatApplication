@@ -23,14 +23,16 @@ export function AdminPage() {
 
   return (
     <div style={{ padding: '2rem' }}>
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '2rem',
-        borderBottom: '2px solid #1976d2',
-        paddingBottom: '1rem'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '2rem',
+          borderBottom: '2px solid #1976d2',
+          paddingBottom: '1rem',
+        }}
+      >
         <h1>Admin Dashboard</h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <span>Welcome, {user?.email}</span>
@@ -42,7 +44,7 @@ export function AdminPage() {
               color: 'white',
               border: 'none',
               borderRadius: '4px',
-              cursor: 'pointer'
+              cursor: 'pointer',
             }}
           >
             Logout
@@ -50,27 +52,41 @@ export function AdminPage() {
         </div>
       </div>
 
-      <div style={{
-        backgroundColor: '#f5f5f5',
-        padding: '1.5rem',
-        borderRadius: '8px',
-        marginBottom: '1.5rem'
-      }}>
+      <div
+        style={{
+          backgroundColor: '#f5f5f5',
+          padding: '1.5rem',
+          borderRadius: '8px',
+          marginBottom: '1.5rem',
+        }}
+      >
         <h2 style={{ marginBottom: '1rem' }}>User Information</h2>
         <div style={{ display: 'grid', gap: '0.5rem' }}>
-          <div><strong>ID:</strong> {user?.id}</div>
-          <div><strong>Email:</strong> {user?.email}</div>
-          <div><strong>Username:</strong> {user?.username}</div>
-          <div><strong>Role:</strong> {user?.isAdmin ? 'Admin' : 'User'}</div>
-          <div><strong>Created:</strong> {user?.createdAt}</div>
+          <div>
+            <strong>ID:</strong> {user?.id}
+          </div>
+          <div>
+            <strong>Email:</strong> {user?.email}
+          </div>
+          <div>
+            <strong>Username:</strong> {user?.username}
+          </div>
+          <div>
+            <strong>Role:</strong> {user?.isAdmin ? 'Admin' : 'User'}
+          </div>
+          <div>
+            <strong>Created:</strong> {user?.createdAt}
+          </div>
         </div>
       </div>
 
-      <div style={{
-        backgroundColor: '#e3f2fd',
-        padding: '1.5rem',
-        borderRadius: '8px'
-      }}>
+      <div
+        style={{
+          backgroundColor: '#e3f2fd',
+          padding: '1.5rem',
+          borderRadius: '8px',
+        }}
+      >
         <h2 style={{ marginBottom: '1rem' }}>Admin Features</h2>
         <p style={{ marginBottom: '1rem' }}>
           This page is only accessible to authenticated admin users.

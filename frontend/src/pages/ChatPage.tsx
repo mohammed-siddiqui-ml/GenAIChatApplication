@@ -1,40 +1,53 @@
-import { Box, Paper, Typography } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Box, Container } from '@mui/material';
+import { ChatWindow } from '@components/index';
+import { v4 as uuidv4 } from 'uuid';
 
 export function ChatPage() {
+  const [sessionId, setSessionId] = useState<string>('');
+
+  useEffect(() => {
+    // Generate or retrieve session ID
+    let storedSessionId = localStorage.getItem('currentSessionId');
+
+    if (!storedSessionId) {
+      storedSessionId = uuidv4();
+      localStorage.setItem('currentSessionId', storedSessionId);
+    }
+
+    setSessionId(storedSessionId);
+  }, []);
+
+  const handleMessageSent = (message: string) => {
+    console.log('Message sent:', message);
+    // Additional message handling logic can go here
+  };
+
+  if (!sessionId) {
+    return null; // or a loading spinner
+  }
+
   return (
-    <Box
+    <Container
+      maxWidth="lg"
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        flex: 1,
+        height: 'calc(100vh - 64px)', // Adjust based on your layout header height
+        py: 2,
       }}
     >
-      <Paper
-        elevation={2}
+      <Box
         sx={{
-          flex: 1,
+          height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          p: 2,
         }}
       >
-        <Typography variant="h5" gutterBottom>
-          Chat Interface
-        </Typography>
-        <Box
-          sx={{
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Typography color="text.secondary">
-            Chat interface will be implemented here
-          </Typography>
-        </Box>
-      </Paper>
-    </Box>
+        <ChatWindow
+          sessionId={sessionId}
+          title="GenAI Knowledge Assistant"
+          onMessageSent={handleMessageSent}
+        />
+      </Box>
+    </Container>
   );
 }

@@ -63,7 +63,9 @@ describe('authService', () => {
 
       vi.mocked(api.post).mockRejectedValueOnce(mockError);
 
-      await expect(authService.login('test@example.com', 'wrongpassword')).rejects.toEqual(mockError);
+      await expect(
+        authService.login('test@example.com', 'wrongpassword')
+      ).rejects.toEqual(mockError);
       expect(api.post).toHaveBeenCalledWith('/v1/auth/login', {
         email: 'test@example.com',
         password: 'wrongpassword',
@@ -162,7 +164,9 @@ describe('authService', () => {
       const mockError = new Error('Token expired');
       vi.mocked(api.post).mockRejectedValueOnce(mockError);
 
-      await expect(authService.refreshToken('invalid-token')).rejects.toThrow('Token expired');
+      await expect(authService.refreshToken('invalid-token')).rejects.toThrow(
+        'Token expired'
+      );
     });
   });
 
