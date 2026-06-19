@@ -137,7 +137,7 @@ async def engine():
     """
     from sqlalchemy.ext.asyncio import create_async_engine
     from sqlalchemy.pool import StaticPool
-    from sqlalchemy import Integer, BigInteger
+    from sqlalchemy import Integer, BigInteger, event
     from models.base import Base
 
     test_engine = create_async_engine(
@@ -145,6 +145,13 @@ async def engine():
         poolclass=StaticPool,
         connect_args={"check_same_thread": False}
     )
+
+    # CRITICAL: Enable foreign key constraints in SQLite
+    @event.listens_for(test_engine.sync_engine, "connect")
+    def set_sqlite_pragma(dbapi_conn, connection_record):
+        cursor = dbapi_conn.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
 
     # CRITICAL: Replace BigInteger with Integer for SQLite compatibility
     # SQLite doesn't auto-increment BIGINT columns, only INTEGER PRIMARY KEY

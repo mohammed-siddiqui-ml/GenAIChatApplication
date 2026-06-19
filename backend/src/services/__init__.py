@@ -5,6 +5,7 @@ Services module containing business logic and external integrations.
 from services.auth_service import AuthService, AuthenticationError
 from services.chat_service import ChatService, ChatSessionError
 from services.rag_service import RAGEngine, RAGError
+from services.admin_service import DataSourceService, DataSourceError
 
 __all__ = [
     "AuthService",
@@ -13,4 +14,6 @@ __all__ = [
     "ChatSessionError",
     "RAGEngine",
     "RAGError",
+    "DataSourceService",
+    "DataSourceError",
 ]
