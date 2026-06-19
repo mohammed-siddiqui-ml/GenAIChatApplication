@@ -125,6 +125,12 @@ class Settings(BaseSettings):
     CELERY_TASK_ALWAYS_EAGER: bool = Field(default=False)  # Execute tasks synchronously in testing
     CELERY_TASK_EAGER_PROPAGATES: bool = Field(default=True)  # Propagate exceptions in eager mode
 
+    # Sentry Error Tracking Settings
+    SENTRY_DSN: str = Field(default="")  # Sentry Data Source Name
+    SENTRY_ENVIRONMENT: str = Field(default="development")  # Sentry environment (development, staging, production)
+    SENTRY_TRACES_SAMPLE_RATE: float = Field(default=0.1, ge=0.0, le=1.0)  # 10% transaction sampling
+    SENTRY_ENABLE_TRACING: bool = Field(default=True)  # Enable performance monitoring
+
 
 # Global settings instance
 settings = Settings()

@@ -9,6 +9,7 @@ import {
 } from 'react';
 import type { User } from '../types';
 import * as authService from '../services/authService';
+import { setSentryUser, clearSentryUser } from '@utils/sentry';
 
 interface AuthContextType {
   user: User | null;
@@ -50,14 +51,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(currentUser);
         // Store user info in localStorage for UI state persistence
         localStorage.setItem('user', JSON.stringify(currentUser));
+        // Set Sentry user context
+        setSentryUser(
+          currentUser.id.toString(),
+          currentUser.email,
+          currentUser.username
+        );
       } else {
         setUser(null);
         localStorage.removeItem('user');
+        clearSentryUser();
       }
     } catch (error) {
       // If getCurrentUser fails, user is not authenticated
       setUser(null);
       localStorage.removeItem('user');
+      clearSentryUser();
     }
   }, []);
 
@@ -90,9 +99,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // Store user info in localStorage for UI state only
       // JWT token is stored in HTTP-only cookie by backend
       localStorage.setItem('user', JSON.stringify(loginResponse.user));
+      // Set Sentry user context
+      setSentryUser(
+        loginResponse.user.id.toString(),
+        loginResponse.user.email,
+        loginResponse.user.username
+      );
     } catch (error) {
       setUser(null);
       localStorage.removeItem('user');
+      clearSentryUser();
       throw error;
     } finally {
       setIsLoading(false);
@@ -109,6 +125,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } finally {
       setUser(null);
       localStorage.removeItem('user');
+      clearSentryUser();
       setIsLoading(false);
     }
   }, []);

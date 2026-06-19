@@ -4,13 +4,19 @@ FastAPI Main Application Entry Point
 GenAI Intelligent Chat-Based Knowledge Retrieval System
 """
 
+import os
+import subprocess
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
+import sentry_sdk
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
+from sentry_sdk.integrations.fastapi import FastApiIntegration
+from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
+from sentry_sdk.integrations.redis import RedisIntegration
 
 from core.config import settings
 from core.logging import setup_logging
@@ -19,6 +25,41 @@ from core.redis import init_redis, close_redis, check_redis_health
 
 # Initialize logging
 logger = setup_logging()
+
+# Initialize Sentry for error tracking and performance monitoring
+if settings.SENTRY_DSN:
+    # Get Git commit SHA for release tracking
+    release_version = None
+    try:
+        release_version = subprocess.check_output(
+            ['git', 'rev-parse', 'HEAD'],
+            stderr=subprocess.STDOUT
+        ).decode('utf-8').strip()
+    except Exception:
+        # Fallback to environment variable or version
+        release_version = os.environ.get('GIT_COMMIT_SHA', settings.API_VERSION)
+
+    sentry_sdk.init(
+        dsn=settings.SENTRY_DSN,
+        environment=settings.SENTRY_ENVIRONMENT,
+        release=release_version,
+        traces_sample_rate=settings.SENTRY_TRACES_SAMPLE_RATE,
+        enable_tracing=settings.SENTRY_ENABLE_TRACING,
+        integrations=[
+            FastApiIntegration(transaction_style="endpoint"),
+            SqlalchemyIntegration(),
+            RedisIntegration(),
+        ],
+        # Send default PII like IP addresses and user data
+        send_default_pii=True,
+        # Attach stack traces to messages
+        attach_stacktrace=True,
+        # Set sample rate for error events (100% = all errors)
+        sample_rate=1.0,
+    )
+    logger.info(f"Sentry initialized with DSN for environment: {settings.SENTRY_ENVIRONMENT}, release: {release_version}")
+else:
+    logger.info("Sentry DSN not configured - error tracking disabled")
 
 
 @asynccontextmanager
@@ -94,6 +135,12 @@ app.add_middleware(
 # Configure Logging Middleware for request context and structured logging
 from middleware.logging_middleware import LoggingMiddleware
 app.add_middleware(LoggingMiddleware)
+
+# Configure Sentry Context Middleware for error tracking with user context
+if settings.SENTRY_DSN:
+    from middleware.sentry_middleware import SentryContextMiddleware
+    app.add_middleware(SentryContextMiddleware)
+    logger.info("Sentry context middleware enabled")
 
 # Configure Prometheus metrics instrumentation
 # This automatically collects HTTP request metrics (count, duration, error rate)

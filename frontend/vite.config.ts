@@ -1,10 +1,29 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import { execSync } from 'child_process';
+
+/**
+ * Get Git commit SHA for release tracking
+ */
+const getGitCommitSha = (): string => {
+  try {
+    return execSync('git rev-parse HEAD').toString().trim();
+  } catch (error) {
+    console.warn('Failed to get Git commit SHA:', error);
+    return 'unknown';
+  }
+};
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  define: {
+    // Inject Git commit SHA at build time for Sentry release tracking
+    'import.meta.env.VITE_GIT_COMMIT_SHA': JSON.stringify(
+      process.env.VITE_GIT_COMMIT_SHA || getGitCommitSha()
+    ),
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
