@@ -17,6 +17,8 @@ from sqlalchemy.orm import selectinload
 from models.knowledge import DocumentEmbedding, KnowledgeDocument
 from models.chat import ChatMessage, MessageRole
 from integrations.openai_client import OpenAIClient, OpenAIError
+from integrations.ollama_client import OllamaClient, OllamaError
+from integrations.llm_factory import LLMFactory
 from core.config import settings
 from core.metrics import (
     query_processing_duration,
@@ -56,23 +58,27 @@ class RAGEngine:
     def __init__(
         self,
         db_session: AsyncSession,
-        openai_client: Optional[OpenAIClient] = None
+        llm_client: Optional[OpenAIClient | OllamaClient] = None
     ):
         """
         Initialize RAG engine.
 
         Args:
             db_session: Async database session for vector search
-            openai_client: OpenAI client instance (creates new if None)
+            llm_client: LLM client instance (OpenAI or Ollama, creates new if None)
         """
         self.db = db_session
-        self.openai_client = openai_client or OpenAIClient(
-            api_key=settings.OPENAI_API_KEY,
-            embedding_model=settings.EMBEDDING_MODEL,
-            chat_model=settings.OPENAI_MODEL
-        )
 
-        logger.info("RAG Engine initialized")
+        # Use provided client or create one based on LLM_PROVIDER setting
+        if llm_client is not None:
+            self.llm_client = llm_client
+        else:
+            self.llm_client = LLMFactory.create_client()
+
+        # Keep backward compatibility with openai_client attribute
+        self.openai_client = self.llm_client
+
+        logger.info(f"RAG Engine initialized with {settings.LLM_PROVIDER} provider")
 
     async def query(
         self,

@@ -63,15 +63,26 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_HOURS: int = Field(default=24, ge=1)  # 24-hour expiry as per requirements
     REFRESH_TOKEN_EXPIRE_DAYS: int = Field(default=7, ge=1)
     
-    # GenAI Settings
+    # LLM Provider Selection: "openai" or "ollama"
+    LLM_PROVIDER: str = Field(default="ollama", pattern="^(openai|ollama)$")
+
+    # GenAI Settings - OpenAI
     OPENAI_API_KEY: str = Field(default="")
     OPENAI_MODEL: str = Field(default="gpt-4-turbo-preview")  # GPT-4 Turbo for chat completions
     OPENAI_TEMPERATURE: float = Field(default=0.7, ge=0.0, le=2.0)
     OPENAI_MAX_TOKENS: int = Field(default=500, ge=1)
 
-    # Embedding Settings
+    # Embedding Settings - OpenAI
     EMBEDDING_MODEL: str = Field(default="text-embedding-3-small")  # text-embedding-3-small (1536 dimensions)
     EMBEDDING_DIMENSION: int = Field(default=1536, ge=1)
+
+    # Ollama Settings (Local LLM)
+    OLLAMA_BASE_URL: str = Field(default="http://ollama:11434")  # Ollama server URL
+    OLLAMA_CHAT_MODEL: str = Field(default="llama2")  # Chat model: llama2, mistral, codellama, etc.
+    OLLAMA_EMBEDDING_MODEL: str = Field(default="nomic-embed-text")  # Embedding model
+    OLLAMA_TEMPERATURE: float = Field(default=0.7, ge=0.0, le=2.0)
+    OLLAMA_MAX_TOKENS: int = Field(default=500, ge=1)
+    OLLAMA_EMBEDDING_DIMENSION: int = Field(default=768, ge=1)  # nomic-embed-text uses 768 dimensions
     
     # Vector Database Settings (for semantic search)
     VECTOR_DB_URL: str = Field(default="http://localhost:6333")

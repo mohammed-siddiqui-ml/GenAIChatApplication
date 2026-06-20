@@ -1,0 +1,16 @@
+# Docker Compose Override for Ollama CPU-only mode
+# Use this if you don't have an NVIDIA GPU
+#
+# Usage:
+#   docker-compose -f docker-compose.yml -f docker-compose.ollama-cpu.yml up -d
+
+version: '3.8'
+
+services:
+  ollama:
+    # Remove GPU configuration for CPU-only execution
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 8G

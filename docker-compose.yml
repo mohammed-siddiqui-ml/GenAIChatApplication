@@ -73,6 +73,33 @@ services:
       start_period: 30s
     restart: unless-stopped
 
+  # Ollama - Local LLM Server
+  ollama:
+    image: ollama/ollama:latest
+    container_name: knowledge_ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - backend_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    # Comment out the deploy section above if you don't have GPU
+    # Ollama works fine on CPU, just slower
+
   # FastAPI Backend
   backend:
     build:
@@ -97,6 +124,8 @@ services:
       redis:
         condition: service_healthy
       minio:
+        condition: service_healthy
+      ollama:
         condition: service_healthy
     volumes:
       - ./backend:/app
@@ -137,6 +166,8 @@ services:
       redis:
         condition: service_healthy
       minio:
+        condition: service_healthy
+      ollama:
         condition: service_healthy
     volumes:
       - ./backend:/app
@@ -304,6 +335,8 @@ volumes:
   redis_data:
     driver: local
   minio_data:
+    driver: local
+  ollama_data:
     driver: local
   prometheus_data:
     driver: local

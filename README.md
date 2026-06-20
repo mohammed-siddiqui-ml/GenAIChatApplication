@@ -15,10 +15,10 @@ A GenAI-powered chat-based knowledge retrieval application that enables users to
 ### Backend
 - **Framework**: FastAPI
 - **Language**: Python 3.11+
-- **Database**: PostgreSQL
+- **Database**: PostgreSQL with pgvector
 - **Cache**: Redis
 - **ORM**: SQLAlchemy with Alembic migrations
-- **GenAI**: OpenAI API, LangChain
+- **GenAI**: OpenAI API or Ollama (local LLM), LangChain
 - **Vector Store**: ChromaDB / FAISS
 - **Task Queue**: Celery
 
@@ -56,10 +56,19 @@ Before running the application, you need to configure environment variables:
 
 3. **Required configurations (minimum to start):**
    - `SECRET_KEY`: Generate using `openssl rand -hex 32`
-   - `OPENAI_API_KEY`: Get from [OpenAI Platform](https://platform.openai.com/api-keys)
+   - `LLM_PROVIDER`: Choose `ollama` (free, local) or `openai` (cloud, requires API key)
    - `POSTGRES_PASSWORD`: Change from default for production
    - `REDIS_PASSWORD`: Change from default for production
    - `MINIO_ROOT_PASSWORD`: Change from default for production
+
+   **For Ollama (Recommended - No API Key Required):**
+   - Set `LLM_PROVIDER=ollama` in `.env`
+   - See [OLLAMA_SETUP.md](OLLAMA_SETUP.md) for detailed setup instructions
+   - Run `./scripts/setup-ollama.sh` to download required models
+
+   **For OpenAI:**
+   - Set `LLM_PROVIDER=openai` in `.env`
+   - `OPENAI_API_KEY`: Get from [OpenAI Platform](https://platform.openai.com/api-keys)
 
 4. **Optional configurations (for full functionality):**
    - **Confluence Integration:**
