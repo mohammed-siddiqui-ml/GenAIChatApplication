@@ -28,15 +28,26 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
-    # CORS
-    CORS_ORIGINS: List[str] = ["http://localhost:3000"]
-    
+    # CORS - Allow frontend from any origin in development
+    CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://127.0.0.1:3000", "*"]
+
+    # LLM Provider
+    LLM_PROVIDER: str = "ollama"
+
     # OpenAI
-    OPENAI_API_KEY: str
+    OPENAI_API_KEY: str = ""
     OPENAI_MODEL: str = "gpt-4-turbo-preview"
     EMBEDDING_MODEL: str = "text-embedding-ada-002"
     MAX_TOKENS: int = 2048
     TEMPERATURE: float = 0.7
+
+    # Ollama
+    OLLAMA_BASE_URL: str = "http://ollama:11434"
+    OLLAMA_CHAT_MODEL: str = "llama2"
+    OLLAMA_EMBEDDING_MODEL: str = "nomic-embed-text"
+    OLLAMA_TEMPERATURE: float = 0.7
+    OLLAMA_MAX_TOKENS: int = 500
+    OLLAMA_EMBEDDING_DIMENSION: int = 768
     
     # Vector Store
     VECTOR_STORE_TYPE: str = "chromadb"
