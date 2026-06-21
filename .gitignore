@@ -86,3 +86,12 @@ volumes/
 
 # OS
 Thumbs.db
+
+# Development & Testing Scripts
+check_db_quick.sh
+check_documents.py
+fix_schema.sql
+backend/create_admin.py
+
+# Watch Folder (ingestion source)
+watch_folder/
