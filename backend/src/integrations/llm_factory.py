@@ -29,15 +29,16 @@ class LLMFactory:
     def create_client() -> Union[OpenAIClient, OllamaClient]:
         """
         Create an LLM client based on LLM_PROVIDER setting.
-        
+
         Returns:
             OpenAIClient or OllamaClient instance
-            
+
         Raises:
             ValueError: If LLM_PROVIDER is invalid
         """
         provider = settings.LLM_PROVIDER.lower()
-        
+        logger.info(f"LLMFactory: LLM_PROVIDER={settings.LLM_PROVIDER}, provider={provider}")
+
         if provider == "openai":
             logger.info("Creating OpenAI client")
             return OpenAIClient(
@@ -46,7 +47,7 @@ class LLMFactory:
                 chat_model=settings.OPENAI_MODEL
             )
         elif provider == "ollama":
-            logger.info("Creating Ollama client")
+            logger.info(f"Creating Ollama client with base_url={settings.OLLAMA_BASE_URL}, embedding_model={settings.OLLAMA_EMBEDDING_MODEL}")
             return OllamaClient(
                 base_url=settings.OLLAMA_BASE_URL,
                 embedding_model=settings.OLLAMA_EMBEDDING_MODEL,

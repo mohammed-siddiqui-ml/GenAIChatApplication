@@ -80,7 +80,17 @@ class Settings(BaseSettings):
     # Performance
     RESPONSE_TIMEOUT_SECONDS: int = 3
     MAX_CONCURRENT_REQUESTS: int = 100
-    
+
+    # Folder Watch (for stage/internal testing only)
+    FOLDER_WATCH_ENABLED: bool = False
+    FOLDER_WATCH_PATH: str = "/app/watch_folder"
+    FOLDER_WATCH_DATA_SOURCE_ID: int = 1
+
+    # Video Processing (Whisper)
+    WHISPER_MODEL: str = "base"
+    WHISPER_DEVICE: str = "cpu"
+    FFMPEG_PATH: str = "/usr/bin/ffmpeg"
+
     class Config:
         env_file = ".env"
         case_sensitive = True

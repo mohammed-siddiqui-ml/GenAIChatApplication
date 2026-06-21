@@ -130,6 +130,7 @@ services:
       - ./backend:/app
       - ./chroma_db:/app/chroma_db
       - backend_logs:/app/logs
+      - ./watch_folder:/app/watch_folder  # Local folder watch for PDF/video auto-ingestion
     networks:
       - frontend_network
       - backend_network
@@ -172,6 +173,7 @@ services:
       - ./backend:/app
       - ./chroma_db:/app/chroma_db
       - celery_logs:/app/logs
+      - ./watch_folder:/app/watch_folder  # Local folder watch for PDF/video auto-ingestion
     networks:
       - backend_network
       - monitoring_network
@@ -193,7 +195,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - VITE_API_URL=http://localhost:8000
+      - VITE_API_URL=http://localhost:8000/api
     depends_on:
       - backend
     volumes:
@@ -202,7 +204,7 @@ services:
     networks:
       - frontend_network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"]
       interval: 30s
       timeout: 10s
       retries: 3
