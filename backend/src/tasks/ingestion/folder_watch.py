@@ -179,6 +179,24 @@ def _process_video_from_watch_sync(data_source_id: int, minio_path: str, filenam
         dict: Processing result
     """
     logger.info(f"🎬 Processing video through Whisper pipeline: {filename}")
-    # For now, return a placeholder - video processing needs to be implemented separately
-    logger.warning(f"Video processing not yet implemented for: {filename}")
-    return {'status': 'skipped', 'reason': 'video processing not implemented'}
+
+    # Import the async function and run it synchronously
+    import asyncio
+    from tasks.ingestion.video_processor import process_video_async
+    import core.database as db_module
+
+    # Reset global database engine to avoid event loop conflicts in Celery workers
+    db_module._engine = None
+    db_module._async_session_factory = None
+
+    # Use asyncio.run() to properly handle async execution in Celery worker
+    try:
+        result = asyncio.run(process_video_async(data_source_id, minio_path, filename))
+        return result if result else {}
+    except Exception as e:
+        logger.error(f"Error in video processing: {e}")
+        return {'status': 'error', 'message': str(e)}
+    finally:
+        # Clean up the engine created in this async context
+        db_module._engine = None
+        db_module._async_session_factory = None

@@ -29,7 +29,7 @@ from core.config import settings
 from core.minio_client import download_file, BUCKET_KNOWLEDGE_FILES
 from models.data_source import DataSource
 from models.knowledge import KnowledgeDocument, DocumentEmbedding, ContentType
-from integrations.openai_client import OpenAIClient, OpenAIError
+from integrations.llm_factory import LLMFactory
 from utils.text_processing import chunk_text, count_tokens
 
 logger = logging.getLogger(__name__)
@@ -272,12 +272,17 @@ async def process_video_async(
             await session.flush()
 
             # Generate embeddings and store chunks
-            openai_client = OpenAIClient()
+            llm_client = LLMFactory.create_client()
             chunk_texts = [chunk['text'] for chunk in chunks]
-            embeddings = await openai_client.generate_embeddings_batch(
-                chunk_texts,
-                batch_size=EMBEDDING_BATCH_SIZE
-            )
+
+            # Check if client supports batch_size parameter (OpenAI does, Ollama doesn't)
+            if hasattr(llm_client, '__class__') and llm_client.__class__.__name__ == 'OpenAIClient':
+                embeddings = await llm_client.generate_embeddings_batch(
+                    chunk_texts,
+                    batch_size=EMBEDDING_BATCH_SIZE
+                )
+            else:
+                embeddings = await llm_client.generate_embeddings_batch(chunk_texts)
 
             # Store embeddings with timestamps
             for chunk, embedding in zip(chunks, embeddings):
