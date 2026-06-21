@@ -23,6 +23,7 @@ class DataSourceType(str, enum.Enum):
     CONFLUENCE = "confluence"
     JIRA = "jira"
     ONBOARDING = "onboarding"
+    FOLDER_WATCH = "folder_watch"
     CUSTOM = "custom"
 
 
@@ -75,8 +76,8 @@ class DataSource(Base, TimestampMixin):
         comment="Display name of the data source"
     )
 
-    type: Mapped[DataSourceType] = mapped_column(
-        SQLEnum(DataSourceType, name="data_source_type", create_constraint=True),
+    type: Mapped[str] = mapped_column(
+        String(50),
         nullable=False,
         index=True,
         comment="Type of data source"
@@ -187,8 +188,8 @@ class IngestionJob(Base):
     )
 
     # Job attributes
-    status: Mapped[JobStatus] = mapped_column(
-        SQLEnum(JobStatus, name="job_status", create_constraint=True),
+    status: Mapped[str] = mapped_column(
+        String(50),
         nullable=False,
         comment="Current job status"
     )
