@@ -8,16 +8,14 @@ Combines vector search with LLM prompting for accurate, source-cited answers.
 import logging
 import time
 from typing import List, Dict, Any, Optional, AsyncIterator
-from datetime import datetime
+from datetime import datetime, timezone
 
-from sqlalchemy import select, func, text
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
-from models.knowledge import DocumentEmbedding, KnowledgeDocument
 from models.chat import ChatMessage, MessageRole
 from integrations.openai_client import OpenAIClient, OpenAIError
-from integrations.ollama_client import OllamaClient, OllamaError
+from integrations.ollama_client import OllamaClient
 from integrations.llm_factory import LLMFactory
 from core.config import settings
 from core.metrics import (
@@ -33,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 # Constants
 DEFAULT_TOP_K = 10
-DEFAULT_SIMILARITY_THRESHOLD = 0.7
+DEFAULT_SIMILARITY_THRESHOLD = 0.6  # Raised to reduce false positives (spurious matches)
 DEFAULT_MAX_CONTEXT_TOKENS = 3000
 
 
@@ -79,6 +77,8 @@ class RAGEngine:
         self.openai_client = self.llm_client
 
         logger.info(f"RAG Engine initialized with {settings.LLM_PROVIDER} provider")
+        logger.info(f"Client type: {type(self.llm_client).__name__}")
+        logger.info(f"Expected embedding dimension: {LLMFactory.get_embedding_dimension()}")
 
     async def query(
         self,
@@ -171,7 +171,7 @@ class RAGEngine:
                         "query": query_text,
                         "num_sources": len(sources),
                         "context_length": len(context),
-                        "timestamp": datetime.utcnow().isoformat()
+                        "timestamp": datetime.now(timezone.utc).isoformat()
                     }
                 }
             else:
@@ -196,7 +196,7 @@ class RAGEngine:
                         "usage": response.get("usage", {}),
                         "finish_reason": response.get("finish_reason"),
                         "processing_time_seconds": query_duration,
-                        "timestamp": datetime.utcnow().isoformat()
+                        "timestamp": datetime.now(timezone.utc).isoformat()
                     }
                 }
 
@@ -221,7 +221,8 @@ class RAGEngine:
             RAGError: If embedding generation fails
         """
         try:
-            logger.debug(f"Generating query embedding ({len(query_text)} chars)")
+            logger.info(f"Generating query embedding ({len(query_text)} chars)")
+            logger.info(f"Using client: {type(self.openai_client).__name__}")
 
             # Time embedding generation
             embed_start = time.time()
@@ -231,7 +232,7 @@ class RAGEngine:
             # Record embedding generation time
             embedding_generation_duration.observe(embed_duration)
 
-            logger.debug(f"Query embedding generated: {len(embedding)} dimensions in {embed_duration:.3f}s")
+            logger.info(f"Query embedding generated: {len(embedding)} dimensions in {embed_duration:.3f}s")
             return embedding
         except Exception as e:
             logger.error(f"Query embedding failed: {e}")
@@ -277,11 +278,10 @@ class RAGEngine:
             embedding_str = '[' + ','.join(map(str, query_embedding)) + ']'
 
             # Build query using pgvector cosine similarity operator (<=>)
-            # Cosine similarity = 1 - cosine_distance
-            # Filter by similarity > threshold (cosine_distance < 1 - threshold)
-            distance_threshold = 1.0 - similarity_threshold
+            # For simplicity, retrieve top_k results without filtering by threshold first
 
-            query = text("""
+            # Build SQL with embedding as parameter
+            query_sql = f"""
                 SELECT
                     de.chunk_text,
                     de.document_id,
@@ -290,50 +290,48 @@ class RAGEngine:
                     kd.url,
                     kd.content_type,
                     kd.metadata as doc_metadata,
-                    (1 - (de.embedding <=> :embedding::vector)) as similarity
+                    (1 - (de.embedding <=> '{embedding_str}'::vector)) as similarity
                 FROM document_embeddings de
                 JOIN knowledge_documents kd ON de.document_id = kd.id
                 WHERE
                     kd.is_deleted = FALSE
-                    AND (de.embedding <=> :embedding::vector) < :distance_threshold
-                ORDER BY de.embedding <=> :embedding::vector
-                LIMIT :top_k
-            """)
+                ORDER BY de.embedding <=> '{embedding_str}'::vector
+                LIMIT {top_k}
+            """
 
-            result = await self.db.execute(
-                query,
-                {
-                    "embedding": embedding_str,
-                    "distance_threshold": distance_threshold,
-                    "top_k": top_k
-                }
-            )
+            result = await self.db.execute(text(query_sql))
 
             rows = result.fetchall()
+            logger.info(f"SQL query returned {len(rows)} rows from database")
 
             # Record vector search time
             search_duration = time.time() - search_start
             vector_search_duration.observe(search_duration)
 
-            # Use subscript notation for compatibility with both Row objects and dicts
-            search_results = [
-                {
-                    "chunk_text": row["chunk_text"],
-                    "document_id": row["document_id"],
-                    "chunk_index": row["chunk_index"],
-                    "title": row["title"],
-                    "url": row["url"],
-                    "content_type": row["content_type"],
-                    "similarity": float(row["similarity"]),
-                    "metadata": row["doc_metadata"] or {}
-                }
-                for row in rows
-            ]
+            # Process rows - SQLAlchemy Row objects support both index and key access
+            # Filter by similarity threshold after fetching
+            search_results = []
+            for row in rows:
+                # Use index-based access for compatibility
+                similarity = float(row[7])  # similarity is the 8th column (index 7)
+                logger.info(f"Document chunk similarity: {similarity:.4f} | Threshold: {similarity_threshold} | Text preview: {row[0][:60]}...")
+
+                if similarity >= similarity_threshold:
+                    search_results.append({
+                        "chunk_text": row[0],      # de.chunk_text
+                        "document_id": row[1],     # de.document_id
+                        "chunk_index": row[2],     # de.chunk_index
+                        "title": row[3],           # kd.title
+                        "url": row[4],             # kd.url
+                        "content_type": row[5],    # kd.content_type
+                        "metadata": row[6] or {},  # kd.metadata as doc_metadata
+                        "similarity": similarity   # similarity score
+                    })
 
             # Record number of results
             vector_search_results.observe(len(search_results))
 
-            logger.info(f"Vector search found {len(search_results)} results in {search_duration:.3f}s")
+            logger.info(f"Vector search found {len(search_results)} results (threshold: {similarity_threshold}) in {search_duration:.3f}s")
 
             return search_results
 
@@ -484,20 +482,38 @@ class RAGEngine:
         Returns:
             System message string with instructions and context
         """
-        system_message = f"""You are an intelligent assistant for a knowledge retrieval system. Your role is to provide accurate, helpful answers based on the provided context.
+        # If no context is available, provide a special instruction
+        if not context or context.strip() == "":
+            system_message = """You are an intelligent assistant for a knowledge retrieval system.
 
-INSTRUCTIONS:
-1. Answer questions based ONLY on the provided context below
-2. If the context doesn't contain enough information, acknowledge this clearly
-3. Cite specific sources using [Source N] notation when referencing information
-4. Be concise and direct in your responses
-5. If you're uncertain, express appropriate uncertainty
-6. For ambiguous questions, ask clarifying questions
+IMPORTANT: No relevant information was found in the available documents for this query.
 
-CONTEXT:
+You MUST respond with EXACTLY this message and NOTHING else:
+"I'm sorry, the information you're looking for is not present in the available documents."
+
+DO NOT provide any other information. DO NOT use external knowledge. DO NOT make assumptions."""
+        else:
+            system_message = f"""You are an intelligent assistant for a knowledge retrieval system.
+
+⚠️ CRITICAL INSTRUCTION - READ CAREFULLY ⚠️
+
+You MUST follow these rules WITHOUT EXCEPTION:
+
+1. ONLY use information from the CONTEXT section below
+2. If the CONTEXT does not contain information to answer the user's question, respond EXACTLY with:
+   "I'm sorry, the information you're looking for is not present in the available documents."
+3. DO NOT use any knowledge you have from training data
+4. DO NOT make up information
+5. DO NOT infer or assume anything beyond what is explicitly stated in the CONTEXT
+6. If you provide an answer, cite sources using [Source N]
+7. Respond in English only
+
+CONTEXT (Your ONLY source of information):
+---
 {context}
+---
 
-Please provide a helpful, accurate response based on the above context."""
+IMPORTANT: Read the CONTEXT carefully. If it does not contain information about what the user is asking, you MUST use the "not present" response above. Do NOT provide information from your training data."""
 
         return system_message
 
