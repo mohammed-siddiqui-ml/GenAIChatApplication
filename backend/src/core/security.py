@@ -9,44 +9,40 @@ import logging
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 
+import bcrypt
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 
 from core.config import settings
 
 # Logger
 logger = logging.getLogger(__name__)
 
-# Password hashing context with bcrypt (cost factor 12)
-pwd_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto",
-    bcrypt__rounds=12  # Cost factor 12 for bcrypt
-)
-
 
 def hash_password(password: str) -> str:
     """
     Hash a plain text password using bcrypt with cost factor 12.
-    
+
     The bcrypt algorithm is specifically designed for password hashing and
     includes automatic salting and protection against rainbow table attacks.
     Cost factor 12 provides a good balance between security and performance.
-    
+
     Args:
         password: Plain text password to hash
-        
+
     Returns:
         Hashed password string suitable for database storage
-        
+
     Example:
         >>> hashed = hash_password("mySecurePassword123")
         >>> verify_password("mySecurePassword123", hashed)
         True
     """
-    hashed = pwd_context.hash(password)
+    # Convert password to bytes and hash with bcrypt
+    password_bytes = password.encode('utf-8')
+    salt = bcrypt.gensalt(rounds=12)
+    hashed = bcrypt.hashpw(password_bytes, salt)
     logger.debug("Password hashed successfully")
-    return hashed
+    return hashed.decode('utf-8')
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -70,7 +66,12 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
         False
     """
     try:
-        is_valid = pwd_context.verify(plain_password, hashed_password)
+        # Convert inputs to bytes
+        password_bytes = plain_password.encode('utf-8')
+        hashed_bytes = hashed_password.encode('utf-8')
+
+        # Use bcrypt to verify
+        is_valid = bcrypt.checkpw(password_bytes, hashed_bytes)
         logger.debug(f"Password verification: {'successful' if is_valid else 'failed'}")
         return is_valid
     except Exception as e:

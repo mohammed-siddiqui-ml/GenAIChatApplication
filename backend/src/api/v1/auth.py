@@ -183,7 +183,8 @@ async def login(
         return {
             "access_token": token_data["access_token"],
             "refresh_token": token_data["refresh_token"],
-            "token_type": token_data["token_type"]
+            "token_type": token_data["token_type"],
+            "user": token_data["user"]
         }
 
     except AuthenticationError as e:

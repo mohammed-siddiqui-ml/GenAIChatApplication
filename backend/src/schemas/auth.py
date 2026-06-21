@@ -112,6 +112,13 @@ class LoginRequest(BaseModel):
     }
 
 
+class UserInfo(BaseModel):
+    """User information included in auth responses."""
+    id: int = Field(..., description="User ID", examples=[1])
+    email: str = Field(..., description="User email", examples=["admin@example.com"])
+    role: str = Field(..., description="User role", examples=["admin", "user"])
+
+
 class TokenResponse(BaseModel):
     """Response schema for successful authentication."""
     access_token: str = Field(
@@ -129,14 +136,23 @@ class TokenResponse(BaseModel):
         description="Token type (always 'bearer')",
         examples=["bearer"]
     )
-    
+    user: UserInfo = Field(
+        ...,
+        description="User information"
+    )
+
     model_config = {
         "json_schema_extra": {
             "examples": [
                 {
                     "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsInVzZXJfaWQiOjEsInJvbGUiOiJhZG1pbiIsImV4cCI6MTcwOTI4NDgwMCwiaWF0IjoxNzA5MTk4NDAwLCJ0eXAiOiJhY2Nlc3MifQ...",
                     "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsInVzZXJfaWQiOjEsInJvbGUiOiJhZG1pbiIsImV4cCI6MTcwOTgwMzIwMCwiaWF0IjoxNzA5MTk4NDAwLCJ0eXAiOiJyZWZyZXNoIn0...",
-                    "token_type": "bearer"
+                    "token_type": "bearer",
+                    "user": {
+                        "id": 1,
+                        "email": "admin@example.com",
+                        "role": "admin"
+                    }
                 }
             ]
         }

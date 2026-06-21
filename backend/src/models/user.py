@@ -67,7 +67,7 @@ class User(Base, TimestampMixin):
     
     # User attributes
     role: Mapped[UserRole] = mapped_column(
-        SQLEnum(UserRole, name="user_role", create_constraint=True),
+        SQLEnum(UserRole, name="user_role", create_constraint=True, values_callable=lambda x: [e.value for e in x]),
         nullable=False,
         server_default="user",
         comment="User role (admin or user)"
