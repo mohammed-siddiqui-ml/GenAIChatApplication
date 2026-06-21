@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 # Constants
 DEFAULT_TOP_K = 10
-DEFAULT_SIMILARITY_THRESHOLD = 0.6  # Raised to reduce false positives (spurious matches)
+DEFAULT_SIMILARITY_THRESHOLD = 0.5  # Lowered to 0.5 to allow more flexible matching (was 0.6)
 DEFAULT_MAX_CONTEXT_TOKENS = 3000
 
 
@@ -143,6 +143,46 @@ class RAGEngine:
                 search_results=search_results,
                 max_tokens=max_context_tokens
             )
+
+            # CRITICAL: If no sources found, return "not found" message WITHOUT calling LLM
+            # This prevents hallucination where LLM makes up information
+            if not sources or len(sources) == 0:
+                logger.warning(f"No sources found for query: '{query_text[:100]}...'")
+
+                no_info_message = "I'm sorry, but I couldn't find any relevant information in the available documents to answer your question. Please try rephrasing your query or ask about topics that are covered in the knowledge base."
+
+                query_duration = time.time() - query_start_time
+                query_processing_duration.observe(query_duration)
+
+                if stream:
+                    # Return a streaming iterator that yields the message
+                    async def no_info_iterator():
+                        yield no_info_message
+
+                    return {
+                        "streaming_iterator": no_info_iterator(),
+                        "sources": [],
+                        "metadata": {
+                            "query": query_text,
+                            "num_sources": 0,
+                            "context_length": 0,
+                            "no_results": True,
+                            "timestamp": datetime.now(timezone.utc).isoformat()
+                        }
+                    }
+                else:
+                    return {
+                        "content": no_info_message,
+                        "sources": [],
+                        "metadata": {
+                            "query": query_text,
+                            "num_sources": 0,
+                            "context_length": 0,
+                            "no_results": True,
+                            "processing_time_seconds": query_duration,
+                            "timestamp": datetime.now(timezone.utc).isoformat()
+                        }
+                    }
 
             # Step 4: Build prompt with conversation history
             messages = self._build_prompt(
