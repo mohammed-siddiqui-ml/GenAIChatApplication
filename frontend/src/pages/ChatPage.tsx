@@ -1,21 +1,34 @@
 import { useState, useEffect } from 'react';
-import { Box, Container } from '@mui/material';
+import { Box, Container, CircularProgress, Alert, Button } from '@mui/material';
 import { ChatWindow } from '@components/index';
-import { v4 as uuidv4 } from 'uuid';
+import { getOrCreateSession } from '../services/chatService';
 
 export function ChatPage() {
   const [sessionId, setSessionId] = useState<string>('');
+  const [sessionToken, setSessionToken] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>('');
+
+  const initSession = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const session = await getOrCreateSession();
+      setSessionId(session.sessionId);
+      setSessionToken(session.sessionToken);
+      // Store token for WebSocket authentication
+      localStorage.setItem('token', session.sessionToken);
+      console.log('Chat session initialized:', session.sessionId);
+    } catch (error) {
+      console.error('Failed to initialize chat session:', error);
+      setError(error instanceof Error ? error.message : 'Failed to create chat session');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Generate or retrieve session ID
-    let storedSessionId = localStorage.getItem('currentSessionId');
-
-    if (!storedSessionId) {
-      storedSessionId = uuidv4();
-      localStorage.setItem('currentSessionId', storedSessionId);
-    }
-
-    setSessionId(storedSessionId);
+    initSession();
   }, []);
 
   const handleMessageSent = (message: string) => {
@@ -23,8 +36,37 @@ export function ChatPage() {
     // Additional message handling logic can go here
   };
 
-  if (!sessionId) {
-    return null; // or a loading spinner
+  if (loading) {
+    return (
+      <Container maxWidth="lg" sx={{ height: 'calc(100vh - 64px)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <CircularProgress />
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container maxWidth="lg" sx={{ height: 'calc(100vh - 64px)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <Box sx={{ textAlign: 'center' }}>
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+          <Button variant="contained" onClick={initSession}>
+            Retry
+          </Button>
+        </Box>
+      </Container>
+    );
+  }
+
+  if (!sessionId || !sessionToken) {
+    return (
+      <Container maxWidth="lg" sx={{ height: 'calc(100vh - 64px)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <Alert severity="warning">
+          Unable to initialize chat session. Please refresh the page.
+        </Alert>
+      </Container>
+    );
   }
 
   return (

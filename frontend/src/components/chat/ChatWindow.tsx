@@ -34,12 +34,13 @@ export function ChatWindow({
 
   // Handle errors
   const handleError = useCallback(
-    (error: { message: string }) => {
+    (error: { error?: string; message?: string }) => {
       console.error('Socket error:', error);
       // Add error message to chat
+      const errorText = error.error || error.message || 'Unknown error occurred';
       const errorMessage: Message = {
         id: `error-${Date.now()}`,
-        content: `Error: ${error.message}`,
+        content: `Error: ${errorText}`,
         role: 'system',
         timestamp: new Date().toISOString(),
         sessionId,

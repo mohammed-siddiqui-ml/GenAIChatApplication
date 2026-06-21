@@ -1,5 +1,26 @@
 import { io, Socket } from 'socket.io-client';
-import type { Message, ApiError } from '../types';
+import type { Message, ApiError, Source } from '../types';
+
+interface ChatChunkData {
+  chunk: string;
+  chunk_index: number;
+  timestamp: string;
+}
+
+interface ChatSourcesData {
+  sources: Source[];
+  timestamp: string;
+}
+
+interface ChatDoneData {
+  message_id: number;
+  session_id: string;
+  metadata: {
+    duration_ms: number;
+    num_sources: number;
+    chunk_count?: number;
+  };
+}
 
 class SocketService {
   private socket: Socket | null = null;
@@ -38,11 +59,11 @@ class SocketService {
     if (!this.socket) return;
 
     this.socket.on('connect', () => {
-      // Socket connected
+      console.log('Socket connected');
     });
 
     this.socket.on('disconnect', () => {
-      // Socket disconnected
+      console.log('Socket disconnected');
     });
 
     this.socket.on('connect_error', (error) => {
@@ -79,7 +100,9 @@ class SocketService {
   }
 
   sendMessage(message: string, sessionId: string): void {
-    this.emit('send_message', { content: message, sessionId });
+    // Get session token from localStorage
+    const sessionToken = localStorage.getItem('token') || '';
+    this.emit('chat:query', { query: message, sessionId, sessionToken });
   }
 
   onMessage(callback: (message: Message) => void): void {
@@ -91,7 +114,20 @@ class SocketService {
   }
 
   onError(callback: (error: ApiError) => void): void {
-    this.on<ApiError>('error', callback);
+    this.on<ApiError>('chat:error', callback);
+  }
+
+  // New handlers for RAG streaming events
+  onChatChunk(callback: (data: ChatChunkData) => void): void {
+    this.on<ChatChunkData>('chat:chunk', callback);
+  }
+
+  onChatSources(callback: (data: ChatSourcesData) => void): void {
+    this.on<ChatSourcesData>('chat:sources', callback);
+  }
+
+  onChatDone(callback: (data: ChatDoneData) => void): void {
+    this.on<ChatDoneData>('chat:done', callback);
   }
 
   isConnected(): boolean {

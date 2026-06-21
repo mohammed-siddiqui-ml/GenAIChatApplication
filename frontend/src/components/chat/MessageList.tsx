@@ -65,41 +65,92 @@ const MessageBubble = memo(({ message }: MessageBubbleProps) => {
                 mt: 2,
                 pt: 2,
                 borderTop: '1px solid',
-                borderColor: 'divider',
+                borderColor: isUser ? 'rgba(255,255,255,0.3)' : 'divider',
               }}
             >
               <Typography
                 variant="caption"
-                color="text.secondary"
-                sx={{ mb: 1, display: 'block' }}
+                sx={{
+                  mb: 1,
+                  display: 'block',
+                  fontWeight: 600,
+                  color: isUser ? 'rgba(255,255,255,0.9)' : 'text.secondary',
+                }}
               >
-                Sources:
+                📚 Sources ({message.sources.length}):
               </Typography>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                {message.sources.map((source) => (
+                {message.sources.map((source, index) => (
                   <Box
                     key={source.id}
-                    sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      flexWrap: 'wrap',
+                    }}
                   >
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: isUser ? 'rgba(255,255,255,0.8)' : 'text.secondary',
+                        fontWeight: 500,
+                      }}
+                    >
+                      [{index + 1}]
+                    </Typography>
                     <Chip
                       label={source.type}
                       size="small"
                       variant="outlined"
-                      sx={{ textTransform: 'capitalize' }}
-                    />
-                    <Link
-                      href={source.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      variant="caption"
                       sx={{
-                        color: isUser ? 'inherit' : 'primary.main',
-                        textDecoration: 'none',
-                        '&:hover': { textDecoration: 'underline' },
+                        textTransform: 'capitalize',
+                        borderColor: isUser ? 'rgba(255,255,255,0.5)' : undefined,
+                        color: isUser ? 'rgba(255,255,255,0.9)' : undefined,
                       }}
-                    >
-                      {source.title}
-                    </Link>
+                    />
+                    {source.url ? (
+                      <Link
+                        href={source.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        variant="caption"
+                        sx={{
+                          color: isUser ? 'rgba(255,255,255,0.95)' : 'primary.main',
+                          textDecoration: 'none',
+                          fontWeight: 500,
+                          '&:hover': {
+                            textDecoration: 'underline',
+                            color: isUser ? 'white' : 'primary.dark',
+                          },
+                        }}
+                      >
+                        {source.title}
+                      </Link>
+                    ) : (
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: isUser ? 'rgba(255,255,255,0.9)' : 'text.primary',
+                          fontWeight: 500,
+                        }}
+                      >
+                        {source.title}
+                      </Typography>
+                    )}
+                    {(source.relevanceScore !== undefined || source.similarity !== undefined) && (
+                      <Chip
+                        label={`${Math.round((source.similarity || source.relevanceScore || 0) * 100)}% match`}
+                        size="small"
+                        color="success"
+                        variant="outlined"
+                        sx={{
+                          ml: 'auto',
+                          borderColor: isUser ? 'rgba(255,255,255,0.5)' : undefined,
+                          color: isUser ? 'rgba(255,255,255,0.9)' : undefined,
+                        }}
+                      />
+                    )}
                   </Box>
                 ))}
               </Box>

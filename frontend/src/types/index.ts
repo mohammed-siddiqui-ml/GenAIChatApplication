@@ -18,12 +18,15 @@ export interface Message {
 }
 
 export interface Source {
-  id: string;
+  id: string | number;
   title: string;
-  type: 'confluence' | 'issue' | 'onboarding' | 'documentation';
-  url: string;
-  excerpt: string;
+  type: 'confluence' | 'issue' | 'onboarding' | 'documentation' | 'folder_watch' | 'pdf' | 'video' | 'document' | 'unknown';
+  url?: string | null;
+  excerpt?: string;
   relevanceScore?: number;
+  similarity?: number;
+  chunk_index?: number;
+  metadata?: Record<string, unknown>;
 }
 
 export interface ChatSession {
