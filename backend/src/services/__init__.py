@@ -2,11 +2,11 @@
 Services module containing business logic and external integrations.
 """
 
-from services.auth_service import AuthService, AuthenticationError
-from services.chat_service import ChatService, ChatSessionError
-from services.rag_service import RAGEngine, RAGError
-from services.admin_service import DataSourceService, DataSourceError
-from services.audit_service import AuditService, AuditServiceError
+from src.services.auth_service import AuthService, AuthenticationError
+from src.services.chat_service import ChatService, ChatSessionError
+from src.services.rag_service import RAGEngine, RAGError
+from src.services.admin_service import DataSourceService, DataSourceError
+from src.services.audit_service import AuditService, AuditServiceError
 
 __all__ = [
     "AuthService",

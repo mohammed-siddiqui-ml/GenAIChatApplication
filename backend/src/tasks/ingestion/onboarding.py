@@ -28,7 +28,9 @@ from core.config import settings
 from core.minio_client import download_file, get_file_info, BUCKET_KNOWLEDGE_FILES
 from models.data_source import DataSource, IngestionJob, JobStatus, DataSourceType
 from models.knowledge import KnowledgeDocument, DocumentEmbedding, ContentType
-from integrations.openai_client import OpenAIClient, OpenAIError
+from integrations.llm_factory import LLMFactory
+from integrations.openai_client import OpenAIError
+from integrations.ollama_client import OllamaError
 from utils.text_processing import chunk_text, count_tokens, clean_html
 
 # Logger
@@ -76,9 +78,14 @@ def ingest_onboarding_materials(self, data_source_id: int, file_path: str) -> Di
         Exception: Retries on failure with exponential backoff
     """
     try:
+        # Reset global database engine to avoid event loop conflicts in Celery workers
+        import core.database as db_module
+        db_module._engine = None
+        db_module._async_session_factory = None
+
         # Run async ingestion in event loop
-        loop = asyncio.get_event_loop()
-        result = loop.run_until_complete(
+        # Use asyncio.run() instead of get_event_loop() to avoid event loop conflicts in Celery
+        result = asyncio.run(
             _ingest_onboarding_materials_async(data_source_id, file_path, self)
         )
         return result
@@ -86,6 +93,11 @@ def ingest_onboarding_materials(self, data_source_id: int, file_path: str) -> Di
         logger.error(f"Onboarding materials ingestion failed: {exc}", exc_info=True)
         # Retry with exponential backoff
         raise self.retry(exc=exc, countdown=2 ** self.request.retries * 60)
+    finally:
+        # Clean up the engine created in this async context
+        import core.database as db_module
+        db_module._engine = None
+        db_module._async_session_factory = None
 
 
 # ============================================================================
@@ -321,13 +333,17 @@ async def _process_file(
     logger.info(f"Split document into {len(chunks)} chunks")
 
     # Generate embeddings for chunks
-    openai_client = OpenAIClient()
+    llm_client = LLMFactory.create_client()
 
     try:
-        embeddings = await openai_client.generate_embeddings_batch(
-            chunks,
-            batch_size=EMBEDDING_BATCH_SIZE
-        )
+        # Check if client supports batch_size parameter (OpenAI does, Ollama doesn't)
+        if hasattr(llm_client, '__class__') and llm_client.__class__.__name__ == 'OpenAIClient':
+            embeddings = await llm_client.generate_embeddings_batch(
+                chunks,
+                batch_size=EMBEDDING_BATCH_SIZE
+            )
+        else:
+            embeddings = await llm_client.generate_embeddings_batch(chunks)
 
         logger.info(f"Generated {len(embeddings)} embeddings")
 
@@ -346,7 +362,7 @@ async def _process_file(
 
         logger.info(f"Stored {len(embeddings)} embeddings for document {document.id}")
 
-    except OpenAIError as e:
+    except (OpenAIError, OllamaError) as e:
         logger.error(f"Failed to generate embeddings: {e}")
         raise
 

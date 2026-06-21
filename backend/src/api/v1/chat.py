@@ -28,6 +28,68 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
+@router.post(
+    "/sessions",
+    status_code=status.HTTP_201_CREATED,
+    summary="Create new chat session",
+    description="Create a new chat session for anonymous or authenticated users",
+    responses={
+        201: {
+            "description": "Session created successfully",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "session_id": "550e8400-e29b-41d4-a716-446655440000",
+                        "session_token": "abc123...",
+                        "created_at": "2024-01-15T10:30:00Z"
+                    }
+                }
+            }
+        }
+    }
+)
+async def create_session(
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Create a new chat session.
+
+    Creates a session record in the database and returns the session token
+    for use in subsequent requests.
+
+    Args:
+        db: Database session
+
+    Returns:
+        Session data including session_id, session_token, and created_at
+
+    Raises:
+        HTTPException: If session creation fails
+    """
+    try:
+        chat_service = ChatService(db)
+
+        # Create new session (anonymous user)
+        session = await chat_service.create_session()
+        await db.commit()
+
+        logger.info(f"Created new chat session: {session.id}")
+
+        return {
+            "session_id": str(session.id),
+            "session_token": session.session_token,
+            "created_at": session.started_at.isoformat()
+        }
+
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Session creation error: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to create chat session"
+        )
+
+
 async def get_session_token(x_session_token: str = Header(..., description="Session token")) -> str:
     """
     Extract and validate session token from X-Session-Token header.

@@ -42,14 +42,16 @@ class DataSourceService:
         DataSourceType.CONFLUENCE: ['api_token', 'password', 'api_key'],
         DataSourceType.JIRA: ['api_token', 'password', 'api_key'],
         DataSourceType.ONBOARDING: ['api_token', 'password', 'api_key'],
+        DataSourceType.FOLDER_WATCH: [],  # No sensitive fields for local folder watch
         DataSourceType.CUSTOM: ['api_token', 'password', 'api_key', 'credentials'],
     }
-    
+
     # Required configuration fields for each data source type
     REQUIRED_CONFIG_FIELDS = {
         DataSourceType.CONFLUENCE: ['url', 'username', 'api_token', 'space_key'],
         DataSourceType.JIRA: ['url', 'username', 'api_token', 'project_key'],
         DataSourceType.ONBOARDING: ['storage_path'],
+        DataSourceType.FOLDER_WATCH: ['watch_path'],  # Path to folder being watched
         DataSourceType.CUSTOM: ['url'],
     }
     

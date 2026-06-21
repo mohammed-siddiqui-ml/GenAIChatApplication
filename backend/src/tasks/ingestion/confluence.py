@@ -79,8 +79,8 @@ def ingest_confluence_docs(self, data_source_id: int) -> Dict[str, Any]:
     """
     try:
         # Run async ingestion in event loop
-        loop = asyncio.get_event_loop()
-        result = loop.run_until_complete(_ingest_confluence_docs_async(data_source_id, self))
+        # Use asyncio.run() instead of get_event_loop() to avoid event loop conflicts in Celery
+        result = asyncio.run(_ingest_confluence_docs_async(data_source_id, self))
         return result
     except Exception as exc:
         logger.error(f"Confluence ingestion failed: {exc}", exc_info=True)
@@ -393,8 +393,8 @@ def refresh_confluence_data(self) -> Dict[str, Any]:
         dict: Summary of refresh operation
     """
     try:
-        loop = asyncio.get_event_loop()
-        result = loop.run_until_complete(_refresh_confluence_data_async())
+        # Use asyncio.run() instead of get_event_loop() to avoid event loop conflicts in Celery
+        result = asyncio.run(_refresh_confluence_data_async())
         return result
     except Exception as exc:
         logger.error(f"Confluence refresh failed: {exc}", exc_info=True)

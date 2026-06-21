@@ -223,11 +223,11 @@ async def handle_chat_query(sid: str, data: Dict[str, Any]):
         await sio.emit('chat:sources', {
             'sources': [
                 {
-                    'id': source.get('chunk_id'),
+                    'id': source.get('id'),
                     'title': source.get('title', 'Unknown'),
                     'url': source.get('url', ''),
-                    'type': source.get('source_type', 'unknown'),
-                    'similarity': source.get('similarity_score', 0.0),
+                    'type': source.get('type', 'unknown'),
+                    'similarity': source.get('similarity', 0.0),
                     'chunk_index': source.get('chunk_index', 0),
                     'metadata': source.get('metadata', {})
                 }

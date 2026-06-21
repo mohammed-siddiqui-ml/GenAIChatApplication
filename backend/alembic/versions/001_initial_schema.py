@@ -173,8 +173,8 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(['document_id'], ['knowledge_documents.id'], ondelete='CASCADE')
     )
 
-    # Alter embedding column to use pgvector type
-    op.execute('ALTER TABLE document_embeddings ALTER COLUMN embedding TYPE vector(1536) USING embedding::vector(1536)')
+    # Alter embedding column to use pgvector type (768 dimensions for Ollama nomic-embed-text)
+    op.execute('ALTER TABLE document_embeddings ALTER COLUMN embedding TYPE vector(768) USING embedding::vector(768)')
 
     op.create_index('idx_document_embeddings_document_id', 'document_embeddings', ['document_id'])
     op.create_index('idx_document_embeddings_document_chunk', 'document_embeddings', ['document_id', 'chunk_index'], unique=True)

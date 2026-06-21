@@ -166,8 +166,8 @@ class ChatMessage(Base):
     )
 
     # Message attributes
-    role: Mapped[MessageRole] = mapped_column(
-        SQLEnum(MessageRole, name="message_role", create_constraint=True),
+    role: Mapped[str] = mapped_column(
+        String(50),
         nullable=False,
         comment="Message role (user, assistant, or system)"
     )
