@@ -345,3 +345,258 @@ graph LR
     style L1P fill:#f1f8e9
 
 ```
+
+---
+
+## Document Ingestion Flows
+
+### PDF Processing Flow
+
+When a PDF file is dropped into the `watch_folder/` directory, the following automated pipeline is triggered:
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant WatchFolder as watch_folder/
+    participant FolderWatcher as Folder Watcher Service
+    participant CeleryBroker as Redis<br/>(Celery Broker)
+    participant CeleryWorker as Celery Worker
+    participant MinIO as MinIO<br/>(Object Storage)
+    participant PDFProcessor as PDF Processor<br/>(PyPDF2)
+    participant TextChunker as Text Chunker<br/>(500 tokens)
+    participant Ollama as Ollama<br/>(Embeddings)
+    participant PostgreSQL as PostgreSQL<br/>(pgvector)
+    participant ProcessedFolder as watch_folder/<br/>_processed/
+
+    Note over User,ProcessedFolder: PDF Ingestion Pipeline - Complete Flow
+
+    User->>WatchFolder: 1. Drop PDF file<br/>(e.g., manual.pdf)
+
+    Note over FolderWatcher: Watchdog detects file event
+    FolderWatcher->>FolderWatcher: 2. Detect new file<br/>(.pdf extension)
+    FolderWatcher->>MinIO: 3. Upload to MinIO<br/>bucket: knowledge-files<br/>path: folder-watch/manual.pdf
+    MinIO-->>FolderWatcher: Upload complete<br/>(file size, S3 key)
+
+    FolderWatcher->>CeleryBroker: 4. Dispatch async task<br/>task: process_file_from_folder<br/>args: {file_path, data_source_id}
+    CeleryBroker-->>FolderWatcher: Task queued (task_id)
+
+    FolderWatcher->>WatchFolder: 5. Move file<br/>watch_folder/manual.pdf<br/>→ _processed/manual.pdf
+    Note over FolderWatcher: Main thread continues,<br/>processing happens async
+
+    CeleryBroker->>CeleryWorker: 6. Worker picks up task<br/>(from default queue)
+
+    CeleryWorker->>MinIO: 7. Download PDF from MinIO<br/>to temp file
+    MinIO-->>CeleryWorker: PDF binary data
+
+    CeleryWorker->>PDFProcessor: 8. Extract text<br/>PyPDF2.PdfReader()
+    Note over PDFProcessor: - Read all pages<br/>- Extract text content<br/>- Preserve structure
+    PDFProcessor-->>CeleryWorker: Raw text content<br/>(e.g., 50 pages = 25,000 chars)
+
+    CeleryWorker->>TextChunker: 9. Chunk text<br/>chunk_size=500 tokens<br/>overlap=50 tokens
+    Note over TextChunker: - Use tiktoken for tokenization<br/>- Create overlapping chunks<br/>- Maintain context
+    TextChunker-->>CeleryWorker: Text chunks<br/>(e.g., 50 chunks)
+
+    CeleryWorker->>PostgreSQL: 10. Create document record<br/>INSERT INTO knowledge_documents<br/>(title, content, content_type, metadata)
+    PostgreSQL-->>CeleryWorker: Document ID (e.g., 123)
+
+    Note over CeleryWorker,Ollama: Generate embeddings for each chunk
+
+    loop For each chunk (e.g., 50 iterations)
+        CeleryWorker->>Ollama: 11. Generate embedding<br/>POST /api/embeddings<br/>model: nomic-embed-text<br/>text: chunk[i]
+        Note over Ollama: Convert text to<br/>768-dimension vector
+        Ollama-->>CeleryWorker: Embedding vector<br/>[0.123, -0.456, ..., 0.789]<br/>(768 floats)
+
+        CeleryWorker->>PostgreSQL: 12. Store embedding<br/>INSERT INTO document_embeddings<br/>(document_id=123,<br/>chunk_index=i,<br/>chunk_text,<br/>embedding::vector(768))
+    end
+
+    PostgreSQL-->>CeleryWorker: All embeddings stored<br/>(50 rows inserted)
+
+    Note over PostgreSQL: pgvector index automatically<br/>updated for similarity search
+
+    CeleryWorker->>CeleryWorker: 13. Mark task complete<br/>status: SUCCESS<br/>documents_processed: 1<br/>chunks_created: 50
+
+    CeleryWorker-->>CeleryBroker: Task result stored<br/>(in Redis DB 2)
+
+    Note over User,ProcessedFolder: ✅ PDF fully searchable via RAG!<br/>Total time: ~30-60 seconds for 50-page PDF
+
+```
+
+**Detailed Step Breakdown:**
+
+| Step | Component | Action | Duration | Details |
+|------|-----------|--------|----------|---------|
+| 1 | User | Drop file | Instant | User places PDF in `watch_folder/` directory |
+| 2 | Folder Watcher | Detect | <1s | Watchdog library detects filesystem event |
+| 3 | Folder Watcher | Upload to MinIO | 1-5s | S3-compatible upload, preserves original file |
+| 4 | Folder Watcher | Dispatch task | <0.1s | Celery task queued in Redis |
+| 5 | Folder Watcher | Move file | <0.1s | Moved to `_processed/` to prevent reprocessing |
+| 6 | Celery Worker | Pick task | <1s | Worker pulls task from queue |
+| 7 | Celery Worker | Download | 1-5s | Retrieve PDF from MinIO |
+| 8 | PDF Processor | Extract text | 5-15s | PyPDF2 parses all pages |
+| 9 | Text Chunker | Create chunks | 1-3s | Split into 500-token chunks with 50-token overlap |
+| 10 | Celery Worker | Insert document | <1s | Store in `knowledge_documents` table |
+| 11-12 | Ollama + DB | Generate & store embeddings | 20-40s | ~0.5s per chunk × 50 chunks |
+| 13 | Celery Worker | Complete | <1s | Update job status, cleanup |
+
+**Total Processing Time:** 30-60 seconds for a typical 50-page PDF
+
+---
+
+### Video Processing Flow
+
+When a video file is dropped into the `watch_folder/` directory, the following comprehensive pipeline is triggered:
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant WatchFolder as watch_folder/
+    participant FolderWatcher as Folder Watcher Service
+    participant CeleryBroker as Redis<br/>(Celery Broker)
+    participant CeleryWorker as Celery Worker
+    participant MinIO as MinIO<br/>(Object Storage)
+    participant FFmpeg as FFmpeg<br/>(Audio Extraction)
+    participant Whisper as OpenAI Whisper<br/>(Speech-to-Text)
+    participant TextChunker as Text Chunker<br/>(Timestamp-aware)
+    participant Ollama as Ollama<br/>(Embeddings)
+    participant PostgreSQL as PostgreSQL<br/>(pgvector)
+    participant ProcessedFolder as watch_folder/<br/>_processed/
+
+    Note over User,ProcessedFolder: Video Ingestion Pipeline - Complete Flow
+
+    User->>WatchFolder: 1. Drop video file<br/>(e.g., demo.mp4, 100MB, 15min)
+
+    Note over FolderWatcher: Watchdog detects file event
+    FolderWatcher->>FolderWatcher: 2. Detect new file<br/>(.mp4/.avi/.mov/.mkv)
+    FolderWatcher->>MinIO: 3. Upload to MinIO<br/>bucket: knowledge-files<br/>path: folder-watch/demo.mp4
+    Note over MinIO: Large file upload<br/>(100MB at ~10MB/s)
+    MinIO-->>FolderWatcher: Upload complete<br/>(S3 key, 100MB stored)
+
+    FolderWatcher->>CeleryBroker: 4. Dispatch async task<br/>task: process_file_from_folder<br/>args: {file_path, data_source_id}
+    CeleryBroker-->>FolderWatcher: Task queued (task_id)
+
+    FolderWatcher->>WatchFolder: 5. Move file<br/>watch_folder/demo.mp4<br/>→ _processed/demo.mp4
+    Note over FolderWatcher: Main thread continues,<br/>heavy processing happens async
+
+    CeleryBroker->>CeleryWorker: 6. Worker picks up task<br/>(from default queue)
+
+    CeleryWorker->>MinIO: 7. Download video from MinIO<br/>to temp file (/tmp/video_xxx.mp4)
+    MinIO-->>CeleryWorker: Video binary data (100MB)
+
+    CeleryWorker->>FFmpeg: 8. Extract audio<br/>ffmpeg -i video.mp4<br/>-acodec pcm_s16le<br/>-ar 16000 -ac 1<br/>output.wav
+    Note over FFmpeg: - Convert to 16kHz mono WAV<br/>- PCM format for Whisper<br/>- Preserve all audio
+    FFmpeg-->>CeleryWorker: WAV file<br/>(/tmp/audio_xxx.wav, ~15MB)
+
+    CeleryWorker->>Whisper: 9. Load Whisper model<br/>model='base' (or 'small'/'medium')
+    Note over Whisper: Model loaded to CPU/GPU<br/>(~140MB model file)
+    Whisper-->>CeleryWorker: Model ready
+
+    CeleryWorker->>Whisper: 10. Transcribe audio<br/>whisper.transcribe(<br/>  audio_file,<br/>  language='en',<br/>  word_timestamps=True<br/>)
+    Note over Whisper: Speech-to-text processing<br/>~1min video = ~10s processing<br/>15min video = ~2-3min
+    Whisper-->>CeleryWorker: Transcript with timestamps<br/>{<br/>  text: "full transcript...",<br/>  segments: [<br/>    {start: 0.0, end: 5.2, text: "..."},<br/>    {start: 5.2, end: 10.8, text: "..."},<br/>  ]<br/>}
+
+    CeleryWorker->>TextChunker: 11. Chunk transcript<br/>chunk_size=500 tokens<br/>overlap=50 tokens<br/>preserve_timestamps=True
+    Note over TextChunker: - Create time-aligned chunks<br/>- Each chunk has start/end time<br/>- Enable video citations
+    TextChunker-->>CeleryWorker: Timestamped chunks<br/>(e.g., 8 chunks for 15min video)<br/>[<br/>  {text: "...", start: 0.0, end: 112.5},<br/>  {text: "...", start: 95.0, end: 225.0},<br/>  ...<br/>]
+
+    CeleryWorker->>PostgreSQL: 12. Create document record<br/>INSERT INTO knowledge_documents<br/>(title='demo.mp4',<br/> content='full transcript',<br/> content_type='VIDEO_TRANSCRIPT',<br/> video_duration=900.0,<br/> metadata={duration, format})
+    PostgreSQL-->>CeleryWorker: Document ID (e.g., 456)
+
+    Note over CeleryWorker,Ollama: Generate embeddings for each timestamped chunk
+
+    loop For each chunk (e.g., 8 iterations)
+        CeleryWorker->>Ollama: 13. Generate embedding<br/>POST /api/embeddings<br/>model: nomic-embed-text<br/>text: chunk[i].text
+        Note over Ollama: Convert chunk to<br/>768-dimension vector
+        Ollama-->>CeleryWorker: Embedding vector<br/>[0.234, -0.567, ..., 0.890]
+
+        CeleryWorker->>PostgreSQL: 14. Store embedding + metadata<br/>INSERT INTO document_embeddings<br/>(document_id=456,<br/>chunk_index=i,<br/>chunk_text,<br/>embedding::vector(768))<br/><br/>UPDATE knowledge_documents<br/>SET video_start_time=chunk.start,<br/>    video_end_time=chunk.end<br/>WHERE id=456 AND chunk_index=i
+    end
+
+    PostgreSQL-->>CeleryWorker: All embeddings stored<br/>(8 rows with timestamps)
+
+    Note over PostgreSQL: pgvector index updated<br/>Video content now searchable<br/>with timestamp citations
+
+    CeleryWorker->>CeleryWorker: 15. Cleanup temp files<br/>rm /tmp/video_xxx.mp4<br/>rm /tmp/audio_xxx.wav
+
+    CeleryWorker->>CeleryWorker: 16. Mark task complete<br/>status: SUCCESS<br/>documents_processed: 1<br/>chunks_created: 8<br/>video_duration: 900s
+
+    CeleryWorker-->>CeleryBroker: Task result stored<br/>(in Redis DB 2)
+
+    Note over User,ProcessedFolder: ✅ Video fully searchable via RAG!<br/>Answers include timestamp citations<br/>(e.g., "At 2:15 in demo.mp4...")<br/><br/>Total time: ~4-7 minutes for 15min video
+
+```
+
+**Detailed Step Breakdown:**
+
+| Step | Component | Action | Duration | Details |
+|------|-----------|--------|----------|---------|
+| 1 | User | Drop file | Instant | User places video (MP4/AVI/MOV/MKV) in `watch_folder/` |
+| 2 | Folder Watcher | Detect | <1s | Watchdog detects video file extension |
+| 3 | Folder Watcher | Upload to MinIO | 10-30s | 100MB at ~10MB/s network speed |
+| 4 | Folder Watcher | Dispatch task | <0.1s | Celery task queued in Redis |
+| 5 | Folder Watcher | Move file | <0.1s | Moved to `_processed/` (no disk copy, just rename) |
+| 6 | Celery Worker | Pick task | <1s | Worker pulls task from queue |
+| 7 | Celery Worker | Download | 10-30s | Retrieve video from MinIO to `/tmp/` |
+| 8 | FFmpeg | Extract audio | 5-15s | Convert to 16kHz mono WAV (1min video = ~1s processing) |
+| 9 | Whisper | Load model | 2-5s | Load 140MB model file (cached after first use) |
+| 10 | Whisper | Transcribe | 2-5min | CPU: ~10-15s per minute of video<br/>GPU: ~2-3s per minute of video |
+| 11 | Text Chunker | Create chunks | 1-2s | Split transcript with timestamp preservation |
+| 12 | Celery Worker | Insert document | <1s | Store in `knowledge_documents` table |
+| 13-14 | Ollama + DB | Generate & store embeddings | 4-8s | ~0.5s per chunk × 8 chunks |
+| 15 | Celery Worker | Cleanup | <1s | Remove temp files (video + audio WAV) |
+| 16 | Celery Worker | Complete | <1s | Update job status, record metrics |
+
+**Total Processing Time:**
+- **100MB, 15-minute video (CPU):** ~4-7 minutes
+- **100MB, 15-minute video (GPU):** ~2-3 minutes
+
+**Key Features:**
+- ✅ **Timestamp Citations**: Each chunk preserves video timestamps
+- ✅ **Format Support**: MP4, AVI, MOV, MKV, WEBM, FLV, M4V
+- ✅ **Language**: English (can be configured for other languages)
+- ✅ **Model Options**: Whisper base/small/medium/large (configured via `WHISPER_MODEL`)
+
+---
+
+### Comparison: PDF vs Video Processing
+
+| Aspect | PDF Processing | Video Processing |
+|--------|---------------|------------------|
+| **Input Formats** | .pdf | .mp4, .avi, .mov, .mkv, .webm, .flv, .m4v |
+| **Extraction** | PyPDF2 text extraction | FFmpeg → Whisper transcription |
+| **Processing Time** | 30-60s (50-page PDF) | 4-7min (15min video, CPU) |
+| **Chunk Metadata** | Page numbers | Video timestamps (start/end) |
+| **Embedding Count** | ~1 per page (50 chunks) | ~1 per 2min (8 chunks for 15min) |
+| **Citations in Answers** | "Page 12 of manual.pdf" | "At 2:15 in demo.mp4" |
+| **Storage** | Text only | Transcript + original video in MinIO |
+| **Bottleneck** | Embedding generation | Whisper transcription (CPU-bound) |
+| **GPU Acceleration** | No | Yes (Whisper 5-10x faster with GPU) |
+
+---
+
+### Error Handling
+
+Both pipelines include comprehensive error handling:
+
+1. **File Validation**: Check file type and size before processing
+2. **Retry Logic**: Celery automatically retries failed tasks (3 attempts with exponential backoff)
+3. **Error Logging**: Failed tasks logged to `ingestion_jobs` table with error details
+4. **Cleanup**: Temp files removed even if processing fails
+5. **Status Tracking**: Real-time status available via admin dashboard
+
+**Monitor Processing:**
+```bash
+# Watch Celery worker logs
+docker logs knowledge_celery_worker -f
+
+# Check ingestion job status
+docker exec knowledge_postgres psql -U user -d knowledge_db -c "
+  SELECT id, status, documents_processed, documents_failed, error_message
+  FROM ingestion_jobs
+  ORDER BY started_at DESC
+  LIMIT 5;
+"
+```
+
+---
+
+
